@@ -43,7 +43,7 @@ export default function LoginPage() {
 
       // 🚀 الحل السحري: التوجيه أولاً وبشكل فوري لإنهاء التعليق القاتل
       const targetPath = data.user.role === "professional" ? "/dashboard" : "/search";
-      router.push(targetPath);
+      window.location.href = targetPath;
 
       // كسر الكاش وتحديث الجلسة بسلاسة تامة بعد بدء التوجيه
       setTimeout(() => {
