@@ -1,0 +1,117 @@
+{
+  "app": {
+    "name": "الدليل المهني",
+    "tagline": "اعثر على أفضل المحترفين — أو اعرض مهاراتك لأصحاب الشركات"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "search": "بحث",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "dashboard": "لوحتي",
+    "logout": "خروج"
+  },
+  "home": {
+    "browseProfessions": "تصفح حسب المهنة",
+    "featured": "محترفون مميزون"
+  },
+  "hero": {
+    "title": "الدليل المهني الشامل",
+    "subtitle": "منصة تجمع المحترفين بجميع المهن مع أصحاب الشركات الباحثين عن المواهب",
+    "searchPlaceholder": "ابحث بالاسم أو المهنة أو المهارة...",
+    "searchBtn": "بحث",
+    "ctaProfessional": "أنا محترف — أنشئ ملفي",
+    "ctaEmployer": "أنا صاحب شركة — ابحث عن موظف"
+  },
+  "professions": {
+    "programmer": "مبرمج",
+    "accountant": "محاسب",
+    "doctor": "طبيب",
+    "engineer": "مهندس",
+    "teacher": "معلم",
+    "designer": "مصمم",
+    "lawyer": "محامي",
+    "nurse": "ممرض/ة",
+    "chef": "طباخ",
+    "electrician": "كهربائي",
+    "plumber": "سباك",
+    "driver": "سائق",
+    "marketing": "تسويق",
+    "sales": "مبيعات",
+    "other": "أخرى"
+  },
+  "card": {
+    "viewProfile": "عرض الملف",
+    "rating": "التقييم",
+    "reviews": "تقييم",
+    "experience": "خبرة",
+    "location": "الموقع"
+  },
+  "search": {
+    "title": "نتائج البحث",
+    "filterProfession": "تصفية حسب المهنة",
+    "allProfessions": "جميع المهن",
+    "noResults": "لا توجد نتائج مطابقة",
+    "resultsCount": "{count} محترف"
+  },
+  "profile": {
+    "about": "نبذة",
+    "skills": "المهارات",
+    "workHistory": "العمل السابق",
+    "contact": "تواصل",
+    "rateThis": "قيّم هذا المحترف",
+    "yourRating": "تقييمك",
+    "comment": "تعليق (اختياري)",
+    "submitRating": "إرسال التقييم",
+    "loginToRate": "سجّل الدخول كصاحب شركة لتقييم المحترفين",
+    "alreadyRated": "لقد قيّمت هذا المحترف مسبقاً"
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب جديد",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "name": "الاسم الكامل",
+    "role": "نوع الحساب",
+    "roleProfessional": "محترف — أريد عرض مهاراتي",
+    "roleEmployer": "صاحب شركة — أبحث عن موظفين",
+    "loginBtn": "دخول",
+    "registerBtn": "إنشاء الحساب",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "errors": {
+      "invalidCredentials": "البريد أو كلمة المرور غير صحيحة",
+      "emailExists": "البريد الإلكتروني مستخدم مسبقاً",
+      "validation": "يرجى التحقق من البيانات المدخلة",
+      "nameShort": "الاسم يجب أن يكون حرفين على الأقل",
+      "emailInvalid": "البريد الإلكتروني غير صحيح",
+      "passwordShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+      "databaseUnavailable": "قاعدة البيانات غير متصلة. تأكد من تشغيل MongoDB ثم أعد المحاولة",
+      "generic": "حدث خطأ، حاول مرة أخرى"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "أدر ملفك المهني الإعلاني",
+    "photo": "الصورة الشخصية",
+    "profession": "المهنة",
+    "bio": "نبذة عنك",
+    "bioPlaceholder": "اكتب نبذة قصيرة عن خبراتك ومهاراتك...",
+    "skills": "المهارات (افصل بفاصلة)",
+    "location": "الموقع",
+    "phone": "رقم الهاتف",
+    "workHistory": "العمل السابق",
+    "addExperience": "إضافة خبرة عمل",
+    "company": "اسم الشركة",
+    "position": "المسمى الوظيفي",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "description": "الوصف",
+    "save": "حفظ التغييرات",
+    "saved": "تم الحفظ بنجاح",
+    "remove": "حذف"
+  },
+  "footer": {
+    "rights": "جميع الحقوق محفوظة"
+  }
+}
