@@ -3,24 +3,25 @@
 import { useState, useEffect, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 function RegisterForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"professional" | "employer">("professional");
+  const initialRole = (() => {
+    const r = searchParams.get("role");
+    return r === "employer" || r === "professional"
+      ? (r as "professional" | "employer")
+      : "professional";
+  })();
+
+  const [role, setRole] = useState<"professional" | "employer">(initialRole);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const r = searchParams.get("role");
-    if (r === "employer" || r === "professional") setRole(r);
-  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,9 +70,9 @@ function RegisterForm() {
     }
 
     if (role === "professional") {
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } else {
-      router.push("/search");
+      window.location.href = "/search";
     }
   }
 
