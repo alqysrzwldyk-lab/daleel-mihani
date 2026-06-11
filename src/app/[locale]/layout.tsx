@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
+export const dynamic = 'force-dynamic';
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
