@@ -17,8 +17,14 @@ export async function GET() {
   }
 
   let profile = null;
+  
+  // إذا كان المستخدم "محترف"، نجلب بياناته من موديل المحترفين
   if (user.role === "professional") {
     profile = await Professional.findOne({ userId: user._id });
+  } 
+  // إذا كان "شركة"، البيانات موجودة في نفس موديل User (أو أنك لا تحتاج لجلب موديل إضافي)
+  else if (user.role === "company") {
+    profile = user; // نستخدم بيانات المستخدم كأنها ملف تعريف للشركة
   }
 
   return NextResponse.json({
