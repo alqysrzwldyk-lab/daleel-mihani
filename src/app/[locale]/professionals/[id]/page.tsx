@@ -111,20 +111,19 @@ export default function ProfessionalProfilePage() {
 
         <div className="pt-20 px-8 pb-8">
           <h1 className="text-3xl font-bold">{professional.name}</h1>
-          
-          {/* 🟢 تم التعديل هنا: طباعة المهن المتعددة كبطاقات صغيرة (Chips) تفاعلية بدلاً من العنوان المشوه */}
+          {/* عرض المهن المتعددة بشكل احترافي تحت الاسم */}
           <div className="flex flex-wrap gap-2 mt-2">
-            {professionsList.length > 0 ? (
+            {professionsList && professionsList.length > 0 ? (
               professionsList.map((profKey) => {
                 const matched = PROFESSIONS.find((p) => p.key === profKey);
-                // إذا كانت المهنة معرفة بالنظام نترجمها، وإذا كانت يدوية نطبع النص المكتوب مباشرة
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const finalLabel = matched ? tProf(profKey as any) : profKey;
                 const finalIcon = matched ? matched.icon : "✨";
 
                 return (
                   <span 
                     key={profKey} 
-                    className="inline-flex items-center gap-1.5 bg-blue-50 text-[var(--primary)] border border-blue-100 px-3 py-1 rounded-full text-sm font-semibold shadow-2xs"
+                    className="inline-flex items-center gap-1.5 bg-blue-50 text-[var(--primary)] border border-blue-100 px-3 py-1 rounded-full text-sm font-semibold shadow-xs"
                   >
                     <span>{finalIcon}</span>
                     <span>{finalLabel}</span>
