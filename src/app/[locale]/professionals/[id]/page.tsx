@@ -111,6 +111,7 @@ export default function ProfessionalProfilePage() {
 
         <div className="pt-20 px-8 pb-8">
           <h1 className="text-3xl font-bold">{professional.name}</h1>
+          
           {/* عرض المهن المتعددة بشكل احترافي تحت الاسم */}
           <div className="flex flex-wrap gap-2 mt-2">
             {professionsList && professionsList.length > 0 ? (

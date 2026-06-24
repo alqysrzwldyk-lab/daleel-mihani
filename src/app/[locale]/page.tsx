@@ -139,7 +139,8 @@ async function getFeatured() {
     _id: String(p._id),
     name: p.name,
     photo: p.photo,
-    profession: p.profession,
+    // 🟢 تم الإصلاح هنا: تمرير الخاصية باسم professions كمصفوفة ليتوافق مع الـ Types والـ Card
+    professions: p.professions || [], 
     bio: p.bio,
     skills: p.skills,
     workExperience: p.workExperience,
