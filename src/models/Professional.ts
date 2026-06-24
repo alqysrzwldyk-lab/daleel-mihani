@@ -13,7 +13,7 @@ export interface IProfessional {
   userId: mongoose.Types.ObjectId;
   name: string;
   photo?: string;
-  profession: string;
+  professions: string[]; // 🟢 تم التحديث هنا إلى مصفوفة نصوص لدعم المهن المتعددة
   bio?: string;
   skills: string[];
   workExperience: IWorkExperience[];
@@ -43,7 +43,7 @@ const ProfessionalSchema = new Schema<IProfessional>(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     name: { type: String, required: true, trim: true },
     photo: { type: String },
-    profession: { type: String, required: true, index: true },
+    professions: { type: [String], default: [] }, // 🟢 تم التحديث هنا في قاعدة البيانات كمصفوفة وقيمة افتراضية فارغة لمنع الأخطاء
     bio: { type: String, maxlength: 1000 },
     skills: [{ type: String }],
     workExperience: [WorkExperienceSchema],
@@ -57,6 +57,7 @@ const ProfessionalSchema = new Schema<IProfessional>(
   { timestamps: true }
 );
 
-ProfessionalSchema.index({ name: "text", profession: "text", bio: "text", skills: "text" });
+// 🟢 تم التحديث هنا أيضاً ليشمل البحث النصي المهن المتعددة الجديدة بشكل صحيح
+ProfessionalSchema.index({ name: "text", professions: "text", bio: "text", skills: "text" });
 
 export const Professional = models.Professional || model<IProfessional>("Professional", ProfessionalSchema);

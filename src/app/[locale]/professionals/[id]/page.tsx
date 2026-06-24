@@ -15,6 +15,13 @@ type AuthUser = {
   role: "professional" | "employer";
 };
 
+// تعريف ممتد للـ TypeScript ليدعم الحقل الجديد كمصفوفة نصوص
+type ProfessionalExtended = Omit<ProfessionalPublic, "profession"> & {
+  professions?: string[];
+  profession?: string;
+  userRating?: number;
+};
+
 export default function ProfessionalProfilePage() {
   const t = useTranslations("profile");
   const tProf = useTranslations("professions");
@@ -22,7 +29,7 @@ export default function ProfessionalProfilePage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [professional, setProfessional] = useState<(ProfessionalPublic & { userRating?: number }) | null>(null);
+  const [professional, setProfessional] = useState<ProfessionalExtended | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -78,7 +85,16 @@ export default function ProfessionalProfilePage() {
     );
   }
 
-  const professionIcon = PROFESSIONS.find((p) => p.key === professional.profession)?.icon || "✨";
+  // استخراج مصفوفة المهن بأمان وتغطية الحسابات القديمة التي تملك مهنة واحدة فقط
+  const professionsList = Array.isArray(professional.professions)
+    ? professional.professions
+    : professional.profession
+    ? [professional.profession]
+    : [];
+
+  // أيقونة البداية (تأخذ أول مهنة متوفرة أو علامة افتراضية للغلاف البصري البسيط)
+  const firstProfKey = professionsList[0] || "";
+  const mainProfessionIcon = PROFESSIONS.find((p) => p.key === firstProfKey)?.icon || "💼";
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -88,18 +104,39 @@ export default function ProfessionalProfilePage() {
             {professional.photo ? (
               <Image src={professional.photo} alt={professional.name} width={128} height={128} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-100">{professionIcon}</div>
+              <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-100">{mainProfessionIcon}</div>
             )}
           </div>
         </div>
 
         <div className="pt-20 px-8 pb-8">
           <h1 className="text-3xl font-bold">{professional.name}</h1>
-          <p className="text-[var(--primary)] font-medium text-lg mt-1">
-            {professionIcon} {tProf(professional.profession as "programmer")}
-          </p>
+          
+          {/* 🟢 تم التعديل هنا: طباعة المهن المتعددة كبطاقات صغيرة (Chips) تفاعلية بدلاً من العنوان المشوه */}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {professionsList.length > 0 ? (
+              professionsList.map((profKey) => {
+                const matched = PROFESSIONS.find((p) => p.key === profKey);
+                // إذا كانت المهنة معرفة بالنظام نترجمها، وإذا كانت يدوية نطبع النص المكتوب مباشرة
+                const finalLabel = matched ? tProf(profKey as any) : profKey;
+                const finalIcon = matched ? matched.icon : "✨";
 
-          <div className="flex items-center gap-3 mt-3">
+                return (
+                  <span 
+                    key={profKey} 
+                    className="inline-flex items-center gap-1.5 bg-blue-50 text-[var(--primary)] border border-blue-100 px-3 py-1 rounded-full text-sm font-semibold shadow-2xs"
+                  >
+                    <span>{finalIcon}</span>
+                    <span>{finalLabel}</span>
+                  </span>
+                );
+              })
+            ) : (
+              <span className="text-slate-400 text-sm">لم يتم تحديد أي مهنة</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 mt-4">
             <RatingStars rating={professional.averageRating} />
             <span className="text-[var(--muted)] text-sm">
               ({professional.ratingCount} {tCard("reviews")})
@@ -129,7 +166,7 @@ export default function ProfessionalProfilePage() {
             </div>
           )}
 
-          {professional.skills?.length > 0 && (
+          {professional.skills && professional.skills.length > 0 && (
             <div className="mt-6">
               <h2 className="font-bold text-lg mb-3">{t("skills")}</h2>
               <div className="flex flex-wrap gap-2">
@@ -142,7 +179,7 @@ export default function ProfessionalProfilePage() {
             </div>
           )}
 
-          {professional.workExperience?.length > 0 && (
+          {professional.workExperience && professional.workExperience.length > 0 && (
             <div className="mt-6">
               <h2 className="font-bold text-lg mb-3">{t("workHistory")}</h2>
               <div className="space-y-4">

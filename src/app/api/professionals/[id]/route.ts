@@ -5,10 +5,11 @@ import { getAuthFromRequest } from "@/lib/auth";
 import { Professional, type IProfessional } from "@/models/Professional";
 import { Rating, type IRating } from "@/models/Rating";
 
+// 🟢 تم التحديث هنا في الـ Schema الخاص بـ Zod ليدعم مصفوفة نصوص بدلاً من نص مفرد
 const updateSchema = z.object({
   name: z.string().min(2).optional(),
   photo: z.string().optional(),
-  profession: z.string().min(1).optional(),
+  professions: z.array(z.string()).min(1).optional(), // تم تحويلها لمصفوفة نصوص
   bio: z.string().max(1000).optional(),
   skills: z.array(z.string()).optional(),
   workExperience: z
@@ -51,7 +52,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       _id: String(professional._id),
       name: professional.name,
       photo: professional.photo,
-      profession: professional.profession,
+      // 🟢 إرجاع المصفوفة للتأكد من توافق البيانات القديمة والجديدة
+      professions: professional.professions || [], 
       bio: professional.bio,
       skills: professional.skills,
       workExperience: professional.workExperience,
@@ -97,7 +99,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       _id: String(professional._id),
       name: professional.name,
       photo: professional.photo,
-      profession: professional.profession,
+      // 🟢 إرجاع القيمة المحدثة للمهن بنجاح
+      professions: professional.professions,
       bio: professional.bio,
       skills: professional.skills,
       workExperience: professional.workExperience,

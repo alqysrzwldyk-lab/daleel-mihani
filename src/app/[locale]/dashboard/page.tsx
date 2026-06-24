@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation"; 
-import { Plus, Trash2, Upload, CheckCircle, XCircle, Loader2, Save, MapPin, Phone, Briefcase } from "lucide-react";
+import { Plus, Trash2, Upload, CheckCircle, XCircle, Loader2, Save, MapPin, Phone, Briefcase, X } from "lucide-react";
 import { PROFESSIONS } from "@/lib/professions";
 
 type WorkExp = {
@@ -20,7 +20,7 @@ type Profile = {
   id: string;
   name: string;
   photo?: string;
-  profession: string;
+  professions: string[]; // تم تحويلها إلى مصفوفة لدعم المهن المتعددة
   bio?: string;
   skills: string[];
   workExperience: WorkExp[];
@@ -121,6 +121,10 @@ export default function DashboardPage() {
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // حالات خاصة بالتحكم بالمهن الجديدة المخصصة يدوياً
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customProfession, setCustomProfession] = useState("");
+
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => r.json())
@@ -130,11 +134,18 @@ export default function DashboardPage() {
           return;
         }
         if (d.profile) {
+          // التأكد من تحويل حقل المهن القديم (إذا كان نصاً واحداً) إلى مصفوفة لتفادي أخطاء التشغيل
+          const professionsArray = Array.isArray(d.profile.professions)
+            ? d.profile.professions
+            : d.profile.profession
+            ? [d.profile.profession]
+            : [];
+
           setProfile({
             id: d.profile.id || d.profile._id,
             name: d.profile.name,
             photo: d.profile.photo,
-            profession: d.profile.profession,
+            professions: professionsArray,
             bio: d.profile.bio,
             skills: d.profile.skills || [],
             workExperience: d.profile.workExperience || [],
@@ -166,6 +177,46 @@ export default function DashboardPage() {
       setUploading(false);
     }
   }
+
+  // دالة إضافة مهنة من القائمة المنسدلة
+  const handleProfessionSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (!profile) return;
+
+    if (value === "other") {
+      setShowCustomInput(true);
+    } else if (value && !profile.professions.includes(value)) {
+      setProfile({
+        ...profile,
+        professions: [...profile.professions, value]
+      });
+    }
+    e.target.value = ""; // إعادة القائمة المنسدلة للوضع الافتراضي
+  };
+
+  // دالة إضافة المهنة الحرة المكتوبة يدوياً للـ Chips
+  const handleAddCustomProfession = () => {
+    const trimmed = customProfession.trim();
+    if (!profile || !trimmed) return;
+
+    if (!profile.professions.includes(trimmed)) {
+      setProfile({
+        ...profile,
+        professions: [...profile.professions, trimmed]
+      });
+    }
+    setCustomProfession("");
+    setShowCustomInput(false);
+  };
+
+  // دالة حذف مهنة محددة من الـ Chips المختارة
+  const handleRemoveProfession = (profToRemove: string) => {
+    if (!profile) return;
+    setProfile({
+      ...profile,
+      professions: profile.professions.filter((p) => p !== profToRemove)
+    });
+  };
 
   function addExperience() {
     if (!profile) return;
@@ -207,7 +258,7 @@ export default function DashboardPage() {
         body: JSON.stringify({
           name: profile.name,
           photo: profile.photo,
-          profession: profile.profession,
+          professions: profile.professions, // حفظ المصفوفة الكاملة للمهن في السيرفر
           bio: profile.bio,
           skills: skillsText.split(",").map((s) => s.trim()).filter(Boolean),
           workExperience: profile.workExperience.filter((w) => w.company && w.position),
@@ -218,7 +269,6 @@ export default function DashboardPage() {
 
       if (res.ok) {
         setSaved(true);
-        // إخفاء إشعار الحفظ التلقائي بنعومة بعد 4 ثوانٍ
         setTimeout(() => setSaved(false), 4000);
       }
     } catch (err) {
@@ -240,7 +290,6 @@ export default function DashboardPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8" style={{ direction: "rtl" }}>
       
-      {/* شريط الإجراءات والطلبات الذكي المعزز بـ Suspense */}
       <Suspense fallback={<div className="h-20 bg-slate-50 rounded-2xl animate-pulse mb-6" />}>
         <HireActionBar />
       </Suspense>
@@ -285,20 +334,79 @@ export default function DashboardPage() {
 
         {/* الحقول النصية والأساسية */}
         <div className="space-y-5">
+          {/* قسم اختيار المهن المتعددة الحركي والمفتوح */}
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">{t("profession")}</label>
-            <div className="relative">
+            <div className="space-y-3">
               <select
-                value={profile.profession}
-                onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
+                onChange={handleProfessionSelect}
+                defaultValue=""
                 className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition"
               >
+                <option value="" disabled>-- اختر مهنة أو أضف مهنة جديدة --</option>
                 {PROFESSIONS.map((p) => (
-                  <option key={p.key} value={p.key}>
-                    {p.icon} {tProf(p.key)}
-                  </option>
+                  // إخفاء الخيارات المحددة مسبقاً من القائمة لجمالية التصفح
+                  !profile.professions.includes(p.key) && (
+                    <option key={p.key} value={p.key}>
+                      {p.icon} {tProf(p.key)}
+                    </option>
+                  )
                 ))}
+                <option value="other">✨ {tProf("other")} (كتابة مهنة غير مسجلة)</option>
               </select>
+
+              {/* حقل مخصص يظهر بشكل حركي ناعم فقط عند الضغط على "أخرى" لكتابة مهنة مخصصة */}
+              {showCustomInput && (
+                <div className="flex gap-2 animate-in fade-in zoom-in-95 duration-200">
+                  <input
+                    type="text"
+                    value={customProfession}
+                    onChange={(e) => setCustomProfession(e.target.value)}
+                    placeholder="اكتب اسم المهنة المخصصة هنا..."
+                    className="flex-1 bg-white border border-blue-300 rounded-xl px-4 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomProfession}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                  >
+                    إضافة
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowCustomInput(false); setCustomProfession(""); }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-3 py-2 rounded-xl transition"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              )}
+
+              {/* عرض المهن المحددة حالياً على هيئة بطاقات ذكية Chips قابلة للمسح */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {profile.professions.map((profKey) => {
+                  // محاولة العثور على اسم الأيقونة المناسب للمهن الثابتة، أو عرض أيقونة افتراضية لليدوية
+                  const matchedProf = PROFESSIONS.find((p) => p.key === profKey);
+                  const displayName = matchedProf ? tProf(profKey) : profKey;
+                  const displayIcon = matchedProf ? matchedProf.icon : "💼";
+
+                  return (
+                    <div
+                      key={profKey}
+                      className="flex items-center gap-2 bg-blue-50/70 border border-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-2xs animate-in zoom-in-90 duration-150"
+                    >
+                      <span>{displayIcon} {displayName}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveProfession(profKey)}
+                        className="p-0.5 hover:bg-blue-200/60 rounded-full text-blue-500 hover:text-blue-900 transition"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -341,7 +449,7 @@ export default function DashboardPage() {
                 <Phone className="w-4 h-4 text-slate-400" /> {t("phone")}
               </label>
               <input
-                type="document"
+                type="text"
                 value={profile.phone || ""}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                 className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 text-left tracking-wider focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition"
@@ -351,7 +459,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* قسم خبرات العمل المتطور والمحمي الحذف والتحميل */}
+        {/* قسم خبرات العمل */}
         <div className="pt-6 border-t border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold text-slate-900">{t("workHistory")}</h3>
@@ -424,7 +532,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* زر حفظ النموذج النهائي المعزز بحالة التحميل الاحترافية */}
+        {/* زر حفظ النموذج */}
         <button 
           type="submit" 
           disabled={saving} 
