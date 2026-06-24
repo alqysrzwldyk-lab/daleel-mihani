@@ -118,7 +118,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <h2 className="text-2xl font-bold mb-6">{tHome("featured")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {featured.map((pro) => (
-                <ProfessionalCard key={pro._id} professional={pro} />
+                <ProfessionalCard key={pro._id} professional={pro as any} />
               ))}
             </div>
           </>
@@ -139,7 +139,6 @@ async function getFeatured() {
     _id: String(p._id),
     name: p.name,
     photo: p.photo,
-    // 🟢 تم الإصلاح هنا: تمرير الخاصية باسم professions كمصفوفة ليتوافق مع الـ Types والـ Card
     professions: p.professions || [], 
     bio: p.bio,
     skills: p.skills,
