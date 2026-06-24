@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { getAuthFromRequest } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -25,16 +24,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "tooLarge" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // استخراج الامتداد وإنشاء اسم فريد للملف بناءً على معرف المستخدم والوقت
     const ext = file.name.split(".").pop() || "jpg";
     const filename = `${auth.userId}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, filename), buffer);
+    // الرفع المباشر إلى مخزن فيرسل بدلاً من الحفظ المحلي المقيد
+    const blob = await put(`uploads/${filename}`, file, {
+      access: "public",
+    });
 
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    // إرجاع الرابط السحابي الجديد ليعمل تلقائياً مع واجهتك الأمامية وقاعدة البيانات
+    return NextResponse.json({ url: blob.url });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "generic" }, { status: 500 });
