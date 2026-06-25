@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         _id: String(p._id),
         name: p.name,
         photo: p.photo,
-        profession: p.profession,
+        profession: p.professions,
         bio: p.bio,
         skills: p.skills,
         workExperience: p.workExperience,
