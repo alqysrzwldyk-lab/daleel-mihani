@@ -2,7 +2,7 @@ export type ProfessionalPublic = {
   _id: string;
   name: string;
   photo?: string;
-  profession: string;
+  profession: string[];
   bio?: string;
   skills: string[];
   workExperience: {

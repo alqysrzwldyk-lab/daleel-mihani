@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { Professional, type IProfessional } from "@/models/Professional";
+import { Professional } from "@/models/Professional";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,14 +15,19 @@ export async function GET(req: NextRequest) {
 
     const filter: Record<string, unknown> = { isActive: true };
 
+    // دعم البحث في المهن الفردية والمصفوفات معاً
     if (profession && profession !== "all") {
-      filter.profession = profession;
+      filter.$or = [
+        { profession: profession },
+        { professions: profession }
+      ];
     }
 
     if (q) {
       filter.$or = [
         { name: { $regex: q, $options: "i" } },
         { profession: { $regex: q, $options: "i" } },
+        { professions: { $regex: q, $options: "i" } },
         { bio: { $regex: q, $options: "i" } },
         { skills: { $regex: q, $options: "i" } },
         { location: { $regex: q, $options: "i" } },
@@ -34,24 +39,16 @@ export async function GET(req: NextRequest) {
         .sort({ averageRating: -1, ratingCount: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .lean<IProfessional[]>(),
+        .lean(), // تم إزالة الـ Generic الصارم
       Professional.countDocuments(filter),
     ]);
 
     return NextResponse.json({
-      data: data.map((p) => ({
+      data: (data as any[]).map((p) => ({
+        ...p,
         _id: String(p._id),
-        name: p.name,
-        photo: p.photo,
-        profession: p.professions,
-        bio: p.bio,
-        skills: p.skills,
-        workExperience: p.workExperience,
-        location: p.location,
-        phone: p.phone,
-        email: p.email,
-        averageRating: p.averageRating,
-        ratingCount: p.ratingCount,
+        professions: p.professions || (p.profession ? [p.profession] : []),
+        profession: p.profession || (p.professions?.[0] || ""),
       })),
       total,
       page,
