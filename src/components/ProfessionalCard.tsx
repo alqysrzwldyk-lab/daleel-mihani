@@ -8,7 +8,7 @@ import RatingStars from "./RatingStars";
 import { PROFESSIONS } from "@/lib/professions";
 
 type Props = {
-  professional: any; // تم تحويلها إلى any لمنع تعارض الأنظمة الصارمة أثناء الـ Build
+  professional: any; // لمنع تعارض الأنظمة الصارمة أثناء الـ Build
 };
 
 export default function ProfessionalCard({ professional }: Props) {
@@ -25,6 +25,9 @@ export default function ProfessionalCard({ professional }: Props) {
   const firstProfKey = professionsList[0] || "";
   const professionIcon = PROFESSIONS.find((p) => p.key === firstProfKey)?.icon || "✨";
   const expYears = professional.workExperience?.length || 0;
+
+  // توجيه آمن: نفضل الـ userId ليتوافق تماماً مع حماية التوظيف والـ Auth في صفحة البروفايل
+  const profileId = professional.userId || professional._id;
 
   return (
     <article className="bg-[var(--card)] rounded-2xl card-shadow transition-all duration-300 overflow-hidden border border-[var(--border)] group flex flex-col justify-between h-full">
@@ -93,7 +96,7 @@ export default function ProfessionalCard({ professional }: Props) {
         </div>
 
         <div className="flex items-center justify-center gap-2 mt-3">
-          <RatingStars rating={professional.averageRating} size="sm" />
+          <RatingStars rating={professional.averageRating || 0} size="sm" />
           {professional.ratingCount > 0 && (
             <span className="text-xs text-[var(--muted)]">
               ({professional.ratingCount} {t("reviews")})
@@ -102,7 +105,7 @@ export default function ProfessionalCard({ professional }: Props) {
         </div>
 
         <Link
-          href={`/professionals/${professional._id}`}
+          href={`/professionals/${profileId}`}
           className="mt-4 inline-block w-full btn-primary text-center text-sm"
         >
           {t("viewProfile")}

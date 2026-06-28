@@ -13,7 +13,8 @@ export interface IProfessional {
   userId: mongoose.Types.ObjectId;
   name: string;
   photo?: string;
-  professions: string[]; // 🟢 تم التحديث هنا إلى مصفوفة نصوص لدعم المهن المتعددة
+  profession?: string; // 🟢 إعادة إضافة الحقل المفرد للحفاظ على استقرار البحث والكروت القديمة
+  professions: string[]; // 🟢 مصفوفة النصوص لدعم المهن المتعددة الجديدة
   bio?: string;
   skills: string[];
   workExperience: IWorkExperience[];
@@ -43,7 +44,8 @@ const ProfessionalSchema = new Schema<IProfessional>(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     name: { type: String, required: true, trim: true },
     photo: { type: String },
-    professions: { type: [String], default: [] }, // 🟢 تم التحديث هنا في قاعدة البيانات كمصفوفة وقيمة افتراضية فارغة لمنع الأخطاء
+    profession: { type: String, default: "" }, // 🟢 تفعيل الحقل في قاعدة البيانات
+    professions: { type: [String], default: [] }, // مصفوفة المهن المتعددة
     bio: { type: String, maxlength: 1000 },
     skills: [{ type: String }],
     workExperience: [WorkExperienceSchema],
@@ -57,7 +59,7 @@ const ProfessionalSchema = new Schema<IProfessional>(
   { timestamps: true }
 );
 
-// 🟢 تم التحديث هنا أيضاً ليشمل البحث النصي المهن المتعددة الجديدة بشكل صحيح
-ProfessionalSchema.index({ name: "text", professions: "text", bio: "text", skills: "text" });
+// البحث النصي يغطي الحقلين لضمان عدم سقوط أي مهني من نتائج البحث
+ProfessionalSchema.index({ name: "text", profession: "text", professions: "text", bio: "text", skills: "text" });
 
 export const Professional = models.Professional || model<IProfessional>("Professional", ProfessionalSchema);

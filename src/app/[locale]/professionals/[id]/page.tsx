@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { MapPin, Mail, Phone, Briefcase } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
-import HireModal from "@/components/HireModal"; // 1. استيراد مكون نافذة التوظيف
+import HireModal from "@/components/HireModal"; 
 import type { ProfessionalPublic } from "@/lib/api";
 import { PROFESSIONS } from "@/lib/professions";
 
@@ -15,7 +15,6 @@ type AuthUser = {
   role: "professional" | "employer";
 };
 
-// تعريف ممتد للـ TypeScript ليدعم الحقل الجديد كمصفوفة نصوص
 type ProfessionalExtended = Omit<ProfessionalPublic, "profession"> & {
   professions?: string[];
   profession?: string;
@@ -92,7 +91,6 @@ export default function ProfessionalProfilePage() {
     ? [professional.profession]
     : [];
 
-  // أيقونة البداية (تأخذ أول مهنة متوفرة أو علامة افتراضية للغلاف البصري البسيط)
   const firstProfKey = professionsList[0] || "";
   const mainProfessionIcon = PROFESSIONS.find((p) => p.key === firstProfKey)?.icon || "💼";
 
@@ -112,12 +110,11 @@ export default function ProfessionalProfilePage() {
         <div className="pt-20 px-8 pb-8">
           <h1 className="text-3xl font-bold">{professional.name}</h1>
           
-          {/* 🟢 تم التعديل هنا: طباعة المهن المتعددة كبطاقات صغيرة (Chips) تفاعلية بدلاً من العنوان المشوه */}
+          {/* طباعة المهن المتعددة كبطاقات صغيرة (Chips) تفاعلية من خلال مفاتيح الترجمة المباشرة */}
           <div className="flex flex-wrap gap-2 mt-2">
             {professionsList.length > 0 ? (
               professionsList.map((profKey) => {
                 const matched = PROFESSIONS.find((p) => p.key === profKey);
-                // إذا كانت المهنة معرفة بالنظام نترجمها، وإذا كانت يدوية نطبع النص المكتوب مباشرة
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const finalLabel = matched ? tProf(profKey as any) : profKey;
                 const finalIcon = matched ? matched.icon : "✨";
@@ -138,9 +135,9 @@ export default function ProfessionalProfilePage() {
           </div>
 
           <div className="flex items-center gap-3 mt-4">
-            <RatingStars rating={professional.averageRating} />
+            <RatingStars rating={professional.averageRating || 0} />
             <span className="text-[var(--muted)] text-sm">
-              ({professional.ratingCount} {tCard("reviews")})
+              ({professional.ratingCount || 0} {tCard("reviews")})
             </span>
           </div>
 
@@ -150,11 +147,10 @@ export default function ProfessionalProfilePage() {
             </p>
           )}
 
-          {/* 2. عرض زر "طلب توظيف" هنا إذا كان المستخدم المسجل هو صاحب شركة (Employer) */}
           {user && user.role === "employer" && (
             <div className="mt-6 max-w-xs">
               <HireModal 
-                professionalId={professional._id || id} 
+                professionalId={String(professional._id) || id} 
                 professionalName={professional.name} 
               />
             </div>

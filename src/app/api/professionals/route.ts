@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     const filter: Record<string, unknown> = { isActive: true };
 
-    // دعم البحث في المهن الفردية والمصفوفات معاً
+    // دعم كامل ومضمون للبحث بالفلاتر سواء كانت المهنة مخزنة كمصفوفة أو كحقل مفرد
     if (profession && profession !== "all") {
       filter.$or = [
         { profession: profession },
@@ -39,17 +39,26 @@ export async function GET(req: NextRequest) {
         .sort({ averageRating: -1, ratingCount: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .lean(), // تم إزالة الـ Generic الصارم
+        .lean(),
       Professional.countDocuments(filter),
     ]);
 
-    return NextResponse.json({
-      data: (data as any[]).map((p) => ({
+    // معالجة وتأمين البيانات الراجعة للـ Client لضمان ملء المصفوفة والحقل المفرد بشكل متبادل
+    const mappedData = (data as any[]).map((p) => {
+      const professionsArray = Array.isArray(p.professions) ? p.professions : [];
+      const singleProf = p.profession || professionsArray[0] || "";
+      const finalArray = professionsArray.length > 0 ? professionsArray : (singleProf ? [singleProf] : []);
+
+      return {
         ...p,
         _id: String(p._id),
-        professions: p.professions || (p.profession ? [p.profession] : []),
-        profession: p.profession || (p.professions?.[0] || ""),
-      })),
+        professions: finalArray,
+        profession: singleProf,
+      };
+    });
+
+    return NextResponse.json({
+      data: mappedData,
       total,
       page,
       totalPages: Math.ceil(total / limit),
