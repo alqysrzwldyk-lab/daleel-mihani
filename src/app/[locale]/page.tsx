@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import SearchBar from "@/components/SearchBar";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { connectDB } from "@/lib/mongodb";
-import { Professional, type IProfessional } from "@/models/Professional";
+import { Professional } from "@/models/Professional";
 import { PROFESSIONS } from "@/lib/professions";
 import { getAuthFromCookies } from "@/lib/auth"; // استيراد دالة التحقق من الجلسة
 import { User } from "@/models/User"; // استيراد موديل المستخدم لمعرفة الـ Role
@@ -129,25 +129,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 }
 
 async function getFeatured() {
-  await connectDB();
-  const data = await Professional.find({ isActive: true })
-    .sort({ averageRating: -1, ratingCount: -1 })
-    .limit(8)
-    .lean<IProfessional[]>();
+  await connectDB(); //
+  
+  const data = await Professional.find({ isActive: true }) //
+    .sort({ averageRating: -1, ratingCount: -1 }) //
+    .limit(8) //
+    .lean(); //
+  
+  return data.map((p: any) => {
+    // تأمين ومعالجة المهن للكروت الخارجية هنا أيضاً
+    const professionsArray = Array.isArray(p.professions) ? p.professions : [];
+    const singleProf = p.profession || professionsArray[0] || "";
+    const finalArray = professionsArray.length > 0 ? professionsArray : (singleProf ? [singleProf] : []);
 
-  return data.map((p) => ({
-    _id: String(p._id),
-    name: p.name,
-    photo: p.photo,
-    // 🟢 تم الإصلاح هنا: تمرير الخاصية باسم professions كمصفوفة ليتوافق مع الـ Types والـ Card
-    professions: p.professions || [], 
-    bio: p.bio,
-    skills: p.skills,
-    workExperience: p.workExperience,
-    location: p.location,
-    phone: p.phone,
-    email: p.email,
-    averageRating: p.averageRating,
-    ratingCount: p.ratingCount,
-  }));
+    return {
+      _id: String(p._id), //
+      name: p.name, //
+      photo: p.photo, //
+      userId: p.userId ? String(p.userId) : String(p._id),
+      bio: p.bio || "",
+      location: p.location || "",
+      averageRating: p.averageRating || 0,
+      ratingCount: p.ratingCount || 0,
+      workExperience: p.workExperience || [],
+      professions: finalArray,
+      profession: singleProf,
+    };
+  });
 }
