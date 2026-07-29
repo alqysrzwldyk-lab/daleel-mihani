@@ -126,22 +126,57 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           ))}
 
           {ads.length > 0 && (
-            <section className="mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-extrabold flex items-center gap-2">
-                  <span>📢</span>
-                  <span>الإعلانات</span>
-                </h3>
-                <Link href="/search" className="text-sm text-primary font-semibold">
-                  عرض الكل ←
-                </Link>
-              </div>
-              <div className="h-scroll">
-                {ads.map((ad) => (
-                  <AdCard key={ad._id} ad={ad} />
-                ))}
-              </div>
-            </section>
+            <>
+              {/* Commercial ads */}
+              {(() => {
+                const commercial = ads.filter((a) => a.type === "general");
+                if (commercial.length === 0) return null;
+                const grouped = groupAdsByCategory(commercial);
+                return Object.entries(grouped).map(([cat, items]) => (
+                  <section key={cat} className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-extrabold flex items-center gap-2">
+                        <span>{cat}</span>
+                        <span className="badge badge-warning text-[10px]">إعلان تجاري</span>
+                      </h3>
+                      <Link href={`/ads`} className="text-sm text-primary font-semibold">
+                        الكل ←
+                      </Link>
+                    </div>
+                    <div className="h-scroll">
+                      {items.map((ad) => (
+                        <AdCard key={ad._id} ad={ad} />
+                      ))}
+                    </div>
+                  </section>
+                ));
+              })()}
+
+              {/* Professional ads */}
+              {(() => {
+                const professional = ads.filter((a) => a.type === "professional");
+                if (professional.length === 0) return null;
+                const grouped = groupAdsByCategory(professional);
+                return Object.entries(grouped).map(([cat, items]) => (
+                  <section key={cat} className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-extrabold flex items-center gap-2">
+                        <span>{cat}</span>
+                        <span className="badge badge-primary text-[10px]">خدمة مهنية</span>
+                      </h3>
+                      <Link href={`/ads`} className="text-sm text-primary font-semibold">
+                        الكل ←
+                      </Link>
+                    </div>
+                    <div className="h-scroll">
+                      {items.map((ad) => (
+                        <AdCard key={ad._id} ad={ad} />
+                      ))}
+                    </div>
+                  </section>
+                ));
+              })()}
+            </>
           )}
         </div>
       </section>
@@ -193,6 +228,31 @@ async function getAllAds() {
     location: ad.location || "",
     images: ad.images || [],
   }));
+}
+
+const AD_CATEGORY_LABELS: Record<string, string> = {
+  cars: "سيارات",
+  lands: "عقارات",
+  electronics: "إلكترونيات",
+  furniture: "أثاث",
+  "home-tools": "أدوات منزلية",
+  weapons: "سلاح",
+  services: "خدمات",
+  programming: "برمجة",
+  accounting: "محاسبة",
+  design: "تصميم",
+  teaching: "تدريس",
+  other: "أخرى",
+};
+
+function groupAdsByCategory(items: Awaited<ReturnType<typeof getAllAds>>) {
+  const map: Record<string, typeof items> = {};
+  for (const ad of items) {
+    const key = AD_CATEGORY_LABELS[ad.category] || ad.category;
+    if (!map[key]) map[key] = [];
+    map[key].push(ad);
+  }
+  return map;
 }
 
 function groupByProfession(all: Awaited<ReturnType<typeof getAllProfessionals>>) {

@@ -8,8 +8,16 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "الدليل المهني",
-  description: "منصة الدليل المهني — اعثر على المحترفين أو اعرض مهاراتك لأصحاب الشركات",
+  title: 'الدليل المهني - كل المهنيين في مكان واحد',
+  description: 'منصة تجمع المهنيين، الحرفيين، الطلاب، والخبراء مع أصحاب الأعمال لتسهيل الوصول إلى الكفاءات وبناء فرص مهنية حقيقية.',
+  openGraph: {
+    title: 'الدليل المهني - كل المهنيين في مكان واحد',
+    description: 'منصة تجمع المهنيين، الحرفيين، الطلاب، والخبراء مع أصحاب الأعمال لتسهيل الوصول إلى الكفاءات.',
+    url: 'https://daleel-mihani-azzam-s-projects5.vercel.app',
+    siteName: 'الدليل المهني',
+    locale: 'ar_AR',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

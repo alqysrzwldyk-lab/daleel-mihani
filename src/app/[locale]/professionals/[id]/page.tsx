@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MapPin, Mail, Phone, Briefcase, Star, ArrowLeft } from "lucide-react";
+import { MapPin, Mail, Phone, Briefcase, Star, ArrowLeft, MessageSquare, Loader2 } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
 import HireModal from "@/components/HireModal";
 import type { ProfessionalPublic } from "@/lib/api";
@@ -123,14 +123,37 @@ export default function ProfessionalProfilePage() {
             )}
           </div>
 
-          {user?.role === "employer" && (
-            <div className="mt-5">
-              <HireModal
-                professionalId={professional._id || id}
-                professionalName={professional.name}
-              />
-            </div>
-          )}
+          <div className="mt-5 flex gap-2">
+            {user?.role === "employer" && (
+              <div className="flex-1">
+                <HireModal
+                  professionalId={professional._id || id}
+                  professionalName={professional.name}
+                />
+              </div>
+            )}
+            <button
+              onClick={async () => {
+                if (!user) { router.push("/login"); return; }
+                const res = await fetch("/api/messages", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    receiverId: professional._id || id,
+                    content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
+                    refType: "professional",
+                    refId: professional._id || id,
+                  }),
+                });
+                const data = await res.json();
+                if (res.ok) router.push(`/messages/${data.conversationId}`);
+              }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary/30 text-primary font-bold text-sm hover:bg-primary/5 transition"
+            >
+              <MessageSquare className="w-4 h-4" />
+              أرسل رسالة
+            </button>
+          </div>
 
           {professional.bio && (
             <div className="mt-5">

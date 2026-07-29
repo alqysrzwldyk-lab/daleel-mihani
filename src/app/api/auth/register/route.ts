@@ -4,7 +4,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Professional } from "@/models/Professional";
-import { signToken, setAuthCookie } from "@/lib/auth";
+import { signToken, attachAuthCookie } from "@/lib/auth";
 import { registerSchema, validationMessageKey } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
@@ -44,9 +44,7 @@ export async function POST(req: NextRequest) {
       role: user.role,
     });
 
-    await setAuthCookie(token);
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         id: user._id.toString(),
         name: user.name,
@@ -54,6 +52,9 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
     });
+
+    attachAuthCookie(response, token);
+    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

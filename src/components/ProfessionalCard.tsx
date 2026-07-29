@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MapPin, Briefcase, Star } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { MapPin, Briefcase, Star, MessageSquare } from "lucide-react";
+import { Link, useRouter } from "@/i18n/navigation";
 import type { ProfessionalPublic } from "@/lib/api";
 import { getProfessionIcon, getProfessionArabic } from "@/lib/professions";
 
@@ -13,6 +14,8 @@ type Props = {
 
 export default function ProfessionalCard({ professional }: Props) {
   const t = useTranslations("card");
+  const router = useRouter();
+  const [sending, setSending] = useState(false);
 
   const profs = professional.professions?.length ? professional.professions : [professional.profession || "other"];
   const mainProfession = profs[0];
@@ -99,6 +102,37 @@ export default function ProfessionalCard({ professional }: Props) {
               ))}
             </div>
           )}
+
+          <button
+            onClick={async (e) => {
+              e.preventDefault();
+              setSending(true);
+              try {
+                const res = await fetch("/api/auth/me");
+                const d = await res.json();
+                if (!d.user) { router.push("/login"); return; }
+                const msgRes = await fetch("/api/messages", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    receiverId: professional._id,
+                    content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
+                    refType: "professional",
+                    refId: professional._id,
+                  }),
+                });
+                const msgData = await msgRes.json();
+                if (msgRes.ok) {
+                  router.push(`/messages/${msgData.conversationId}`);
+                }
+              } catch {}
+              setSending(false);
+            }}
+            className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 bg-primary/5 hover:bg-primary/10 text-primary rounded-xl text-xs font-bold transition"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            {sending ? "جاري..." : "تواصل"}
+          </button>
         </div>
       </article>
     </Link>

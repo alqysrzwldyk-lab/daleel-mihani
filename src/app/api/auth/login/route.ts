@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { signToken, setAuthCookie } from "@/lib/auth";
+import { signToken, attachAuthCookie } from "@/lib/auth";
 import { loginSchema, validationMessageKey } from "@/lib/validation";
 import { isRateLimited } from "@/lib/rateLimit"; // 💡 استيراد نظام الحماية
 
@@ -44,9 +44,7 @@ export async function POST(req: NextRequest) {
       role: user.role,
     });
 
-    await setAuthCookie(token);
-
-    // 6. 💡 إنشاء الاستجابة وإضافة ترويسات تمنع الكاش تماماً لضمان تحديث الجلسة فوراً
+    // 6. 💡 إنشاء الاستجابة مع الكوكي وترويسات تمنع الكاش
     const response = NextResponse.json({
       user: {
         id: user._id.toString(),
@@ -56,6 +54,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    attachAuthCookie(response, token);
     response.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
     return response;
 

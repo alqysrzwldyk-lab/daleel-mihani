@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import {
   Home, Mail, Bell, Megaphone, User, LayoutDashboard, Briefcase,
-  Globe, LogOut, X, Building2, ChevronLeft, Settings
+  Globe, LogOut, X, Building2, ChevronLeft, Settings, Wallet, Star
 } from "lucide-react";
 
 type AuthUser = {
@@ -28,6 +28,26 @@ export default function UserMenu({
   hasProfile: boolean;
 }) {
   const [animating, setAnimating] = useState(false);
+  const [balance, setBalance] = useState<number | null>(null);
+
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    if (open) {
+      fetch("/api/wallet")
+        .then((r) => r.json())
+        .then((d) => { if (d.wallet) setBalance(d.wallet.balance); })
+        .catch(() => {});
+      fetch("/api/messages")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.conversations) {
+            setUnreadMessages(d.conversations.reduce((s: number, c: { unread: number }) => s + (c.unread || 0), 0));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -61,8 +81,16 @@ export default function UserMenu({
           <div className="usermenu-user-info">
             <div className="usermenu-user-name">{user.name}</div>
             <div className="usermenu-user-email">{user.email}</div>
-            <div className="usermenu-role-badge">
-              {user.role === "professional" ? "محترف" : "صاحب عمل"}
+            <div className="flex items-center gap-2 mt-1">
+              <span className="usermenu-role-badge">
+                {user.role === "professional" ? "محترف" : "صاحب عمل"}
+              </span>
+              {balance !== null && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <Wallet className="w-3 h-3" />
+                  {balance.toLocaleString()} ﷼
+                </span>
+              )}
             </div>
           </div>
           <button
@@ -86,7 +114,7 @@ export default function UserMenu({
             <span className="usermenu-item-text">المهنيون</span>
           </Link>
 
-          <Link href="/search?type=ad" className="usermenu-item" onClick={handleClose}>
+          <Link href="/ads" className="usermenu-item" onClick={handleClose}>
             <Megaphone className="usermenu-item-icon" />
             <span className="usermenu-item-text">الإعلانات</span>
           </Link>
@@ -100,11 +128,15 @@ export default function UserMenu({
             <span className="usermenu-item-text">الإشعارات</span>
           </Link>
 
-          <div className="usermenu-item opacity-40" onClick={(e) => e.preventDefault()}>
+          <Link href="/messages" className="usermenu-item" onClick={handleClose}>
             <Mail className="usermenu-item-icon" />
             <span className="usermenu-item-text">الرسائل</span>
-            <span className="usermenu-item-badge">قريباً</span>
-          </div>
+            {unreadMessages > 0 && (
+              <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                {unreadMessages}
+              </span>
+            )}
+          </Link>
 
           <div className="usermenu-divider" />
 
@@ -130,6 +162,19 @@ export default function UserMenu({
           <Link href="/profile" className="usermenu-item" onClick={handleClose}>
             <Settings className="usermenu-item-icon" />
             <span className="usermenu-item-text">الحساب</span>
+          </Link>
+
+          <Link href="/wallet" className="usermenu-item" onClick={handleClose}>
+            <Wallet className="usermenu-item-icon" />
+            <span className="usermenu-item-text">المحفظة</span>
+            {balance !== null && (
+              <span className="text-xs font-bold text-emerald-600">{balance.toLocaleString()} ﷼</span>
+            )}
+          </Link>
+
+          <Link href="/subscription" className="usermenu-item" onClick={handleClose}>
+            <Star className="usermenu-item-icon" />
+            <span className="usermenu-item-text">الباقة المميزة</span>
           </Link>
 
           <Link href="/dashboard/my-ads" className="usermenu-item" onClick={handleClose}>

@@ -15,7 +15,7 @@ const cards = [
     desc: "تصفح جميع المهنيين والحرفيين",
   },
   {
-    href: "/search?type=ad",
+    href: "/ads",
     icon: Megaphone,
     color: "orange",
     title: "الإعلانات",
