@@ -7,7 +7,7 @@ export default function Footer() {
   const tApp = useTranslations("app");
 
   return (
-    <footer className="bg-slate-900 text-slate-300 py-8 mt-auto">
+    <footer className="desktop-only bg-slate-900 text-slate-300 py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 text-center">
         <p className="font-semibold text-white mb-1">{tApp("name")}</p>
         <p className="text-sm">{tApp("tagline")}</p>

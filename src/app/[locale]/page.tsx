@@ -1,145 +1,166 @@
-import { Link } from "@/i18n/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import SearchBar from "@/components/SearchBar";
-import ProfessionalCard from "@/components/ProfessionalCard";
 import { connectDB } from "@/lib/mongodb";
 import { Professional, type IProfessional } from "@/models/Professional";
+import { Ad } from "@/models/Ad";
 import { PROFESSIONS } from "@/lib/professions";
-import { getAuthFromCookies } from "@/lib/auth"; // استيراد دالة التحقق من الجلسة
-import { User } from "@/models/User"; // استيراد موديل المستخدم لمعرفة الـ Role
+import { getAuthFromCookies } from "@/lib/auth";
+import { User } from "@/models/User";
+import HeroSection from "@/components/landing/HeroSection";
+import StatsSection from "@/components/landing/StatsSection";
+import ProfessionsGrid from "@/components/landing/ProfessionsGrid";
+import FeaturesSection from "@/components/landing/FeaturesSection";
+import HowItWorks from "@/components/landing/HowItWorks";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import WhyChooseUs from "@/components/landing/WhyChooseUs";
+import CtaSection from "@/components/landing/CtaSection";
+import LandingFooter from "@/components/landing/LandingFooter";
+import ProfessionalCard from "@/components/ProfessionalCard";
+import AdCard from "@/components/AdCard";
+import { Link } from "@/i18n/navigation";
+import { getTranslations as getHomeTranslations } from "next-intl/server";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("hero");
-  const tHome = await getTranslations("home");
-  const tProf = await getTranslations("professions");
+  const tHome = await getHomeTranslations("home");
 
-  // فحص حالة الجلسة، الدور، والملف التعريفي مباشرة على السيرفر
   let isLoggedIn = false;
   let userRole: "professional" | "employer" | null = null;
-  let hasProfile = false;
 
   try {
     const auth = await getAuthFromCookies();
     if (auth?.userId) {
       isLoggedIn = true;
       await connectDB();
-      
-      // جلب بيانات المستخدم لمعرفة صلاحيته (مهني أم صاحب شركة)
       const user = await User.findById(auth.userId);
-      if (user) {
-        userRole = user.role;
-        
-        // إذا كان مهني، نفحص هل أنشأ ملفه التعريفي أم لا
-        if (userRole === "professional") {
-          const profile = await Professional.findOne({ userId: auth.userId });
-          hasProfile = !!profile;
-        }
-      }
+      if (user) userRole = user.role;
     }
-  } catch (error) {
-    console.error("Error checking auth status:", error);
+  } catch {}
+
+  let professionals: Awaited<ReturnType<typeof getAllProfessionals>> = [];
+  let ads: Awaited<ReturnType<typeof getAllAds>> = [];
+
+  try {
+    [professionals, ads] = await Promise.all([
+      getAllProfessionals(),
+      getAllAds(),
+    ]);
+  } catch {
+    professionals = [];
+    ads = [];
   }
 
-  let featured: Awaited<ReturnType<typeof getFeatured>> = [];
-  try {
-    featured = await getFeatured();
-  } catch {
-    featured = [];
-  }
+  const grouped = groupByProfession(professionals);
 
   return (
     <>
-      <section className="gradient-hero text-white py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("title")}</h1>
-          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">{t("subtitle")}</p>
-          <SearchBar variant="hero" />
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-            {/* السيناريو الأول: المستخدم غير مسجل دخول من الأساس (عرض الأزرار الافتراضية) */}
-            {!isLoggedIn && (
-              <>
-                <Link href="/register?role=professional" className="btn-outline">
-                  {t("ctaProfessional")}
-                </Link>
-                <Link href="/register?role=employer" className="btn-outline">
-                  {t("ctaEmployer")}
-                </Link>
-              </>
-            )}
+      <HeroSection isLoggedIn={isLoggedIn} />
 
-            {/* السيناريو الثاني: المسجل هو "مهني" (Professional) */}
-            {isLoggedIn && userRole === "professional" && (
-              hasProfile ? (
-                <Link href="/dashboard" className="btn-outline bg-white text-blue-600 hover:bg-gray-100">
-                  الانتقال إلى لوحتي (مهني)
-                </Link>
-              ) : (
-                <Link href="/create-profile" className="btn-outline bg-green-600 text-white hover:bg-green-700">
-                  أنا محترف — أنشئ ملفي الآن
-                </Link>
-              )
-            )}
+      <StatsSection />
 
-            {/* السيناريو الثالث: المسجل هو "صاحب شركة / صاحب عمل" (Employer) */}
-            {isLoggedIn && userRole === "employer" && (
-              <>
-                <Link href="/dashboard" className="btn-outline bg-white text-blue-600 hover:bg-gray-100">
-                  لوحة تحكم الشركات
-                </Link>
-                <Link href="/search" className="btn-outline">
-                  ابحث عن محترفين موظفين
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+      <FeaturesSection />
 
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">{tHome("browseProfessions")}</h2>
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {PROFESSIONS.slice(0, 8).map((p) => (
-            <Link
-              key={p.key}
-              href={`/search?profession=${p.key}`}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-[var(--border)] hover:border-[var(--primary)] hover:shadow-md transition"
-            >
-              <span className="text-xl">{p.icon}</span>
-              <span className="font-medium text-sm">{tProf(p.key)}</span>
-            </Link>
+      <HowItWorks />
+
+      <ProfessionsGrid />
+
+      <TestimonialsSection />
+
+      <WhyChooseUs />
+
+      <CtaSection isLoggedIn={isLoggedIn} />
+
+      {/* Existing data sections */}
+      <section className="py-8">
+        <div className="page-container">
+          {grouped.length > 0 && (
+            <section className="mb-8">
+              <h2 className="text-xl font-extrabold mb-4">{tHome("browseProfessions")}</h2>
+              <div className="h-scroll">
+                {grouped.map(({ key, icon, arabic, count }) => (
+                  <Link
+                    key={key}
+                    href={`/search?profession=${key}`}
+                    className="app-card app-card-hover flex flex-col items-center justify-center p-3 gap-1 text-center h-scroll-card"
+                    style={{ width: 120, minWidth: 120 }}
+                  >
+                    <span className="text-2xl">{icon}</span>
+                    <span className="text-xs font-semibold text-muted">{arabic}</span>
+                    <span className="text-[10px] text-muted-light">{count}</span>
+                  </Link>
+                ))}
+                <Link
+                  href="/search"
+                  className="app-card app-card-hover flex flex-col items-center justify-center p-3 gap-1 text-center h-scroll-card"
+                  style={{ width: 100, minWidth: 100 }}
+                >
+                  <span className="text-sm font-bold text-primary">عرض الكل</span>
+                  <span className="text-xs">←</span>
+                </Link>
+              </div>
+            </section>
+          )}
+
+          {grouped.map(({ key, icon, arabic, list }) => (
+            <section key={key} className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-extrabold flex items-center gap-2">
+                  <span>{icon}</span>
+                  <span>{arabic}</span>
+                </h3>
+                <Link href={`/search?profession=${key}`} className="text-sm text-primary font-semibold">
+                  عرض الكل ←
+                </Link>
+              </div>
+              <div className="h-scroll">
+                {list.map((pro) => (
+                  <div key={pro._id} className="h-scroll-card h-scroll-card-wide">
+                    <ProfessionalCard professional={pro} />
+                  </div>
+                ))}
+              </div>
+            </section>
           ))}
-        </div>
 
-        {featured.length > 0 && (
-          <>
-            <h2 className="text-2xl font-bold mb-6">{tHome("featured")}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {featured.map((pro) => (
-                <ProfessionalCard key={pro._id} professional={pro} />
-              ))}
-            </div>
-          </>
-        )}
+          {ads.length > 0 && (
+            <section className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-extrabold flex items-center gap-2">
+                  <span>📢</span>
+                  <span>الإعلانات</span>
+                </h3>
+                <Link href="/search" className="text-sm text-primary font-semibold">
+                  عرض الكل ←
+                </Link>
+              </div>
+              <div className="h-scroll">
+                {ads.map((ad) => (
+                  <AdCard key={ad._id} ad={ad} />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </section>
+
+      <LandingFooter />
     </>
   );
 }
 
-async function getFeatured() {
+async function getAllProfessionals() {
   await connectDB();
   const data = await Professional.find({ isActive: true })
     .sort({ averageRating: -1, ratingCount: -1 })
-    .limit(8)
+    .limit(50)
     .lean<IProfessional[]>();
 
   return data.map((p) => ({
     _id: String(p._id),
     name: p.name,
     photo: p.photo,
-    profession: p.profession,
+    professions: p.professions,
+    profession: p.professions?.[0] || "other",
     bio: p.bio,
     skills: p.skills,
     workExperience: p.workExperience,
@@ -149,4 +170,47 @@ async function getFeatured() {
     averageRating: p.averageRating,
     ratingCount: p.ratingCount,
   }));
+}
+
+async function getAllAds() {
+  await connectDB();
+  const data = await Ad.find({ status: "active" })
+    .sort({ createdAt: -1 })
+    .limit(30)
+    .lean();
+
+  return data.map((ad) => ({
+    _id: String(ad._id),
+    type: ad.type || "",
+    category: ad.category || "",
+    title: ad.title || "",
+    description: ad.description || "",
+    price: ad.price,
+    currency: ad.currency,
+    location: ad.location || "",
+    images: ad.images || [],
+  }));
+}
+
+function groupByProfession(all: Awaited<ReturnType<typeof getAllProfessionals>>) {
+  const map = new Map<string, typeof all>();
+
+  for (const pro of all) {
+    const key = pro.professions?.[0] || "other";
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(pro);
+  }
+
+  return Array.from(map.entries())
+    .map(([key, list]) => {
+      const found = PROFESSIONS.find((p) => p.key === key);
+      return {
+        key,
+        icon: found?.icon || "⭐",
+        arabic: found?.arabic || key,
+        count: list.length,
+        list,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 }

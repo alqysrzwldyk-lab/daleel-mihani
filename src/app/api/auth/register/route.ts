@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         userId: user._id,
         name: data.name,
         email: data.email.toLowerCase(),
-        profession: "other",
+        professions: ["other"],
         skills: [],
         workExperience: [],
       });

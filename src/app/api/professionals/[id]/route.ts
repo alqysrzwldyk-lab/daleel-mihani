@@ -8,7 +8,7 @@ import { Rating, type IRating } from "@/models/Rating";
 const updateSchema = z.object({
   name: z.string().min(2).optional(),
   photo: z.string().optional(),
-  profession: z.string().min(1).optional(),
+  professions: z.array(z.string().min(1)).min(1).max(2).optional(),
   bio: z.string().max(1000).optional(),
   skills: z.array(z.string()).optional(),
   workExperience: z
@@ -25,6 +25,24 @@ const updateSchema = z.object({
   location: z.string().optional(),
   phone: z.string().optional(),
 });
+
+function formatProfessional(professional: IProfessional) {
+  return {
+    _id: String(professional._id),
+    name: professional.name,
+    photo: professional.photo,
+    professions: professional.professions || ["other"],
+    profession: professional.professions?.[0] || "other",
+    bio: professional.bio,
+    skills: professional.skills,
+    workExperience: professional.workExperience,
+    location: professional.location,
+    phone: professional.phone,
+    email: professional.email,
+    averageRating: professional.averageRating,
+    ratingCount: professional.ratingCount,
+  };
+}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -48,18 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     return NextResponse.json({
-      _id: String(professional._id),
-      name: professional.name,
-      photo: professional.photo,
-      profession: professional.profession,
-      bio: professional.bio,
-      skills: professional.skills,
-      workExperience: professional.workExperience,
-      location: professional.location,
-      phone: professional.phone,
-      email: professional.email,
-      averageRating: professional.averageRating,
-      ratingCount: professional.ratingCount,
+      ...formatProfessional(professional),
       userRating,
     });
   } catch (error) {
@@ -90,23 +97,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
-    Object.assign(professional, data);
+    if (data.professions) {
+      professional.professions = data.professions;
+    }
+    if (data.name) professional.name = data.name;
+    if (data.photo !== undefined) professional.photo = data.photo;
+    if (data.bio !== undefined) professional.bio = data.bio;
+    if (data.skills) professional.skills = data.skills;
+    if (data.workExperience) professional.workExperience = data.workExperience;
+    if (data.location !== undefined) professional.location = data.location;
+    if (data.phone !== undefined) professional.phone = data.phone;
+
     await professional.save();
 
-    return NextResponse.json({
-      _id: String(professional._id),
-      name: professional.name,
-      photo: professional.photo,
-      profession: professional.profession,
-      bio: professional.bio,
-      skills: professional.skills,
-      workExperience: professional.workExperience,
-      location: professional.location,
-      phone: professional.phone,
-      email: professional.email,
-      averageRating: professional.averageRating,
-      ratingCount: professional.ratingCount,
-    });
+    return NextResponse.json(formatProfessional(professional));
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "validation" }, { status: 400 });

@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation"; 
+import { useRouter } from "@/i18n/navigation";
+import { Bell } from "lucide-react";
 
 interface INotification {
   _id: string;
   title: string;
   message: string;
   isRead: boolean;
-  link?: string; 
+  link?: string;
   createdAt: string;
 }
 
@@ -16,33 +17,19 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const router = useRouter(); 
-  const pathname = usePathname(); 
-
-  // 💡 الحل النهائي: استخدام الأنواع المتوافقة بدقة مع المتصفح والسيرفر دون كلمة any
+  const router = useRouter();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // 🚀 تعديل المسار المطلق لتخطي مشكلة الـ Middleware واللغات (ar/en)
         const origin = window.location.origin;
         const res = await fetch(`${origin}/api/notifications?t=${Date.now()}`, {
-          cache: "no-store"
+          cache: "no-store",
         });
 
         if (res.status === 401) {
-          console.warn("الجلسة منتهية أو غير مصرح به. تم إيقاف جلب الإشعارات في الخلفية.");
-          
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current); 
-          }
-          
-          const segments = pathname.split("/");
-          const currentLocale = segments[1] === "ar" || segments[1] === "en" ? segments[1] : "";
-          const loginPath = currentLocale ? `/${currentLocale}/login` : "/login";
-          
-          router.push(loginPath);
+          if (intervalRef.current) clearInterval(intervalRef.current);
           return;
         }
 
@@ -57,83 +44,82 @@ export default function NotificationBell() {
     };
 
     fetchNotifications();
+    intervalRef.current = setInterval(fetchNotifications, 10000);
 
-    // ⏱️ التحديث الدوري الحركي النظيف وتخزينه في المرجع المعرّف بدقة
-    intervalRef.current = setInterval(fetchNotifications, 4000);
-    
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [router, pathname]);
+  }, []);
 
   const handleNotificationClick = async (notif: INotification) => {
-    setIsOpen(false); 
-
-    if (notif.link) {
-      const segments = pathname.split("/");
-      const currentLocale = segments[1]; 
-      
-      const isLocalePresent = currentLocale === "ar" || currentLocale === "en";
-      const finalLink = isLocalePresent ? `/${currentLocale}${notif.link}` : notif.link;
-
-      console.log("Navigating securely to:", finalLink);
-      router.push(finalLink);
-    }
+    setIsOpen(false);
 
     try {
-      // 🚀 تعديل مسار تحديث حالة القراءة إلى المسار المطلق
       const origin = window.location.origin;
       await fetch(`${origin}/api/notifications/${notif._id}/read`, { method: "PUT" });
-    } catch (error) {
-      console.error("Failed to mark notification as read", error);
+    } catch {}
+
+    if (notif.link) {
+      router.push(notif.link);
     }
   };
 
   return (
     <div className="relative">
-      {/* زر الجرس 🔔 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-blue-600 focus:outline-none transition"
+        className="relative p-2 text-gray-600 hover:text-primary transition rounded-xl hover:bg-gray-50"
       >
-        <span className="text-2xl">🔔</span>
+        <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full animate-pulse">
-            {unreadCount}
+          <span className="nav-badge" style={{ top: -2, right: -2 }}>
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
-      {/* القائمة المنسدلة للإشعارات */}
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl py-2 border border-gray-100 z-50 text-right" style={{ direction: "rtl" }}>
-          <div className="px-4 py-2 font-bold border-b border-gray-100 text-gray-700">
-            <span>الإشعارات المستلمة</span>
-          </div>
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+            <div className="px-4 py-3 font-bold text-sm border-b border-gray-100 flex items-center justify-between">
+              <span>الإشعارات</span>
+              {unreadCount > 0 && (
+                <span className="badge badge-primary text-[11px]">{unreadCount} جديد</span>
+              )}
+            </div>
 
-          <div className="max-h-64 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="px-4 py-6 text-center text-gray-400 text-sm">
-                لا توجد إشعارات حالياً
-              </div>
-            ) : (
-              notifications.map((notif) => (
-                <div
-                  key={notif._id}
-                  onClick={() => handleNotificationClick(notif)} 
-                  className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition cursor-pointer ${
-                    !notif.isRead ? "bg-blue-50/40" : ""
-                  }`}
-                >
-                  <p className="text-sm font-semibold text-gray-800">{notif.title}</p>
-                  <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
+            <div className="max-h-72 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="px-4 py-8 text-center text-muted text-sm">
+                  لا توجد إشعارات حالياً
                 </div>
-              ))
+              ) : (
+                notifications.slice(0, 5).map((notif) => (
+                  <div
+                    key={notif._id}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition cursor-pointer ${
+                      !notif.isRead ? "bg-primary-50/50" : ""
+                    }`}
+                  >
+                    <p className="text-sm font-semibold">{notif.title}</p>
+                    <p className="text-xs text-muted mt-0.5 line-clamp-1">{notif.message}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {notifications.length > 0 && (
+              <button
+                onClick={() => { setIsOpen(false); router.push("/notifications"); }}
+                className="w-full py-2.5 text-xs font-semibold text-primary hover:bg-primary-50 transition border-t border-gray-50"
+              >
+                عرض الكل
+              </button>
             )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

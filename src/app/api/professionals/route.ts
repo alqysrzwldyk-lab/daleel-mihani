@@ -16,13 +16,13 @@ export async function GET(req: NextRequest) {
     const filter: Record<string, unknown> = { isActive: true };
 
     if (profession && profession !== "all") {
-      filter.profession = profession;
+      filter.professions = profession;
     }
 
     if (q) {
       filter.$or = [
         { name: { $regex: q, $options: "i" } },
-        { profession: { $regex: q, $options: "i" } },
+        { professions: { $regex: q, $options: "i" } },
         { bio: { $regex: q, $options: "i" } },
         { skills: { $regex: q, $options: "i" } },
         { location: { $regex: q, $options: "i" } },
@@ -43,7 +43,8 @@ export async function GET(req: NextRequest) {
         _id: String(p._id),
         name: p.name,
         photo: p.photo,
-        profession: p.profession,
+        professions: p.professions,
+        profession: p.professions?.[0] || "other",
         bio: p.bio,
         skills: p.skills,
         workExperience: p.workExperience,

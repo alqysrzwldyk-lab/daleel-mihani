@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     await connectDB();
     const body = await request.json();
-    const { type, category, title, description, price, location, specifications, images } = body;
+    const { type, category, title, description, price, currency, location, specifications, images } = body;
 
     // التحقق من الحقول الأساسية
     if (!type || !category || !title || !description || !location) {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
       title,
       description,
       price: price ? Number(price) : null,
+      currency: currency || "YER",
       location,
       specifications: specifications || {},
       images: images || [],

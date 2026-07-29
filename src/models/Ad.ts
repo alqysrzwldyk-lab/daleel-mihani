@@ -8,6 +8,7 @@ const AdSchema = new Schema(
     title: { type: String, required: true }, // عنوان الإعلان
     description: { type: String, required: true }, // تفاصيل ومواصفات الإعلان
     price: { type: Number, default: null }, // السعر (اختياري، للأراضي والسيارات مثلاً)
+    currency: { type: String, enum: ["YER", "SAR", "USD"], default: "YER" }, // العملة
     location: { type: String, required: true }, // المدينة أو المنطقة
     images: [{ type: String }], // مصفوفة لروابط صور الإعلان
     specifications: { type: Map, of: String }, // حقول ديناميكية للمواصفات (مثل: موديل السيارة، المساحة للأرض)

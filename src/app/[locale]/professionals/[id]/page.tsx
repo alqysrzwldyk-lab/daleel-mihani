@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MapPin, Mail, Phone, Briefcase } from "lucide-react";
+import { MapPin, Mail, Phone, Briefcase, Star, ArrowLeft } from "lucide-react";
 import RatingStars from "@/components/RatingStars";
-import HireModal from "@/components/HireModal"; // 1. استيراد مكون نافذة التوظيف
+import HireModal from "@/components/HireModal";
 import type { ProfessionalPublic } from "@/lib/api";
-import { PROFESSIONS } from "@/lib/professions";
+import { getProfessionArabic, getProfessionIcon } from "@/lib/professions";
 
 type AuthUser = {
   id: string;
@@ -17,8 +17,7 @@ type AuthUser = {
 
 export default function ProfessionalProfilePage() {
   const t = useTranslations("profile");
-  const tProf = useTranslations("professions");
-  const tCard = useTranslations("card");
+  const router = useRouter();
   const params = useParams();
   const id = params.id as string;
 
@@ -72,121 +71,128 @@ export default function ProfessionalProfilePage() {
 
   if (!professional) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="h-96 bg-white rounded-2xl animate-pulse" />
+      <div className="page-container">
+        <div className="skeleton h-64 rounded-xl mb-4" />
+        <div className="skeleton h-48 rounded-xl" />
       </div>
     );
   }
 
-  const professionIcon = PROFESSIONS.find((p) => p.key === professional.profession)?.icon || "✨";
+  const profs = professional.professions?.length ? professional.professions : [professional.profession || "other"];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-2xl card-shadow border border-[var(--border)] overflow-hidden">
-        <div className="gradient-hero h-40 relative">
-          <div className="absolute -bottom-16 start-8 w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-slate-200 shadow-xl">
+    <div className="page-container">
+      <button onClick={() => router.back()} className="back-btn mb-4">
+        <ArrowLeft className="w-4 h-4" />
+      </button>
+
+      <div className="app-card overflow-hidden">
+        <div className="h-32 bg-gradient-to-l from-blue-600 via-blue-500 to-sky-400 relative">
+          <div className="absolute -bottom-12 right-6 w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-slate-200 shadow-xl">
             {professional.photo ? (
-              <Image src={professional.photo} alt={professional.name} width={128} height={128} className="w-full h-full object-cover" />
+              <Image src={professional.photo} alt={professional.name} width={96} height={96} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-5xl bg-slate-100">{professionIcon}</div>
+              <div className="w-full h-full flex items-center justify-center text-4xl bg-slate-100">{getProfessionIcon(profs[0])}</div>
             )}
           </div>
         </div>
 
-        <div className="pt-20 px-8 pb-8">
-          <h1 className="text-3xl font-bold">{professional.name}</h1>
-          <p className="text-[var(--primary)] font-medium text-lg mt-1">
-            {professionIcon} {tProf(professional.profession as "programmer")}
-          </p>
+        <div className="pt-14 px-5 pb-5">
+          <div className="text-right">
+            <h1 className="text-2xl font-bold">{professional.name}</h1>
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {profs.map((p, i) => (
+                <span key={p} className="text-primary font-semibold text-sm">
+                  {getProfessionIcon(p)} {getProfessionArabic(p)}
+                  {i < profs.length - 1 && <span className="text-muted-light mx-1">|</span>}
+                </span>
+              ))}
+            </div>
 
-          <div className="flex items-center gap-3 mt-3">
-            <RatingStars rating={professional.averageRating} />
-            <span className="text-[var(--muted)] text-sm">
-              ({professional.ratingCount} {tCard("reviews")})
-            </span>
+            <div className="flex items-center gap-3 mt-2">
+              <RatingStars rating={professional.averageRating} />
+              <span className="text-xs text-muted">
+                ({professional.ratingCount} تقييم)
+              </span>
+            </div>
+
+            {professional.location && (
+              <p className="flex items-center gap-1.5 text-sm text-muted mt-2">
+                <MapPin className="w-4 h-4" /> {professional.location}
+              </p>
+            )}
           </div>
 
-          {professional.location && (
-            <p className="flex items-center gap-2 text-[var(--muted)] mt-3">
-              <MapPin className="w-4 h-4" /> {professional.location}
-            </p>
-          )}
-
-          {/* 2. عرض زر "طلب توظيف" هنا إذا كان المستخدم المسجل هو صاحب شركة (Employer) */}
-          {user && user.role === "employer" && (
-            <div className="mt-6 max-w-xs">
-              <HireModal 
-                professionalId={professional._id || id} 
-                professionalName={professional.name} 
+          {user?.role === "employer" && (
+            <div className="mt-5">
+              <HireModal
+                professionalId={professional._id || id}
+                professionalName={professional.name}
               />
             </div>
           )}
 
           {professional.bio && (
-            <div className="mt-6">
-              <h2 className="font-bold text-lg mb-2">{t("about")}</h2>
-              <p className="text-[var(--muted)] leading-relaxed">{professional.bio}</p>
+            <div className="mt-5">
+              <h2 className="font-bold text-sm mb-2">{t("about")}</h2>
+              <p className="text-sm text-muted leading-relaxed">{professional.bio}</p>
             </div>
           )}
 
           {professional.skills?.length > 0 && (
-            <div className="mt-6">
-              <h2 className="font-bold text-lg mb-3">{t("skills")}</h2>
+            <div className="mt-5">
+              <h2 className="font-bold text-sm mb-3">{t("skills")}</h2>
               <div className="flex flex-wrap gap-2">
                 {professional.skills.map((skill) => (
-                  <span key={skill} className="bg-blue-50 text-[var(--primary)] px-3 py-1 rounded-full text-sm font-medium">
-                    {skill}
-                  </span>
+                  <span key={skill} className="skill-tag">{skill}</span>
                 ))}
               </div>
             </div>
           )}
 
           {professional.workExperience?.length > 0 && (
-            <div className="mt-6">
-              <h2 className="font-bold text-lg mb-3">{t("workHistory")}</h2>
-              <div className="space-y-4">
+            <div className="mt-5">
+              <h2 className="font-bold text-sm mb-3">{t("workHistory")}</h2>
+              <div className="space-y-3">
                 {professional.workExperience.map((exp, i) => (
-                  <div key={i} className="border-s-4 border-[var(--primary)] ps-4">
+                  <div key={i} className="border-s-[3px] border-primary ps-4 py-1">
                     <div className="flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-[var(--primary)]" />
-                      <span className="font-semibold">{exp.position}</span>
-                      <span className="text-[var(--muted)]">— {exp.company}</span>
+                      <Briefcase className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-sm">{exp.position}</span>
+                      <span className="text-xs text-muted">— {exp.company}</span>
                     </div>
-                    <p className="text-sm text-[var(--muted)] mt-1">
-                      {exp.startDate} {exp.endDate ? `→ ${exp.endDate}` : "→"}
+                    <p className="text-xs text-muted mt-0.5">
+                      {exp.startDate} {exp.endDate ? `→ ${exp.endDate}` : "→ حتى الآن"}
                     </p>
-                    {exp.description && <p className="text-sm mt-1">{exp.description}</p>}
+                    {exp.description && <p className="text-xs text-muted mt-1">{exp.description}</p>}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="mt-6 p-4 bg-slate-50 rounded-xl">
-            <h2 className="font-bold text-lg mb-3">{t("contact")}</h2>
+          <div className="mt-5 bg-slate-50 rounded-xl p-4">
+            <h2 className="font-bold text-sm mb-3">{t("contact")}</h2>
             <p className="flex items-center gap-2 text-sm">
-              <Mail className="w-4 h-4 text-[var(--primary)]" /> {professional.email}
+              <Mail className="w-4 h-4 text-primary" /> {professional.email}
             </p>
             {professional.phone && (
               <p className="flex items-center gap-2 text-sm mt-2">
-                <Phone className="w-4 h-4 text-[var(--primary)]" /> {professional.phone}
+                <Phone className="w-4 h-4 text-primary" /> {professional.phone}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      <div className="mt-8 bg-white rounded-2xl card-shadow border border-[var(--border)] p-6">
-        <h2 className="font-bold text-lg mb-4">{t("rateThis")}</h2>
+      <div className="app-card p-5 mt-4">
+        <h2 className="font-bold text-sm mb-4">{t("rateThis")}</h2>
 
-        {!user ? (
-          <p className="text-[var(--muted)]">{t("loginToRate")}</p>
-        ) : user.role !== "employer" ? (
-          <p className="text-[var(--muted)]">{t("loginToRate")}</p>
+        {!user || user.role !== "employer" ? (
+          <p className="text-muted text-sm">{t("loginToRate")}</p>
         ) : rated ? (
           <div>
-            <p className="text-green-600 mb-2">{t("alreadyRated")}</p>
+            <p className="text-success text-sm mb-2">{t("alreadyRated")}</p>
             <RatingStars rating={rating} interactive value={rating} />
           </div>
         ) : (
@@ -195,8 +201,8 @@ export default function ProfessionalProfilePage() {
               <label className="block text-sm font-medium mb-2">{t("yourRating")}</label>
               <RatingStars rating={0} interactive value={rating} onChange={setRating} size="lg" />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("comment")}</label>
+            <div className="input-group">
+              <label className="input-label">{t("comment")}</label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -204,7 +210,7 @@ export default function ProfessionalProfilePage() {
                 className="input-field resize-none"
               />
             </div>
-            <button type="submit" disabled={!rating || submitting} className="btn-primary">
+            <button type="submit" disabled={!rating || submitting} className="btn btn-primary btn-block">
               {submitting ? "..." : t("submitRating")}
             </button>
           </form>

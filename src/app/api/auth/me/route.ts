@@ -17,14 +17,21 @@ export async function GET() {
   }
 
   let profile = null;
-  
-  // إذا كان المستخدم محترف، نجلب بياناته من موديل المحترفين
+
   if (user.role === "professional") {
-    profile = await Professional.findOne({ userId: user._id });
-  } 
-  // إذا كان المستخدم شركة، نجلب بياناته من موديل المستخدم نفسه
-  else if (user.role === "company") {
-    profile = user; 
+    const prof = await Professional.findOne({ userId: user._id });
+    if (prof) {
+      const obj = prof.toObject();
+      const { _id, professions, ...rest } = obj;
+      profile = {
+        id: _id.toString(),
+        ...rest,
+        professions,
+        profession: professions?.[0] || "other",
+      };
+    }
+  } else if (user.role === "company") {
+    profile = user;
   }
 
   return NextResponse.json({
@@ -34,11 +41,6 @@ export async function GET() {
       email: user.email,
       role: user.role,
     },
-    profile: profile
-      ? {
-          id: profile._id.toString(),
-          ...profile.toObject(),
-        }
-      : null,
+    profile: profile,
   });
 }

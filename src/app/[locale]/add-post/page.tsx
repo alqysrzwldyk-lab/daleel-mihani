@@ -1,221 +1,242 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, Loader2, Tag, MapPin, Send, Upload, X } from "lucide-react";
+
+const CATEGORIES: Record<string, { key: string; label: string }[]> = {
+  general: [
+    { key: "cars", label: "🚗 سيارات ومركبات" },
+    { key: "lands", label: "🗺️ أراضي وعقارات" },
+    { key: "electronics", label: "📱 أجهزة وإلكترونيات" },
+    { key: "furniture", label: "🛋️ أثاث" },
+    { key: "home-tools", label: "🏠 أدوات منزلية" },
+    { key: "weapons", label: "🔫 سلاح وذخائر" },
+    { key: "other", label: "📦 أخرى" },
+  ],
+  professional: [
+    { key: "services", label: "🛠️ خدمات صيانة" },
+    { key: "programming", label: "💻 برمجة وتقنية" },
+    { key: "accounting", label: "📊 محاسبة واستشارات" },
+    { key: "design", label: "🎨 تصميم" },
+    { key: "teaching", label: "📚 تدريس" },
+    { key: "other", label: "✨ أخرى" },
+  ],
+};
+
+const CURRENCIES = [
+  { key: "YER", label: "﷼ يمني", symbol: "﷼" },
+  { key: "SAR", label: "﷼ سعودي", symbol: "﷼" },
+  { key: "USD", label: "$ دولار", symbol: "$" },
+];
 
 export default function AddPostPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
 
-  // بيانات النموذج الأساسية
-  const [type, setType] = useState("general"); // general أو professional
+  const [type, setType] = useState("general");
   const [category, setCategory] = useState("cars");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [location, setLocation] = useState("عمان");
-  
-  // المواصفات الديناميكية حسب القسم
+  const [currency, setCurrency] = useState("YER");
+  const [location, setLocation] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [carModel, setCarModel] = useState("");
   const [landArea, setLandArea] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setStatusMsg("");
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-        // تجميع المواصفات بناءً على القسم المختار
-        const specifications: Record<string, string> = {};
-        if (category === "cars") specifications.model = carModel;
-        if (category === "lands") specifications.area = landArea;
+    setUploadingImg(true);
+    const formData = new FormData();
+    formData.append("file", file);
 
-        try {
-            const res = await fetch("/api/ads", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type,
-                    category,
-                    title,
-                    description,
-                    price: price || null,
-                    location,
-                    specifications,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setStatusMsg("✅ تم نشر الإعلان بنجاح وحفظه في محفظتك!");
-                setTimeout(() => {
-                    router.push("/dashboard"); // التوجيه للمحفظة لمشاهدة إعلاناته
-                }, 2000);
-            } else {
-                setStatusMsg(`❌ ${data.error || "حدث خطأ ما"}`);
-            }
-        } catch (error) {
-            console.error(error);
-            setStatusMsg("❌ فشل الاتصال بالسيرفر");
-        } finally {
-            setLoading(false);
-        }
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setImages((prev) => [...prev, data.url]);
+      } else {
+        setStatusMsg("فشل رفع الصورة");
+      }
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      setStatusMsg("فشل رفع الصورة");
+    } finally {
+      setUploadingImg(false);
     }
+  }
+
+  function removeImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setStatusMsg("");
+
+    const specifications: Record<string, string> = {};
+    if (category === "cars") specifications.model = carModel;
+    if (category === "lands") specifications.area = landArea;
+
+    try {
+      const res = await fetch("/api/ads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type, category, title, description,
+          price: price || null,
+          currency,
+          location,
+          specifications,
+          images,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatusMsg("تم نشر الإعلان بنجاح!");
+        setTimeout(() => router.push("/dashboard/my-ads"), 2000);
+      } else {
+        setStatusMsg(data.error || "حدث خطأ ما");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatusMsg("فشل الاتصال بالسيرفر");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div className="max-w-2xl mx-auto my-10 p-6 bg-white rounded-2xl border border-gray-100 shadow-md" style={{ direction: "rtl" }}>
-      <h2 className="text-xl font-black text-gray-800 mb-2">📢 إضافة إعلان جديد</h2>
-      <p className="text-xs text-gray-500 mb-6">انشر خدماتك المهنية أو قم ببيع ممتلكاتك بسهولة في الأقسام المخصصة.</p>
+    <div className="page-container max-w-xl mx-auto">
+      <div className="page-header">
+        <button onClick={() => router.back()} className="back-btn">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <h1>إضافة إعلان جديد</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* نوع الإعلان */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1.5">نوع الإعلان الرئيسي</label>
+      <form onSubmit={handleSubmit} className="app-card p-5 space-y-5">
+        <div className="input-group">
+          <label className="input-label">نوع الإعلان</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => { setType("general"); setCategory("cars"); }}
-              className={`py-2.5 rounded-xl font-medium text-xs border transition ${type === "general" ? "bg-blue-50 border-blue-500 text-blue-600 font-bold" : "bg-gray-50 text-gray-600"}`}
+              className={`p-3 rounded-xl border-2 text-center text-sm font-semibold transition ${
+                type === "general" ? "border-primary bg-primary-50 text-primary" : "border-gray-100 text-muted"
+              }`}
             >
-              📦 إعلان تجاري عام (بيع سيارة، أرض...)
+              📦 إعلان تجاري
             </button>
             <button
               type="button"
               onClick={() => { setType("professional"); setCategory("services"); }}
-              className={`py-2.5 rounded-xl font-medium text-xs border transition ${type === "professional" ? "bg-blue-50 border-blue-500 text-blue-600 font-bold" : "bg-gray-50 text-gray-600"}`}
+              className={`p-3 rounded-xl border-2 text-center text-sm font-semibold transition ${
+                type === "professional" ? "border-primary bg-primary-50 text-primary" : "border-gray-100 text-muted"
+              }`}
             >
-              💼 إعلان خدمة مهنية (عرض مهنتك للتوظيف)
+              💼 خدمة مهنية
             </button>
           </div>
         </div>
 
-        {/* القسم الفرعي */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">القسم</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs bg-gray-50 outline-none"
-          >
-            {type === "general" ? (
-              <>
-                <option value="cars">🚗 سيارات ومركبات</option>
-                <option value="lands">🗺️ أراضي وعقارات</option>
-                <option value="electronics">📱 أجهزة وإلكترونيات</option>
-              </>
-            ) : (
-              <>
-                <option value="services">🛠️ خدمات صيانة عامة</option>
-                <option value="programming">💻 برمجة وتقنية</option>
-                <option value="accounting">📊 خدمات محاسبة واستشارات</option>
-              </>
+        <div className="input-group">
+          <label className="input-label">القسم</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field">
+            {(CATEGORIES[type] || CATEGORIES.general).map((cat) => (
+              <option key={cat.key} value={cat.key}>{cat.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="input-group">
+          <label className="input-label">صور الإعلان</label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {images.map((url, i) => (
+              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-100">
+                <Image src={url} alt="" width={80} height={80} className="w-full h-full object-cover" />
+                <button type="button" onClick={() => removeImage(i)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center">
+                  <X className="w-3 h-3 text-white" />
+                </button>
+              </div>
+            ))}
+            {images.length < 5 && (
+              <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-primary transition">
+                {uploadingImg ? <Loader2 className="w-5 h-5 animate-spin text-muted" /> : <Upload className="w-5 h-5 text-muted" />}
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImg} />
+              </label>
             )}
-          </select>
+          </div>
+          <p className="text-[11px] text-muted">يمكنك إضافة حتى 5 صور</p>
         </div>
 
-        {/* عنوان الإعلان */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">عنوان الإعلان</label>
-          <input
-            type="text"
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="مثال: تويوتا كامري 2022 بحالة الوكالة / مهندس ديكور محترف"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs outline-none"
-          />
+        <div className="input-group">
+          <label className="input-label">عنوان الإعلان</label>
+          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} className="input-field" placeholder="مثال: تويوتا كامري 2022 بحالة الوكالة" />
         </div>
 
-        {/* السعر - يظهر فقط للإعلانات العامة أو الخدمات المسعرة */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">السعر (اختياري - بالعملة المحلية)</label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="اتركه فارغاً في حال السعر يعتمد على الاتفاق"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs outline-none"
-          />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="input-group">
+            <label className="input-label">السعر</label>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="input-field" placeholder="0" />
+          </div>
+          <div className="input-group">
+            <label className="input-label">العملة</label>
+            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="input-field">
+              {CURRENCIES.map((c) => (
+                <option key={c.key} value={c.key}>{c.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* المدينة / الموقع الجغرافي */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">المدينة / المنطقة</label>
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs bg-gray-50 outline-none"
-          >
-            <option value="عمان">عمان</option>
-            <option value="إربد">إربد</option>
-            <option value="الزرقاء">الزرقاء</option>
-          </select>
+        <div className="input-group">
+          <label className="input-label flex items-center gap-1">
+            <MapPin className="w-4 h-4 text-muted" /> الموقع
+          </label>
+          <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className="input-field" placeholder="اكتب المدينة أو المنطقة" />
         </div>
 
-        {/* الحقول الديناميكية الخاصة بكل قسم */}
         {category === "cars" && (
-          <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-            <p className="text-[11px] font-bold text-blue-600">📋 مواصفات السيارة المطلوبة:</p>
-            <input
-              type="text"
-              placeholder="سنة الصنع وموديل السيارة (مثال: 2022)"
-              value={carModel}
-              onChange={(e) => setCarModel(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-xs outline-none"
-            />
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <p className="text-xs font-bold text-primary mb-2">مواصفات السيارة</p>
+            <input type="text" placeholder="سنة الصنع والموديل" value={carModel} onChange={(e) => setCarModel(e.target.value)} className="input-field" />
           </div>
         )}
 
         {category === "lands" && (
-          <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-            <p className="text-[11px] font-bold text-blue-600">📋 مواصفات الأرض المطلوبة:</p>
-            <input
-              type="text"
-              placeholder="مساحة الأرض بالمتر المربع (مثال: 500 م²)"
-              value={landArea}
-              onChange={(e) => setLandArea(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg text-xs outline-none"
-            />
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <p className="text-xs font-bold text-primary mb-2">مواصفات الأرض</p>
+            <input type="text" placeholder="المساحة بالمتر المربع" value={landArea} onChange={(e) => setLandArea(e.target.value)} className="input-field" />
           </div>
         )}
 
-        {/* تفاصيل الإعلان */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-1">شرح وتفاصيل الإعلان الكاملة</label>
-          <textarea
-            required
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="اكتب مواصفات السلعة بالكامل، أو تفاصيل الخدمة والخبرات التي تقدمها وطريقة التواصل المفضلة..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs outline-none"
-          ></textarea>
+        <div className="input-group">
+          <label className="input-label">الوصف والتفاصيل</label>
+          <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" placeholder="اكتب تفاصيل الإعلان كاملة..." />
         </div>
 
         {statusMsg && (
-          <div className="text-xs font-medium p-2.5 rounded-xl text-center bg-gray-50">
+          <div className={`text-sm font-medium p-3 rounded-xl text-center ${
+            statusMsg.includes("نجاح") ? "bg-success-light text-success" : "bg-danger-light text-danger"
+          }`}>
             {statusMsg}
           </div>
         )}
 
-        {/* أزرار التحكم */}
-        <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-xl font-bold text-xs hover:bg-orange-600 transition disabled:opacity-50"
-          >
-            {loading ? "جاري نشر إعلانك..." : "🚀 انشر الإعلان الآن"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium text-xs text-gray-700 transition"
-          >
-            إلغاء
-          </button>
-        </div>
+        <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg">
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+          {loading ? "جاري النشر..." : "انشر الإعلان"}
+        </button>
       </form>
     </div>
   );

@@ -3,8 +3,11 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
+
 export const dynamic = 'force-dynamic';
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -26,11 +29,12 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       <NextIntlClientProvider messages={messages}>
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="main-content flex-1">{children}</main>
         <Footer />
+        <BottomNav />
       </NextIntlClientProvider>
     </div>
   );

@@ -6,7 +6,7 @@ import { getAuthFromRequest } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const auth = getAuthFromRequest(req);
-    if (!auth || auth.role !== "professional") {
+    if (!auth) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 

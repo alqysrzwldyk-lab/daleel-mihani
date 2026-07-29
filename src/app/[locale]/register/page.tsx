@@ -3,11 +3,12 @@
 import { useState, useEffect, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
+import { Loader2, UserPlus, Briefcase, Building2 } from "lucide-react";
+import OAuthButtons from "@/components/OAuthButtons";
 
 function RegisterForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [name, setName] = useState("");
@@ -44,12 +45,7 @@ function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: trimmedName,
-        email: trimmedEmail,
-        password,
-        role,
-      }),
+      body: JSON.stringify({ name: trimmedName, email: trimmedEmail, password, role }),
     });
 
     const data = await res.json();
@@ -68,89 +64,91 @@ function RegisterForm() {
       return;
     }
 
-    if (role === "professional") {
-      router.push("/dashboard");
-    } else {
-      router.push("/search");
-    }
+    window.location.href = "/";
   }
 
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl card-shadow border border-[var(--border)] p-8">
-      <h1 className="text-2xl font-bold text-center mb-6">{t("registerTitle")}</h1>
+    <div className="form-card">
+      <div className="text-center mb-6">
+        <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-3">
+          <UserPlus className="w-8 h-8 text-primary" />
+        </div>
+        <h1>{t("registerTitle")}</h1>
+        <p className="subtitle">انضم إلى الدليل المهني وابدأ رحلتك</p>
+      </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4">{error}</div>
+        <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">{t("name")}</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="input-field"
-            required
-          />
+        <div className="input-group">
+          <label className="input-label">{t("name")}</label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-field" placeholder="الاسم الكامل" required />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t("email")}</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input-field"
-            required
-          />
+
+        <div className="input-group">
+          <label className="input-label">{t("email")}</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" placeholder="your@email.com" required />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t("password")}</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-field"
-            minLength={6}
-            required
-          />
-          <p className="text-xs text-[var(--muted)] mt-1">6 أحرف على الأقل</p>
+
+        <div className="input-group">
+          <label className="input-label">{t("password")}</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" placeholder="••••••••" minLength={6} required />
+          <p className="text-xs text-muted mt-1">6 أحرف على الأقل</p>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">{t("role")}</label>
-          <div className="space-y-2">
-            <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:border-[var(--primary)] transition">
-              <input
-                type="radio"
-                name="role"
-                value="professional"
-                checked={role === "professional"}
-                onChange={() => setRole("professional")}
-                className="mt-1"
-              />
-              <span className="text-sm">{t("roleProfessional")}</span>
-            </label>
-            <label className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:border-[var(--primary)] transition">
-              <input
-                type="radio"
-                name="role"
-                value="employer"
-                checked={role === "employer"}
-                onChange={() => setRole("employer")}
-                className="mt-1"
-              />
-              <span className="text-sm">{t("roleEmployer")}</span>
-            </label>
+
+        <div className="input-group">
+          <label className="input-label">{t("role")}</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setRole("professional")}
+              className={`p-4 rounded-xl border-2 text-center transition ${
+                role === "professional"
+                  ? "border-primary bg-primary-50"
+                  : "border-gray-100 hover:border-gray-200"
+              }`}
+            >
+              <Briefcase className={`w-6 h-6 mx-auto mb-1 ${role === "professional" ? "text-primary" : "text-muted-light"}`} />
+              <span className={`text-xs font-semibold ${role === "professional" ? "text-primary" : "text-muted"}`}>
+                محترف
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("employer")}
+              className={`p-4 rounded-xl border-2 text-center transition ${
+                role === "employer"
+                  ? "border-primary bg-primary-50"
+                  : "border-gray-100 hover:border-gray-200"
+              }`}
+            >
+              <Building2 className={`w-6 h-6 mx-auto mb-1 ${role === "employer" ? "text-primary" : "text-muted-light"}`} />
+              <span className={`text-xs font-semibold ${role === "employer" ? "text-primary" : "text-muted"}`}>
+                صاحب شركة
+              </span>
+            </button>
           </div>
         </div>
-        <button type="submit" disabled={loading} className="btn-primary w-full py-3">
-          {loading ? "..." : t("registerBtn")}
+
+        <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg mt-2">
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <UserPlus className="w-5 h-5" />
+          )}
+          {loading ? "جاري إنشاء الحساب..." : t("registerBtn")}
         </button>
       </form>
 
-      <p className="text-center text-sm text-[var(--muted)] mt-6">
+      <div className="mt-6">
+        <OAuthButtons />
+      </div>
+
+      <p className="text-center text-sm text-muted mt-6">
         {t("hasAccount")}{" "}
-        <Link href="/login" className="text-[var(--primary)] font-medium">
+        <Link href="/login" className="text-primary font-bold hover:underline">
           {t("loginBtn")}
         </Link>
       </p>
@@ -160,8 +158,8 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <Suspense fallback={<div className="w-full max-w-md h-96 bg-white rounded-2xl animate-pulse" />}>
+    <div className="form-page">
+      <Suspense fallback={<div className="skeleton h-96 w-full max-w-md rounded-xl" />}>
         <RegisterForm />
       </Suspense>
     </div>

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link, useRouter } from "@/i18n/navigation";
-import { Loader2, LogIn } from "lucide-react"; // إضافة أيقونات حركية لإعطاء طابع احترافي
+import { Link } from "@/i18n/navigation";
+import { Loader2, LogIn, Briefcase } from "lucide-react";
+import OAuthButtons from "@/components/OAuthButtons";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +28,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setLoading(false); // إيقاف التحميل فوراً عند حدوث خطأ من السيرفر
+        setLoading(false);
         const fieldKey = data.field as string | undefined;
         const errorKey = data.error as string;
         if (fieldKey && fieldKey !== "validation") {
@@ -41,73 +41,71 @@ export default function LoginPage() {
         return;
       }
 
-      // 🚀 الحل السحري: التوجيه أولاً وبشكل فوري لإنهاء التعليق القاتل
-      const targetPath = data.user.role === "professional" ? "/dashboard" : "/search";
-      router.push(targetPath);
-
-      // كسر الكاش وتحديث الجلسة بسلاسة تامة بعد بدء التوجيه
-      setTimeout(() => {
-        router.refresh();
-      }, 100);
-
+      window.location.href = "/";
     } catch (err) {
       console.error("Login connection error:", err);
       setError(t("errors.generic"));
-      setLoading(false); // ضمان عدم تعليق الزر في حال فشل شبكة الاتصال
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 text-right" style={{ direction: "rtl" }}>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8 transform transition duration-300">
-        <h1 className="text-2xl font-bold text-slate-900 text-center mb-6">{t("loginTitle")}</h1>
+    <div className="form-page">
+      <div className="form-card">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Briefcase className="w-8 h-8 text-primary" />
+          </div>
+          <h1>{t("loginTitle")}</h1>
+          <p className="subtitle">مرحباً بعودتك! سجل دخولك للمتابعة</p>
+        </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-xl mb-4 animate-in fade-in duration-200">
-            {error}
-          </div>
+          <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">{t("email")}</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="input-group">
+            <label className="input-label">{t("email")}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition"
+              className="input-field"
+              placeholder="your@email.com"
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">{t("password")}</label>
+
+          <div className="input-group">
+            <label className="input-label">{t("password")}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition"
+              className="input-field"
+              placeholder="••••••••"
               required
             />
           </div>
-          
-          {/* ترقية الزر الميت بنقاط ثلاث إلى زر تفاعلي حركي عالمي */}
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-blue-600/10 flex items-center justify-center gap-2 text-sm active:scale-[0.99] disabled:opacity-75 disabled:pointer-events-none"
-          >
+
+          <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg mt-2">
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-5 h-5" />
             )}
-            <span>{loading ? "جاري تسجيل الدخول..." : t("loginBtn")}</span>
+            {loading ? "جاري تسجيل الدخول..." : t("loginBtn")}
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <div className="mt-6">
+          <OAuthButtons />
+        </div>
+
+        <p className="text-center text-sm text-muted mt-6">
           {t("noAccount")}{" "}
-          <Link href="/register" className="text-blue-600 font-bold hover:underline transition">
+          <Link href="/register" className="text-primary font-bold hover:underline">
             {t("registerBtn")}
           </Link>
         </p>
