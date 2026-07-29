@@ -18,10 +18,23 @@ export default function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <section className="landing-hero">
-      {/* Background gradient decorations */}
-      <div className="landing-hero-glow landing-hero-glow-1" />
-      <div className="landing-hero-glow landing-hero-glow-2" />
-      <div className="landing-hero-grid" />
+      <div className="landing-hero-mesh" />
+      <div className="landing-hero-orb landing-hero-orb-1" />
+      <div className="landing-hero-orb landing-hero-orb-2" />
+      <div className="landing-hero-orb landing-hero-orb-3" />
+      <div className="landing-hero-dots" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-particle" />
+      <div className="landing-hero-accent landing-hero-accent-1" />
+      <div className="landing-hero-accent landing-hero-accent-2" />
 
       <div className="page-container relative z-10">
         <div className={`max-w-3xl mx-auto text-center transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>

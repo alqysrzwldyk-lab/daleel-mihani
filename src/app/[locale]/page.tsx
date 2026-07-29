@@ -6,6 +6,7 @@ import { PROFESSIONS } from "@/lib/professions";
 import { getAuthFromCookies } from "@/lib/auth";
 import { User } from "@/models/User";
 import HeroSection from "@/components/landing/HeroSection";
+import QuickAccess from "@/components/landing/QuickAccess";
 import StatsSection from "@/components/landing/StatsSection";
 import ProfessionsGrid from "@/components/landing/ProfessionsGrid";
 import FeaturesSection from "@/components/landing/FeaturesSection";
@@ -55,6 +56,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <HeroSection isLoggedIn={isLoggedIn} />
+
+      <QuickAccess />
 
       <StatsSection />
 

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { Loader2, UserPlus, Briefcase, Building2 } from "lucide-react";
+import { Loader2, UserPlus, Briefcase, Building2, Mail, Lock, User } from "lucide-react";
 import OAuthButtons from "@/components/OAuthButtons";
 
 function RegisterForm() {
@@ -68,89 +68,72 @@ function RegisterForm() {
   }
 
   return (
-    <div className="form-card">
-      <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-3">
-          <UserPlus className="w-8 h-8 text-primary" />
-        </div>
-        <h1>{t("registerTitle")}</h1>
-        <p className="subtitle">انضم إلى الدليل المهني وابدأ رحلتك</p>
+    <div className="auth-card">
+      <div className="auth-logo">
+        <UserPlus />
       </div>
 
-      {error && (
-        <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{error}</div>
-      )}
+      <h1 className="auth-title">{t("registerTitle")}</h1>
+      <p className="auth-subtitle">انضم إلى الدليل المهني وابدأ رحلتك</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="input-group">
-          <label className="input-label">{t("name")}</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-field" placeholder="الاسم الكامل" required />
-        </div>
+      {error && <div className="auth-error">{error}</div>}
 
-        <div className="input-group">
-          <label className="input-label">{t("email")}</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" placeholder="your@email.com" required />
-        </div>
+      <div className="auth-role-grid">
+        <button
+          type="button"
+          onClick={() => setRole("professional")}
+          className={`auth-role-btn ${role === "professional" ? "active" : ""}`}
+        >
+          <Briefcase className={role === "professional" ? "text-[#6366f1]" : "text-[#9ca3af]"} />
+          <span className={role === "professional" ? "text-[#6366f1]" : "text-[#6b7280]"}>محترف</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setRole("employer")}
+          className={`auth-role-btn ${role === "employer" ? "active" : ""}`}
+        >
+          <Building2 className={role === "employer" ? "text-[#6366f1]" : "text-[#9ca3af]"} />
+          <span className={role === "employer" ? "text-[#6366f1]" : "text-[#6b7280]"}>صاحب شركة</span>
+        </button>
+      </div>
 
-        <div className="input-group">
-          <label className="input-label">{t("password")}</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" placeholder="••••••••" minLength={6} required />
-          <p className="text-xs text-muted mt-1">6 أحرف على الأقل</p>
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">{t("role")}</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setRole("professional")}
-              className={`p-4 rounded-xl border-2 text-center transition ${
-                role === "professional"
-                  ? "border-primary bg-primary-50"
-                  : "border-gray-100 hover:border-gray-200"
-              }`}
-            >
-              <Briefcase className={`w-6 h-6 mx-auto mb-1 ${role === "professional" ? "text-primary" : "text-muted-light"}`} />
-              <span className={`text-xs font-semibold ${role === "professional" ? "text-primary" : "text-muted"}`}>
-                محترف
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("employer")}
-              className={`p-4 rounded-xl border-2 text-center transition ${
-                role === "employer"
-                  ? "border-primary bg-primary-50"
-                  : "border-gray-100 hover:border-gray-200"
-              }`}
-            >
-              <Building2 className={`w-6 h-6 mx-auto mb-1 ${role === "employer" ? "text-primary" : "text-muted-light"}`} />
-              <span className={`text-xs font-semibold ${role === "employer" ? "text-primary" : "text-muted"}`}>
-                صاحب شركة
-              </span>
-            </button>
+      <form onSubmit={handleSubmit}>
+        <div className="auth-field">
+          <label className="auth-label">{t("name")}</label>
+          <div className="auth-input-wrap">
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="auth-input" placeholder="الاسم الكامل" required />
+            <User className="auth-input-icon" />
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg mt-2">
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <UserPlus className="w-5 h-5" />
-          )}
+        <div className="auth-field">
+          <label className="auth-label">{t("email")}</label>
+          <div className="auth-input-wrap">
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="auth-input" placeholder="your@email.com" required />
+            <Mail className="auth-input-icon" />
+          </div>
+        </div>
+
+        <div className="auth-field">
+          <label className="auth-label">{t("password")}</label>
+          <div className="auth-input-wrap">
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="auth-input" placeholder="••••••••" minLength={6} required />
+            <Lock className="auth-input-icon" />
+          </div>
+          <p className="auth-field-hint">6 أحرف على الأقل</p>
+        </div>
+
+        <button type="submit" disabled={loading} className="auth-btn">
+          {loading ? <Loader2 className="animate-spin" /> : <UserPlus />}
           {loading ? "جاري إنشاء الحساب..." : t("registerBtn")}
         </button>
       </form>
 
-      <div className="mt-6">
-        <OAuthButtons />
-      </div>
+      <OAuthButtons />
 
-      <p className="text-center text-sm text-muted mt-6">
+      <p className="auth-footer">
         {t("hasAccount")}{" "}
-        <Link href="/login" className="text-primary font-bold hover:underline">
-          {t("loginBtn")}
-        </Link>
+        <Link href="/login">{t("loginBtn")}</Link>
       </p>
     </div>
   );
@@ -158,8 +141,13 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <div className="form-page">
-      <Suspense fallback={<div className="skeleton h-96 w-full max-w-md rounded-xl" />}>
+    <div className="auth-page">
+      <div className="auth-page-bg" />
+      <div className="auth-page-grid" />
+      <div className="auth-orb auth-orb-1" />
+      <div className="auth-orb auth-orb-2" />
+      <div className="auth-orb auth-orb-3" />
+      <Suspense fallback={<div className="skeleton h-96 w-full max-w-md rounded-2xl" />}>
         <RegisterForm />
       </Suspense>
     </div>

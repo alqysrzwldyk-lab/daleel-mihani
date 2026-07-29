@@ -54,7 +54,7 @@ export default function TestimonialsSection() {
   }, []);
 
   return (
-    <section className="py-16 md:py-20" ref={ref}>
+    <section id="success-stories" className="py-16 md:py-20" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">قصص نجاح</h2>

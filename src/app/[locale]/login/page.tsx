@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { Loader2, LogIn, Briefcase } from "lucide-react";
+import { Loader2, LogIn, Briefcase, Mail, Lock } from "lucide-react";
 import OAuthButtons from "@/components/OAuthButtons";
 
 export default function LoginPage() {
@@ -50,64 +50,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="form-page">
-      <div className="form-card">
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Briefcase className="w-8 h-8 text-primary" />
-          </div>
-          <h1>{t("loginTitle")}</h1>
-          <p className="subtitle">مرحباً بعودتك! سجل دخولك للمتابعة</p>
+    <div className="auth-page">
+      <div className="auth-page-bg" />
+      <div className="auth-page-grid" />
+      <div className="auth-orb auth-orb-1" />
+      <div className="auth-orb auth-orb-2" />
+      <div className="auth-orb auth-orb-3" />
+      <div className="auth-card">
+        <div className="auth-logo">
+          <Briefcase />
         </div>
 
-        {error && (
-          <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{error}</div>
-        )}
+        <h1 className="auth-title">{t("loginTitle")}</h1>
+        <p className="auth-subtitle">مرحباً بعودتك! سجل دخولك للمتابعة</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="input-group">
-            <label className="input-label">{t("email")}</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              placeholder="your@email.com"
-              required
-            />
+        {error && <div className="auth-error">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label className="auth-label">{t("email")}</label>
+            <div className="auth-input-wrap">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-input"
+                placeholder="your@email.com"
+                required
+              />
+              <Mail className="auth-input-icon" />
+            </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">{t("password")}</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
-              placeholder="••••••••"
-              required
-            />
+          <div className="auth-field">
+            <label className="auth-label">{t("password")}</label>
+            <div className="auth-input-wrap">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="auth-input"
+                placeholder="••••••••"
+                required
+              />
+              <Lock className="auth-input-icon" />
+            </div>
           </div>
 
-          <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg mt-2">
+          <button type="submit" disabled={loading} className="auth-btn">
             {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="animate-spin" />
             ) : (
-              <LogIn className="w-5 h-5" />
+              <LogIn />
             )}
             {loading ? "جاري تسجيل الدخول..." : t("loginBtn")}
           </button>
         </form>
 
-        <div className="mt-6">
-          <OAuthButtons />
-        </div>
+        <OAuthButtons />
 
-        <p className="text-center text-sm text-muted mt-6">
+        <p className="auth-footer">
           {t("noAccount")}{" "}
-          <Link href="/register" className="text-primary font-bold hover:underline">
-            {t("registerBtn")}
-          </Link>
+          <Link href="/register">{t("registerBtn")}</Link>
         </p>
       </div>
     </div>
