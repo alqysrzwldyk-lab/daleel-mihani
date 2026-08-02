@@ -1,5 +1,6 @@
 export type ProfessionalPublic = {
   _id: string;
+  userId: string;
   name: string;
   photo?: string;
   professions: string[];

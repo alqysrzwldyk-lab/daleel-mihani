@@ -12,14 +12,14 @@ const cards = [
     icon: Users,
     color: "purple",
     title: "المهنيون",
-    desc: "تصفح جميع المهنيين والحرفيين",
+    desc: "تصفح جميع المهنيين",
   },
   {
     href: "/ads",
     icon: Megaphone,
     color: "orange",
     title: "الإعلانات",
-    desc: "أحدث الإعلانات والعروض",
+    desc: "تصفح جميع الإعلانات",
   },
   {
     href: "/search",

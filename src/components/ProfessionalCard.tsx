@@ -111,11 +111,12 @@ export default function ProfessionalCard({ professional }: Props) {
                 const res = await fetch("/api/auth/me");
                 const d = await res.json();
                 if (!d.user) { router.push("/login"); return; }
+                if (d.user.id === professional.userId) { setSending(false); return; }
                 const msgRes = await fetch("/api/messages", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    receiverId: professional._id,
+                    receiverId: professional.userId,
                     content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
                     refType: "professional",
                     refId: professional._id,
@@ -124,6 +125,8 @@ export default function ProfessionalCard({ professional }: Props) {
                 const msgData = await msgRes.json();
                 if (msgRes.ok) {
                   router.push(`/messages/${msgData.conversationId}`);
+                } else {
+                  alert(msgData.error || "فشل إرسال الرسالة");
                 }
               } catch {}
               setSending(false);

@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { getAuthFromCookies } from "@/lib/auth";
 import { Conversation } from "@/models/Conversation";
-import { Message } from "@/models/Message";
+import { User } from "@/models/User";
+import {
+  createMessageAndNotify,
+  getOtherUser,
+  getConversationUnread,
+} from "@/lib/messaging";
 
 export async function GET() {
   try {
@@ -17,26 +22,28 @@ export async function GET() {
       participants: auth.userId,
     })
       .sort({ lastMessageAt: -1, updatedAt: -1 })
-      .populate("participants", "name email role photo")
+      .populate("participants", "name email role avatar")
       .lean();
 
-    const enriched = conversations.map((c: Record<string, unknown>) => {
-      const participants = c.participants as Array<Record<string, unknown>>;
-      const other = participants.find(
-        (p) => String(p._id) !== String(auth.userId)
-      );
-      const unreadMap = (c.unreadCount as Map<string, number>) || new Map();
-      return {
-        _id: c._id,
-        otherUser: other || null,
-        lastMessage: c.lastMessage || "",
-        lastMessageAt: c.lastMessageAt || c.updatedAt,
-        unread: unreadMap.get(String(auth.userId)) || 0,
-      };
-    });
+    const enriched = await Promise.all(
+      conversations.map(async (c: Record<string, any>) => {
+        const other = await getOtherUser(c, auth.userId!);
+        const unread = await getConversationUnread(c, auth.userId!);
+        return {
+          _id: c._id,
+          otherUser: other,
+          lastMessage: c.lastMessage || "",
+          lastMessageAt: c.lastMessageAt || c.updatedAt,
+          unread,
+          refType: c.refType || null,
+          refId: c.refId || null,
+        };
+      })
+    );
 
     return NextResponse.json({ success: true, conversations: enriched });
   } catch (error) {
+    console.error("Messages list error:", error);
     return NextResponse.json({ error: "فشل جلب المحادثات" }, { status: 500 });
   }
 }
@@ -53,36 +60,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "المستلم والرسالة مطلوبان" }, { status: 400 });
     }
 
-    await connectDB();
-
-    const participantIds = [auth.userId, receiverId].sort();
-    let conversation = await Conversation.findOne({
-      participants: { $all: participantIds, $size: 2 },
-    });
-
-    if (!conversation) {
-      conversation = await Conversation.create({
-        participants: participantIds,
-        refType: refType || "professional",
-        refId: refId || null,
-        unreadCount: { [String(auth.userId)]: 0, [String(receiverId)]: 1 },
-      });
-    } else {
-      const unreadMap = conversation.unreadCount || new Map();
-      const current = unreadMap.get(String(receiverId)) || 0;
-      unreadMap.set(String(receiverId), current + 1);
-      conversation.unreadCount = unreadMap;
+    if (String(receiverId) === String(auth.userId)) {
+      return NextResponse.json({ error: "لا يمكنك مراسلة نفسك" }, { status: 400 });
     }
 
-    conversation.lastMessage = content;
-    conversation.lastSenderId = auth.userId;
-    conversation.lastMessageAt = new Date();
-    await conversation.save();
+    await connectDB();
 
-    const message = await Message.create({
-      conversationId: conversation._id,
+    const receiver = await User.findById(receiverId).select("_id");
+    if (!receiver) {
+      return NextResponse.json({ error: "المستخدم غير موجود" }, { status: 404 });
+    }
+
+    const { message, conversation } = await createMessageAndNotify({
       senderId: auth.userId,
-      content,
+      receiverId,
+      content: content.slice(0, 2000),
+      refType,
+      refId,
     });
 
     return NextResponse.json({
@@ -91,6 +85,7 @@ export async function POST(request: Request) {
       conversationId: conversation._id,
     });
   } catch (error) {
+    console.error("Send message error:", error);
     return NextResponse.json({ error: "فشل إرسال الرسالة" }, { status: 500 });
   }
 }

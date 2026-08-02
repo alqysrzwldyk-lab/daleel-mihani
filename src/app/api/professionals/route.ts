@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       data: data.map((p) => ({
         _id: String(p._id),
+        userId: String(p.userId),
         name: p.name,
         photo: p.photo,
         professions: p.professions,

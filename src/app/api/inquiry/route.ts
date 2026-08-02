@@ -4,6 +4,7 @@ import { getAuthFromCookies } from "@/lib/auth";
 import { Ad } from "@/models/Ad";
 import { Transaction } from "@/models/Transaction";
 import { Notification } from "@/models/Notification";
+import { createMessageAndNotify } from "@/lib/messaging";
 
 const COMMISSION_RATE = 0.05;
 
@@ -46,15 +47,28 @@ export async function POST(request: Request) {
       note: message?.slice(0, 200),
     });
 
-    if (Notification) {
+    const inquiryText = message?.trim() || `أنا مهتم بـ "${ad.title}"`;
+
+    let conversationId: string | null = null;
+    try {
+      const { conversation } = await createMessageAndNotify({
+        senderId: auth.userId,
+        receiverId: String(ad.userId),
+        content: inquiryText,
+        refType: "ad",
+        refId: adId,
+      });
+      conversationId = String(conversation._id);
+    } catch {
       try {
         await Notification.create({
-          userId: ad.userId,
-          type: "inquiry",
+          recipientId: ad.userId,
+          type: "info",
           title: "طلب جديد على إعلانك",
           message: `هناك طلب جديد على "${ad.title}"`,
           refType: "ad",
           refId: adId,
+          link: "/messages",
         });
       } catch {}
     }
@@ -63,8 +77,10 @@ export async function POST(request: Request) {
       success: true,
       message: "تم إرسال طلبك، يمكن لصاحب الإعلان التواصل معك",
       transaction,
+      conversationId,
     });
   } catch (error) {
+    console.error("Inquiry error:", error);
     return NextResponse.json({ error: "فشل إرسال الطلب" }, { status: 500 });
   }
 }

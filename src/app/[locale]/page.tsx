@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { connectDB } from "@/lib/mongodb";
 import { Professional, type IProfessional } from "@/models/Professional";
-import { Ad } from "@/models/Ad";
 import { PROFESSIONS } from "@/lib/professions";
 import { getAuthFromCookies } from "@/lib/auth";
 import { User } from "@/models/User";
@@ -16,14 +15,12 @@ import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import CtaSection from "@/components/landing/CtaSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import ProfessionalCard from "@/components/ProfessionalCard";
-import AdCard from "@/components/AdCard";
 import { Link } from "@/i18n/navigation";
-import { getTranslations as getHomeTranslations } from "next-intl/server";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const tHome = await getHomeTranslations("home");
+  const tHome = await getTranslations("home");
 
   let isLoggedIn = false;
   let userRole: "professional" | "employer" | null = null;
@@ -39,16 +36,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   } catch {}
 
   let professionals: Awaited<ReturnType<typeof getAllProfessionals>> = [];
-  let ads: Awaited<ReturnType<typeof getAllAds>> = [];
 
   try {
-    [professionals, ads] = await Promise.all([
-      getAllProfessionals(),
-      getAllAds(),
-    ]);
+    professionals = await getAllProfessionals();
   } catch {
     professionals = [];
-    ads = [];
   }
 
   const grouped = groupByProfession(professionals);
@@ -125,59 +117,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </section>
           ))}
 
-          {ads.length > 0 && (
-            <>
-              {/* Commercial ads */}
-              {(() => {
-                const commercial = ads.filter((a) => a.type === "general");
-                if (commercial.length === 0) return null;
-                const grouped = groupAdsByCategory(commercial);
-                return Object.entries(grouped).map(([cat, items]) => (
-                  <section key={cat} className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-extrabold flex items-center gap-2">
-                        <span>{cat}</span>
-                        <span className="badge badge-warning text-[10px]">إعلان تجاري</span>
-                      </h3>
-                      <Link href={`/ads`} className="text-sm text-primary font-semibold">
-                        الكل ←
-                      </Link>
-                    </div>
-                    <div className="h-scroll">
-                      {items.map((ad) => (
-                        <AdCard key={ad._id} ad={ad} />
-                      ))}
-                    </div>
-                  </section>
-                ));
-              })()}
-
-              {/* Professional ads */}
-              {(() => {
-                const professional = ads.filter((a) => a.type === "professional");
-                if (professional.length === 0) return null;
-                const grouped = groupAdsByCategory(professional);
-                return Object.entries(grouped).map(([cat, items]) => (
-                  <section key={cat} className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-extrabold flex items-center gap-2">
-                        <span>{cat}</span>
-                        <span className="badge badge-primary text-[10px]">خدمة مهنية</span>
-                      </h3>
-                      <Link href={`/ads`} className="text-sm text-primary font-semibold">
-                        الكل ←
-                      </Link>
-                    </div>
-                    <div className="h-scroll">
-                      {items.map((ad) => (
-                        <AdCard key={ad._id} ad={ad} />
-                      ))}
-                    </div>
-                  </section>
-                ));
-              })()}
-            </>
-          )}
         </div>
       </section>
 
@@ -195,6 +134,7 @@ async function getAllProfessionals() {
 
   return data.map((p) => ({
     _id: String(p._id),
+    userId: String(p.userId),
     name: p.name,
     photo: p.photo,
     professions: p.professions,
@@ -208,51 +148,6 @@ async function getAllProfessionals() {
     averageRating: p.averageRating,
     ratingCount: p.ratingCount,
   }));
-}
-
-async function getAllAds() {
-  await connectDB();
-  const data = await Ad.find({ status: "active" })
-    .sort({ createdAt: -1 })
-    .limit(30)
-    .lean();
-
-  return data.map((ad) => ({
-    _id: String(ad._id),
-    type: ad.type || "",
-    category: ad.category || "",
-    title: ad.title || "",
-    description: ad.description || "",
-    price: ad.price,
-    currency: ad.currency,
-    location: ad.location || "",
-    images: ad.images || [],
-  }));
-}
-
-const AD_CATEGORY_LABELS: Record<string, string> = {
-  cars: "سيارات",
-  lands: "عقارات",
-  electronics: "إلكترونيات",
-  furniture: "أثاث",
-  "home-tools": "أدوات منزلية",
-  weapons: "سلاح",
-  services: "خدمات",
-  programming: "برمجة",
-  accounting: "محاسبة",
-  design: "تصميم",
-  teaching: "تدريس",
-  other: "أخرى",
-};
-
-function groupAdsByCategory(items: Awaited<ReturnType<typeof getAllAds>>) {
-  const map: Record<string, typeof items> = {};
-  for (const ad of items) {
-    const key = AD_CATEGORY_LABELS[ad.category] || ad.category;
-    if (!map[key]) map[key] = [];
-    map[key].push(ad);
-  }
-  return map;
 }
 
 function groupByProfession(all: Awaited<ReturnType<typeof getAllProfessionals>>) {

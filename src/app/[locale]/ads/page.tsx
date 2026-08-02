@@ -117,6 +117,10 @@ export default function AdsPage() {
         });
         const data = await res.json();
         if (res.ok) {
+          if (data.conversationId) {
+            window.location.href = `/messages/${data.conversationId}`;
+            return;
+          }
           setSent(true);
         } else {
           alert(data.error || "حدث خطأ");

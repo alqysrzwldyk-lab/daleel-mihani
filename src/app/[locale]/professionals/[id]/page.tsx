@@ -132,27 +132,33 @@ export default function ProfessionalProfilePage() {
                 />
               </div>
             )}
-            <button
-              onClick={async () => {
-                if (!user) { router.push("/login"); return; }
-                const res = await fetch("/api/messages", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    receiverId: professional._id || id,
-                    content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
-                    refType: "professional",
-                    refId: professional._id || id,
-                  }),
-                });
-                const data = await res.json();
-                if (res.ok) router.push(`/messages/${data.conversationId}`);
-              }}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary/30 text-primary font-bold text-sm hover:bg-primary/5 transition"
-            >
-              <MessageSquare className="w-4 h-4" />
-              أرسل رسالة
-            </button>
+            {(!user || user.id !== professional.userId) && (
+              <button
+                onClick={async () => {
+                  if (!user) { router.push("/login"); return; }
+                  const res = await fetch("/api/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      receiverId: professional.userId,
+                      content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
+                      refType: "professional",
+                      refId: professional._id || id,
+                    }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    router.push(`/messages/${data.conversationId}`);
+                  } else {
+                    alert(data.error || "فشل إرسال الرسالة");
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary/30 text-primary font-bold text-sm hover:bg-primary/5 transition"
+              >
+                <MessageSquare className="w-4 h-4" />
+                أرسل رسالة
+              </button>
+            )}
           </div>
 
           {professional.bio && (

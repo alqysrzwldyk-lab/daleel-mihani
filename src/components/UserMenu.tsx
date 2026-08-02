@@ -33,11 +33,16 @@ export default function UserMenu({
   const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+
+    const fetchWallet = () => {
       fetch("/api/wallet")
         .then((r) => r.json())
         .then((d) => { if (d.wallet) setBalance(d.wallet.balance); })
         .catch(() => {});
+    };
+
+    const fetchUnread = () => {
       fetch("/api/messages")
         .then((r) => r.json())
         .then((d) => {
@@ -46,7 +51,15 @@ export default function UserMenu({
           }
         })
         .catch(() => {});
-    }
+    };
+
+    fetchWallet();
+    fetchUnread();
+    const interval = setInterval(() => {
+      fetchWallet();
+      fetchUnread();
+    }, 5000);
+    return () => clearInterval(interval);
   }, [open]);
 
   useEffect(() => {

@@ -29,6 +29,7 @@ const updateSchema = z.object({
 function formatProfessional(professional: IProfessional) {
   return {
     _id: String(professional._id),
+    userId: String(professional.userId),
     name: professional.name,
     photo: professional.photo,
     professions: professional.professions || ["other"],

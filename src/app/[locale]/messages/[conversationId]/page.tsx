@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Send, User, Building2, Loader2, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, Loader2, MessageSquare, User, Building2 } from "lucide-react";
 
 type Msg = {
   _id: string;
@@ -13,57 +12,91 @@ type Msg = {
   createdAt: string;
 };
 
+type OtherUser = {
+  _id: string;
+  name: string;
+  role: string;
+  email?: string;
+};
+
 export default function ConversationPage() {
   const router = useRouter();
   const params = useParams();
   const conversationId = params.conversationId as string;
+
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [otherUser, setOtherUser] = useState<{ _id: string; name: string; role: string } | null>(null);
+  const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [myId, setMyId] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const bottomRef = useRef<HTMLDivElement>(null);
+  const myIdRef = useRef<string | null>(null);
+  const markedReadRef = useRef(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((d) => {
-        if (d.user) setMyId(d.user.id);
+        if (d.user) {
+          setMyId(d.user.id);
+          myIdRef.current = d.user.id;
+        } else {
+          router.push("/login");
+        }
       });
-  }, []);
+  }, [router]);
 
-  useEffect(() => {
-    fetch(`/api/messages/${conversationId}`)
-      .then((r) => r.json())
-      .then((d) => {
+  const markRead = useCallback(() => {
+    fetch(`/api/messages/${conversationId}/read`, { method: "POST" }).catch(() => {});
+  }, [conversationId]);
+
+  const loadMessages = useCallback(
+    async (initial = false) => {
+      try {
+        const res = await fetch(`/api/messages/${conversationId}`, {
+          cache: "no-store",
+        });
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
+        if (res.status === 403 || res.status === 404) {
+          setError("لا يمكن الوصول إلى هذه المحادثة");
+          setLoading(false);
+          return;
+        }
+        const d = await res.json();
         if (d.messages) {
           setMessages(d.messages);
-          const other = d.messages.find((m: Msg) => m.senderId._id !== myId);
-          if (other) setOtherUser(other.senderId);
+          const hasUnreadFromOther = d.messages.some(
+            (m: Msg) => m.senderId._id !== myIdRef.current && !m.read
+          );
+          if (hasUnreadFromOther && !markedReadRef.current) {
+            markRead();
+            markedReadRef.current = true;
+          }
         }
+        if (d.otherUser) setOtherUser(d.otherUser);
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      } catch {
+        setLoading(false);
+      }
+    },
+    [conversationId, markRead, router]
+  );
 
-    fetch(`/api/messages/${conversationId}/read`, { method: "POST" }).catch(() => {});
-  }, [conversationId, myId]);
+  useEffect(() => {
+    loadMessages(true);
+    const interval = setInterval(() => loadMessages(false), 3000);
+    return () => clearInterval(interval);
+  }, [loadMessages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetch(`/api/messages/${conversationId}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.messages) setMessages(d.messages);
-        })
-        .catch(() => {});
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [conversationId]);
+  }, [messages, loading]);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
@@ -79,7 +112,7 @@ export default function ConversationPage() {
         }),
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.message) {
         setMessages((prev) => [
           ...prev,
           {
@@ -91,16 +124,23 @@ export default function ConversationPage() {
           },
         ]);
         setText("");
+      } else {
+        alert(data.error || "فشل إرسال الرسالة");
       }
     } catch {}
     setSending(false);
   }
 
-  if (loading) {
+  if (error) {
     return (
       <div className="page-container max-w-2xl mx-auto">
-        <div className="skeleton h-12 rounded-xl mb-4" />
-        <div className="skeleton h-96 rounded-xl" />
+        <div className="empty-state">
+          <MessageSquare />
+          <h3>{error}</h3>
+          <button onClick={() => router.push("/messages")} className="btn btn-primary mt-4">
+            العودة إلى الرسائل
+          </button>
+        </div>
       </div>
     );
   }
@@ -112,22 +152,35 @@ export default function ConversationPage() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-          {otherUser?.role === "professional" ? (
-            <User className="w-4 h-4 text-primary" />
+          {otherUser?.role === "employer" ? (
+            <Building2 className="w-4 h-4 text-violet-600" />
           ) : (
-            <Building2 className="w-4 h-4 text-primary" />
+            <User className="w-4 h-4 text-primary" />
           )}
         </div>
-        <div>
-          <span className="font-bold text-sm">{otherUser?.name || "المحادثة"}</span>
-          <span className="text-[11px] text-muted block">
-            {otherUser?.role === "professional" ? "محترف" : "مستخدم"}
+        <div className="flex-1 min-w-0">
+          <span className="font-bold text-sm block truncate">{otherUser?.name || "المحادثة"}</span>
+          <span className={`text-[11px] font-semibold ${otherUser?.role === "employer" ? "text-violet-600" : "text-primary"}`}>
+            {otherUser?.role === "employer" ? "شركة" : otherUser?.role === "professional" ? "محترف" : ""}
           </span>
         </div>
+        {otherUser?.role === "professional" && otherUser?._id && (
+          <button
+            onClick={() => router.push("/search")}
+            className="text-[11px] font-bold text-primary border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition"
+          >
+            الملف المهني
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto bg-white rounded-2xl border border-gray-100 p-4 space-y-3 mb-3" style={{ maxHeight: "calc(100dvh - 280px)" }}>
-        {messages.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3 py-10">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <p className="text-sm text-muted">جاري تحميل الرسائل...</p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-10">
             <MessageSquare className="w-10 h-10 text-gray-200 mb-3" />
             <p className="text-sm text-muted">لا توجد رسائل بعد</p>
@@ -136,7 +189,12 @@ export default function ConversationPage() {
         ) : (
           messages.map((msg, i) => {
             const isMe = msg.senderId._id === myId;
-            const showDate = i === 0 || new Date(msg.createdAt).toDateString() !== new Date(messages[i - 1].createdAt).toDateString();
+            const showDate =
+              i === 0 ||
+              new Date(msg.createdAt).toDateString() !==
+                new Date(messages[i - 1].createdAt).toDateString();
+            const prevIsSameSender =
+              i > 0 && messages[i - 1].senderId._id === msg.senderId._id;
             return (
               <div key={msg._id}>
                 {showDate && (
@@ -154,12 +212,20 @@ export default function ConversationPage() {
                         : "bg-gray-100 text-gray-800 rounded-bl-md"
                     }`}
                   >
-                    {msg.content}
-                    <div className={`text-[10px] mt-1 ${isMe ? "text-white/60" : "text-gray-400"}`}>
-                      {new Date(msg.createdAt).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
+                    <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                    <div className={`flex items-center gap-1 justify-end mt-1 ${isMe ? "text-white/60" : "text-gray-400"}`}>
+                      <span className="text-[10px]">
+                        {new Date(msg.createdAt).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                      {isMe && (
+                        <span className={`text-[10px] font-bold ${msg.read ? "text-emerald-300" : "text-white/40"}`}>
+                          {msg.read ? "✓✓" : "✓"}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+                <div className={`h-1.5 ${prevIsSameSender ? "" : "my-0.5"}`} />
               </div>
             );
           })
