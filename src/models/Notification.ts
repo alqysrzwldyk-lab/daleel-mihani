@@ -8,6 +8,7 @@ export interface INotification {
   type: "info" | "success" | "warning" | "alert"; // نوع الإشعار لشكل الأيقونة
   isRead: boolean;                     // هل قرأ المستخدم الإشعار أم لا؟
   link?: string;                       // رابط اختياري يفتح عند الضغط على الإشعار
+  data?: Record<string, any>;          // بيانات إضافية لأزرار الإجراءات (طلب توظيف، تقييم...)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +21,7 @@ const NotificationSchema = new Schema<INotification>(
     type: { type: String, enum: ["info", "success", "warning", "alert"], default: "info" },
     isRead: { type: Boolean, default: false },
     link: { type: String },
+    data: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
 );

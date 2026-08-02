@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { getAuthFromRequest } from "@/lib/auth";
 import { Professional } from "@/models/Professional";
 import { Rating } from "@/models/Rating";
+import { User } from "@/models/User";
+import { Notification } from "@/models/Notification";
 
 const schema = z.object({
   score: z.number().min(1).max(5),
@@ -58,6 +60,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     professional.averageRating = Math.round((stats[0]?.average || 0) * 10) / 10;
     professional.ratingCount = stats[0]?.count || 0;
     await professional.save();
+
+    if (professional.userId) {
+      try {
+        const rater = await User.findById(auth.userId).select("name");
+        await Notification.create({
+          recipientId: professional.userId,
+          title: `⭐ تقييم جديد من ${rater?.name || "شركة"}`,
+          message: `حصلت على تقييم ${data.score} من 5${data.comment ? ` مع تعليق: "${data.comment}"` : ""}.`,
+          type: "info",
+          link: `/professionals/${professional._id}`,
+          data: { action: "rating", senderName: rater?.name || "", score: data.score },
+        });
+      } catch {}
+    }
 
     return NextResponse.json({
       averageRating: professional.averageRating,

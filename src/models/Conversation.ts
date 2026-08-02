@@ -7,7 +7,7 @@ const ConversationSchema = new Schema(
     lastSenderId: { type: Schema.Types.ObjectId, ref: "User" },
     lastMessageAt: { type: Date },
     unreadCount: { type: Map, of: Number, default: {} },
-    refType: { type: String, enum: ["ad", "professional"] },
+    refType: { type: String, enum: ["ad", "professional", "hire"] },
     refId: { type: Schema.Types.ObjectId },
   },
   { timestamps: true }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Bell, ChevronLeft } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import HireRequestActions from "@/components/HireRequestActions";
 
 type INotification = {
   _id: string;
@@ -11,7 +11,17 @@ type INotification = {
   message: string;
   isRead: boolean;
   link?: string;
+  type?: string;
   createdAt: string;
+  data?: {
+    action?: string;
+    hireRequestId?: string;
+    status?: string;
+    companyName?: string;
+    title?: string;
+    senderName?: string;
+    conversationId?: string;
+  };
 };
 
 export default function NotificationsPage() {
@@ -21,6 +31,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchNotifications() {
@@ -48,7 +60,18 @@ export default function NotificationsPage() {
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
     } catch {}
+    if (link) router.push(link);
   }
+
+  const handleHireResolved = (notifId: string, status: string, conversationId?: string) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n._id === notifId
+          ? { ...n, data: { ...(n.data || {}), status, conversationId } }
+          : n
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -98,6 +121,31 @@ export default function NotificationsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm">{notif.title}</p>
                   <p className="text-xs text-muted mt-1 line-clamp-2">{notif.message}</p>
+
+                  {notif.data?.action === "hire" && (
+                    <div className="mt-2">
+                      <div className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
+                        {notif.data.companyName && (
+                          <p className="text-xs font-bold text-gray-700">
+                            الشركة: {notif.data.companyName}
+                          </p>
+                        )}
+                        {notif.data.title && (
+                          <p className="text-[11px] text-muted mt-0.5 line-clamp-1">
+                            {notif.data.title}
+                          </p>
+                        )}
+                      </div>
+                      <HireRequestActions
+                        hireRequestId={notif.data.hireRequestId!}
+                        status={notif.data.status}
+                        onResolved={(status, conversationId) =>
+                          handleHireResolved(notif._id, status, conversationId)
+                        }
+                      />
+                    </div>
+                  )}
+
                   <p className="text-[11px] text-muted-light mt-2">
                     {new Date(notif.createdAt).toLocaleDateString("ar-EG", {
                       day: "numeric",
