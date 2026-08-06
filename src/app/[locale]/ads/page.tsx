@@ -183,7 +183,7 @@ export default function AdsPage() {
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">{CATEGORY_ICONS[category] || "📌"}</span>
           <h3 className="font-extrabold text-base">{CATEGORY_LABELS[category] || category}</h3>
-          <span className="text-xs text-muted-light bg-gray-100 px-2 py-0.5 rounded-full">{items.length}</span>
+          <span className="text-xs text-muted-light bg-[var(--border-light)] px-2 py-0.5 rounded-full">{items.length}</span>
         </div>
         {items.length <= 3 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -224,9 +224,9 @@ export default function AdsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="ابحث في الإعلانات..."
-          className="w-full py-3 px-4 pr-10 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/5 transition"
+          className="w-full py-3 px-4 pr-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/5 transition"
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-light)]" />
       </div>
 
       {/* Tabs */}
@@ -238,12 +238,12 @@ export default function AdsPage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
               activeTab === tab.key
                 ? "bg-primary text-white shadow-md"
-                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                : "bg-[var(--card)] text-[var(--muted)] border border-[var(--border)] hover:bg-[var(--border-light)]"
             }`}
           >
             {tab.label}
             <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-              activeTab === tab.key ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+              activeTab === tab.key ? "bg-white/20 text-white" : "bg-[var(--border-light)] text-[var(--muted-light)]"
             }`}>
               {tab.count}
             </span>

@@ -57,10 +57,33 @@ export default function NotificationBell() {
     fetchNotifications();
     intervalRef.current = setInterval(fetchNotifications, 10000);
 
+    const handleReadAll = () => {
+      setUnreadCount(0);
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    };
+
+    window.addEventListener("notifications:read", handleReadAll);
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      window.removeEventListener("notifications:read", handleReadAll);
     };
   }, []);
+
+  const markAllRead = async () => {
+    try {
+      const origin = window.location.origin;
+      await fetch(`${origin}/api/notifications/read-all`, { method: "POST" });
+    } catch {}
+    setUnreadCount(0);
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    window.dispatchEvent(new Event("notifications:read"));
+  };
+
+  const handleToggle = () => {
+    if (!isOpen) markAllRead();
+    setIsOpen(!isOpen);
+  };
 
   const handleNotificationClick = async (notif: INotification) => {
     setIsOpen(false);
@@ -88,8 +111,8 @@ export default function NotificationBell() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-primary transition rounded-xl hover:bg-gray-50"
+        onClick={handleToggle}
+        className="relative p-2 text-[var(--muted)] hover:text-primary transition rounded-xl hover:bg-[var(--border-light)]"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
@@ -102,8 +125,8 @@ export default function NotificationBell() {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-            <div className="px-4 py-3 font-bold text-sm border-b border-gray-100 flex items-center justify-between">
+          <div className="absolute left-0 mt-2 w-80 bg-[var(--surface)] rounded-xl shadow-xl border border-[var(--border-light)] z-50 overflow-hidden">
+            <div className="px-4 py-3 font-bold text-sm border-b border-[var(--border-light)] flex items-center justify-between">
               <span>الإشعارات</span>
               {unreadCount > 0 && (
                 <span className="badge badge-primary text-[11px]">{unreadCount} جديد</span>
@@ -120,7 +143,7 @@ export default function NotificationBell() {
                   <div
                     key={notif._id}
                     onClick={() => handleNotificationClick(notif)}
-                    className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition cursor-pointer ${
+                    className={`px-4 py-3 border-b border-[var(--border-light)] hover:bg-[var(--border-light)] transition cursor-pointer ${
                       !notif.isRead ? "bg-primary-50/50" : ""
                     }`}
                   >
@@ -129,9 +152,9 @@ export default function NotificationBell() {
 
                     {notif.data?.action === "hire" && (
                       <div className="mt-2">
-                        <div className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
+                        <div className="rounded-lg bg-[var(--border-light)] border border-[var(--border)] px-3 py-2">
                           {notif.data.companyName && (
-                            <p className="text-xs font-bold text-gray-700">{notif.data.companyName}</p>
+                            <p className="text-xs font-bold text-[var(--foreground)]">{notif.data.companyName}</p>
                           )}
                           {notif.data.title && (
                             <p className="text-[11px] text-muted mt-0.5 line-clamp-1">

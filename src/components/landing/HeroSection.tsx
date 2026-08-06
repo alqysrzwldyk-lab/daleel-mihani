@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Link } from "@/i18n/navigation";
 import { Search, Briefcase, Sparkles, ArrowLeft } from "lucide-react";
 
@@ -8,13 +8,15 @@ const POPULAR = [
   "طبيب", "مهندس", "معلم", "كهربائي", "سباك", "مصمم", "مبرمج", "محامي"
 ];
 
+const emptySubscribe = () => () => {};
+
 export default function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [query, setQuery] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   return (
     <section className="landing-hero">

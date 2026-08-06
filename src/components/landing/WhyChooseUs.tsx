@@ -26,7 +26,7 @@ export default function WhyChooseUs() {
   }, []);
 
   return (
-    <section className="py-16 md:py-20 bg-white" ref={ref}>
+    <section className="py-16 md:py-20 bg-[var(--surface)]" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">لماذا الدليل المهني؟</h2>
@@ -37,7 +37,7 @@ export default function WhyChooseUs() {
           {reasons.map((r, i) => (
             <div
               key={r.title}
-              className={`flex gap-4 p-5 rounded-xl border border-gray-100 bg-white hover:border-primary/20 hover:shadow-md transition-all duration-500 ${
+              className={`flex gap-4 p-5 rounded-xl border border-[var(--border-light)] bg-[var(--card)] hover:border-primary/20 hover:shadow-md transition-all duration-500 ${
                 visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
               }`}
               style={{ transitionDelay: `${i * 80}ms` }}

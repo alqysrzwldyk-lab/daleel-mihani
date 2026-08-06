@@ -140,7 +140,7 @@ export default function OAuthButtons() {
           ref={googleBtnRef}
           onClick={handleGoogleClick}
           disabled={loading === "google"}
-          className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+          className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 border-[var(--border)] bg-[var(--card)] hover:bg-[var(--border-light)] hover:border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
         >
           {loading === "google" ? (
             <Loader2 className="w-5 h-5 animate-spin" />

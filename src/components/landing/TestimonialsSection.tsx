@@ -16,7 +16,7 @@ const testimonials = [
     name: "سارة عبدالله",
     role: "مصممة جرافيك",
     avatar: "س",
-    color: "bg-purple-500",
+    color: "bg-sky-500",
     text: "الدليل المهني غير مسيرتي المهنية تماماً. وجدت أول وظيفة لي من خلال المنصة والآن لدي عملاء مستمرون.",
     rating: 5,
   },
@@ -65,13 +65,13 @@ export default function TestimonialsSection() {
           {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className={`p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-700 ${
+              className={`p-6 rounded-2xl bg-[var(--card)] border border-[var(--border-light)] shadow-sm hover:shadow-md transition-all duration-700 ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: `${i * 150}ms` }}
             >
               <Stars count={t.rating} />
-              <p className="text-sm text-gray-600 mt-3 mb-4 leading-relaxed">&ldquo;{t.text}&rdquo;</p>
+              <p className="text-sm text-[var(--muted)] mt-3 mb-4 leading-relaxed">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white text-sm font-bold`}>
                   {t.avatar}

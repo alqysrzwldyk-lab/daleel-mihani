@@ -115,8 +115,8 @@ export default function SubscriptionPage() {
                 isCurrent
                   ? "border-primary bg-primary/5"
                   : plan.popular
-                  ? "border-amber-200 bg-white"
-                  : "border-gray-200 bg-white"
+                  ? "border-amber-200 bg-[var(--card)]"
+                  : "border-[var(--border)] bg-[var(--card)]"
               }`}
             >
               {plan.popular && !isCurrent && (
@@ -150,11 +150,11 @@ export default function SubscriptionPage() {
                 onClick={() => handleSubscribe(plan.id)}
                 disabled={isCurrent || subscribing}
                 className={`w-full py-3 rounded-xl font-bold text-sm transition ${
-                  isCurrent
-                    ? "bg-gray-100 text-gray-400 cursor-default"
-                    : isPremium
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg hover:shadow-amber-200"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isCurrent
+                  ? "bg-[var(--border-light)] text-[var(--muted-light)] cursor-default"
+                  : isPremium
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg hover:shadow-amber-200"
+                  : "bg-[var(--border-light)] text-[var(--muted)] hover:bg-[var(--border)]"
                 }`}
               >
                 {subscribing ? (

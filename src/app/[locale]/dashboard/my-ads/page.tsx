@@ -53,8 +53,8 @@ function BoostModal({ adId, onClose }: { adId: string; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl w-full max-w-sm mx-4 p-6 shadow-xl animate-slide-up">
-        <button onClick={onClose} className="absolute top-4 left-4 w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
+      <div className="relative bg-[var(--surface)] rounded-2xl w-full max-w-sm mx-4 p-6 shadow-xl animate-slide-up">
+        <button onClick={onClose} className="absolute top-4 left-4 w-8 h-8 rounded-full hover:bg-[var(--border-light)] flex items-center justify-center">
           <X className="w-4 h-4" />
         </button>
         <div className="flex items-center gap-2 mb-4">
@@ -164,14 +164,14 @@ export default function MyWalletAdsPage() {
                   <span className={`badge ${ad.type === "professional" ? "badge-primary" : "badge-warning"}`}>
                     {ad.type === "professional" ? "💼 خدمة مهنية" : "📦 إعلان عام"}
                   </span>
-                  <span className="badge bg-gray-50 text-gray-500 border border-gray-100">{ad.category}</span>
+                  <span className="badge bg-[var(--border-light)] text-[var(--muted)] border border-[var(--border)]">{ad.category}</span>
                 </div>
                 <h3 className="text-sm font-bold mb-1 line-clamp-1">{ad.title}</h3>
                 <p className="text-xs text-muted line-clamp-2 mb-3">{ad.description}</p>
                 {ad.specifications && Object.keys(ad.specifications).length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {Object.entries(ad.specifications).map(([key, val]) => (
-                      <span key={key} className="text-[11px] bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
+                      <span key={key} className="text-[11px] bg-[var(--border-light)] px-2 py-0.5 rounded-md border border-[var(--border)]">
                         {key === "model" ? "موديل" : "مساحة"}: {val}
                       </span>
                     ))}

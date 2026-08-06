@@ -55,7 +55,7 @@ export default function StatsSection() {
       <div className="page-container">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center p-6 md:p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div key={stat.label} className="text-center p-6 md:p-8 rounded-2xl bg-[var(--card)] border border-[var(--border-light)] shadow-sm hover:shadow-md transition-shadow">
               <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
               <AnimatedNumber target={stat.value} suffix={stat.suffix} />
               <p className="text-muted text-sm mt-1">{stat.label}</p>

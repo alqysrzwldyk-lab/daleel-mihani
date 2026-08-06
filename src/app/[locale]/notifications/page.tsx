@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Bell, ChevronLeft } from "lucide-react";
 import HireRequestActions from "@/components/HireRequestActions";
@@ -28,6 +28,7 @@ export default function NotificationsPage() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const markedReadRef = useRef(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -45,12 +46,24 @@ export default function NotificationsPage() {
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications || []);
+        if (!markedReadRef.current) {
+          markedReadRef.current = true;
+          markAllRead();
+        }
       }
     } catch (err) {
       console.error("Failed to fetch notifications", err);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function markAllRead() {
+    try {
+      await fetch("/api/notifications/read-all", { method: "POST" });
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      window.dispatchEvent(new Event("notifications:read"));
+    } catch {}
   }
 
   async function markAsRead(id: string, link?: string) {
@@ -124,9 +137,9 @@ export default function NotificationsPage() {
 
                   {notif.data?.action === "hire" && (
                     <div className="mt-2">
-                      <div className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
+                      <div className="rounded-lg bg-[var(--border-light)] border border-[var(--border)] px-3 py-2">
                         {notif.data.companyName && (
-                          <p className="text-xs font-bold text-gray-700">
+                          <p className="text-xs font-bold text-[var(--foreground)]">
                             الشركة: {notif.data.companyName}
                           </p>
                         )}

@@ -3,7 +3,6 @@ import { connectDB } from "@/lib/mongodb";
 import { Professional, type IProfessional } from "@/models/Professional";
 import { PROFESSIONS } from "@/lib/professions";
 import { getAuthFromCookies } from "@/lib/auth";
-import { User } from "@/models/User";
 import HeroSection from "@/components/landing/HeroSection";
 import QuickAccess from "@/components/landing/QuickAccess";
 import StatsSection from "@/components/landing/StatsSection";
@@ -23,16 +22,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const tHome = await getTranslations("home");
 
   let isLoggedIn = false;
-  let userRole: "professional" | "employer" | null = null;
 
   try {
     const auth = await getAuthFromCookies();
-    if (auth?.userId) {
-      isLoggedIn = true;
-      await connectDB();
-      const user = await User.findById(auth.userId);
-      if (user) userRole = user.role;
-    }
+    if (auth?.userId) isLoggedIn = true;
   } catch {}
 
   let professionals: Awaited<ReturnType<typeof getAllProfessionals>> = [];

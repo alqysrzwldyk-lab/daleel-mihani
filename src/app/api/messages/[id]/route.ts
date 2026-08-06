@@ -5,6 +5,12 @@ import { Conversation } from "@/models/Conversation";
 import { Message } from "@/models/Message";
 import { getOtherUser } from "@/lib/messaging";
 
+type LeanConversation = {
+  _id: unknown;
+  participants?: unknown;
+  unreadCount?: unknown;
+};
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -20,7 +26,7 @@ export async function GET(
 
     const conversation = (await Conversation.findById(id)
       .populate("participants", "name email role avatar")
-      .lean()) as Record<string, any> | null;
+      .lean()) as LeanConversation | null;
 
     if (!conversation) {
       return NextResponse.json({ error: "المحادثة غير موجودة" }, { status: 404 });

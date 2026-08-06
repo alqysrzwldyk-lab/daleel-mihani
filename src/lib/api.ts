@@ -19,6 +19,51 @@ export type ProfessionalPublic = {
   email: string;
   averageRating: number;
   ratingCount: number;
+  cover?: string;
+  specialization?: string;
+  objective?: string;
+  education?: string;
+  currentWorkplace?: string;
+  experienceYears?: string;
+  skillLevels?: { skill: string; level: number }[];
+  languages?: { name: string; level?: string }[];
+  projects?: {
+    title: string;
+    description?: string;
+    category?: string;
+    image?: string;
+    images?: string[];
+    video?: string;
+    pdf?: string;
+    beforeAfter?: { before?: string; after?: string };
+    completedDate?: string;
+  }[];
+  certificates?: {
+    name: string;
+    organization?: string;
+    issueDate?: string;
+    expiryDate?: string;
+    image?: string;
+    pdf?: string;
+  }[];
+  workingHours?: {
+    days?: string[];
+    hours?: string;
+    availableToday?: boolean;
+    availableNow?: boolean;
+    emergencyAvailable?: boolean;
+  };
+  social?: {
+    whatsapp?: string;
+    telegram?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    github?: string;
+    twitter?: string;
+    website?: string;
+  };
+  availability?: "available" | "busy" | "away";
 };
 
 export async function fetchProfessionals(params?: {

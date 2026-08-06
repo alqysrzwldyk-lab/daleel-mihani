@@ -26,7 +26,7 @@ export async function PUT(
     );
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "خطأ في تحديث الإشعار" }, { status: 500 });
   }
 }

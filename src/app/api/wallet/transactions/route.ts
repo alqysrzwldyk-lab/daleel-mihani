@@ -18,7 +18,7 @@ export async function GET() {
       .limit(50);
 
     return NextResponse.json({ success: true, transactions });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "فشل جلب المعاملات" }, { status: 500 });
   }
 }

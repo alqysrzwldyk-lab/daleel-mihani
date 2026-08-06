@@ -326,6 +326,28 @@ body {
   text-align: center;
 }
 
+/* ===== Card Shadow (used across jobs feature) ===== */
+.card-shadow {
+  box-shadow:
+    0 4px 20px -2px rgb(15 23 42 / 0.08),
+    0 2px 6px -2px rgb(15 23 42 / 0.04);
+}
+
+[data-theme="dark"] .card-shadow {
+  box-shadow:
+    0 4px 20px -2px rgb(0 0 0 / 0.3),
+    0 2px 6px -2px rgb(0 0 0 / 0.15);
+}
+
+/* ===== Gradient Hero Banner (jobs feature) ===== */
+.gradient-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0ea5e9 100%);
+}
+
+[data-theme="dark"] .gradient-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 45%, #0ea5e9 100%);
+}
+
 /* ===== Buttons ===== */
 .btn {
   display: inline-flex;
@@ -767,9 +789,9 @@ select.input-field {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.25), transparent),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(139,92,246,0.15), transparent),
-    radial-gradient(ellipse 50% 40% at 20% 90%, rgba(236,72,153,0.1), transparent);
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(37,99,235,0.35), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(14,165,233,0.2), transparent),
+    radial-gradient(ellipse 50% 40% at 20% 90%, rgba(59,130,246,0.15), transparent);
   animation: authBgPulse 8s ease-in-out infinite alternate;
 }
 
@@ -800,7 +822,7 @@ select.input-field {
 .auth-orb-1 {
   width: 500px;
   height: 500px;
-  background: rgba(99,102,241,0.12);
+  background: rgba(37,99,235,0.15);
   top: -200px;
   right: -150px;
   animation: authOrbFloat 12s ease-in-out infinite alternate;
@@ -809,7 +831,7 @@ select.input-field {
 .auth-orb-2 {
   width: 350px;
   height: 350px;
-  background: rgba(139,92,246,0.1);
+  background: rgba(14,165,233,0.12);
   bottom: -120px;
   left: -100px;
   animation: authOrbFloat 10s ease-in-out infinite alternate-reverse;
@@ -818,7 +840,7 @@ select.input-field {
 .auth-orb-3 {
   width: 200px;
   height: 200px;
-  background: rgba(236,72,153,0.08);
+  background: rgba(59,130,246,0.1);
   top: 40%;
   right: -60px;
   animation: authOrbFloat 14s ease-in-out infinite alternate;
@@ -855,12 +877,12 @@ select.input-field {
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 18px;
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.35);
   animation: authLogoIn 0.6s ease 0.15s both;
 }
 
@@ -966,14 +988,14 @@ select.input-field {
 }
 
 .auth-input:focus {
-  border-color: rgba(99,102,241,0.5);
+  border-color: rgba(59,130,246,0.6);
   background: rgba(255,255,255,0.08);
-  box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
 }
 
 .auth-input:focus + .auth-input-icon,
 .auth-input:focus ~ .auth-input-icon {
-  color: rgba(99,102,241,0.8);
+  color: rgba(96,165,250,0.9);
 }
 
 .auth-input::placeholder {
@@ -994,16 +1016,16 @@ select.input-field {
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
   color: white;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
   margin-top: 4px;
   animation: authFadeUp 0.5s ease 0.5s both;
 }
 
 .auth-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.4);
 }
 
 .auth-btn:active {
@@ -1051,14 +1073,14 @@ select.input-field {
 }
 
 .auth-footer a {
-  color: #a78bfa;
+  color: #60a5fa;
   font-weight: 700;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .auth-footer a:hover {
-  color: #c4b5fd;
+  color: #93c5fd;
   text-decoration: underline;
 }
 
@@ -1087,13 +1109,13 @@ select.input-field {
 }
 
 .auth-role-btn:hover {
-  border-color: rgba(99,102,241,0.3);
-  background: rgba(99,102,241,0.08);
+  border-color: rgba(59,130,246,0.35);
+  background: rgba(37,99,235,0.1);
 }
 
 .auth-role-btn.active {
-  border-color: rgba(99,102,241,0.6);
-  background: rgba(99,102,241,0.12);
+  border-color: rgba(59,130,246,0.65);
+  background: rgba(37,99,235,0.14);
 }
 
 .auth-role-btn svg {
@@ -1328,7 +1350,7 @@ select.input-field {
   bottom: 0;
   width: 300px;
   max-width: 85vw;
-  background: white;
+  background: var(--surface);
   z-index: 61;
   display: flex;
   flex-direction: column;
@@ -1343,7 +1365,7 @@ select.input-field {
 
 .usermenu-header {
   padding: 24px 20px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -1354,7 +1376,7 @@ select.input-field {
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  background: linear-gradient(135deg, var(--primary-50), var(--primary-light));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1364,7 +1386,7 @@ select.input-field {
 .usermenu-avatar svg {
   width: 22px;
   height: 22px;
-  color: #6366f1;
+  color: var(--primary);
 }
 
 .usermenu-user-info {
@@ -1375,12 +1397,12 @@ select.input-field {
 .usermenu-user-name {
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--foreground);
 }
 
 .usermenu-user-email {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--muted-light);
   margin-top: 1px;
 }
 
@@ -1393,8 +1415,8 @@ select.input-field {
   padding: 2px 8px;
   border-radius: 20px;
   margin-top: 4px;
-  background: #eef2ff;
-  color: #6366f1;
+  background: var(--primary-50);
+  color: var(--primary);
 }
 
 .usermenu-body {
@@ -1406,7 +1428,7 @@ select.input-field {
 .usermenu-section-label {
   font-size: 11px;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--muted-light);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 16px 20px 6px;
@@ -1418,7 +1440,7 @@ select.input-field {
   gap: 14px;
   padding: 13px 20px;
   text-decoration: none;
-  color: #334155;
+  color: var(--foreground);
   font-size: 14px;
   font-weight: 600;
   transition: all 0.15s ease;
@@ -1432,24 +1454,24 @@ select.input-field {
 }
 
 .usermenu-item:hover {
-  background: #f8fafc;
-  color: #6366f1;
+  background: var(--primary-50);
+  color: var(--primary);
 }
 
 .usermenu-item:active {
-  background: #f1f5f9;
+  background: var(--border-light);
 }
 
 .usermenu-item-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #94a3b8;
+  color: var(--muted-light);
   transition: color 0.15s;
 }
 
 .usermenu-item:hover .usermenu-item-icon {
-  color: #6366f1;
+  color: var(--primary);
 }
 
 .usermenu-item-text {
@@ -1467,41 +1489,41 @@ select.input-field {
 
 .usermenu-item-sub {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--muted-light);
   font-weight: 400;
   margin-top: 1px;
 }
 
 .usermenu-divider {
   height: 1px;
-  background: #f1f5f9;
+  background: var(--border-light);
   margin: 8px 20px;
 }
 
 .usermenu-item-danger {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .usermenu-item-danger:hover {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--danger-light);
+  color: var(--danger);
 }
 
 .usermenu-item-danger:hover .usermenu-item-icon {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .usermenu-footer {
   padding: 16px 20px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--border-light);
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--muted-light);
   text-align: center;
 }
 
 /* ===== Quick Access Cards ===== */
 .quick-access {
-  background: #f8faff;
+  background: #f4f8ff;
   padding: 0 0 32px;
   margin: -40px 0 0;
   position: relative;
@@ -1527,18 +1549,18 @@ select.input-field {
   gap: 8px;
   padding: 20px 12px;
   border-radius: 16px;
-  background: #f8faff;
-  border: 1px solid #eef2ff;
+  background: #f4f8ff;
+  border: 1px solid #e3edff;
   text-decoration: none;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .quick-card:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
+  background: #dbeafe;
+  border-color: #bfdbfe;
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(99,102,241,0.1);
+  box-shadow: 0 4px 16px rgba(37,99,235,0.12);
 }
 
 .quick-card:active {
@@ -1588,6 +1610,16 @@ select.input-field {
 .quick-card-icon-teal {
   background: #f0fdfa;
   color: #14b8a6;
+}
+
+.quick-card-icon-violet {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.quick-card-icon-amber {
+  background: #fffbeb;
+  color: #f59e0b;
 }
 
 .quick-card-title {
@@ -1641,9 +1673,9 @@ select.input-field {
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(ellipse 50% 40% at 30% 20%, rgba(99,102,241,0.3), transparent),
-    radial-gradient(ellipse 40% 50% at 70% 80%, rgba(168,85,247,0.2), transparent),
-    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(6,182,212,0.15), transparent);
+    radial-gradient(ellipse 50% 40% at 30% 20%, rgba(37,99,235,0.4), transparent),
+    radial-gradient(ellipse 40% 50% at 70% 80%, rgba(14,165,233,0.25), transparent),
+    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(59,130,246,0.15), transparent);
   animation: meshShift 15s ease-in-out infinite alternate;
 }
 
@@ -1666,7 +1698,7 @@ select.input-field {
 .landing-hero-orb-1 {
   width: 700px;
   height: 700px;
-  background: rgba(99,102,241,0.12);
+  background: rgba(37,99,235,0.15);
   top: -300px;
   left: -200px;
   animation: orbDrift 12s ease-in-out infinite alternate;
@@ -1675,7 +1707,7 @@ select.input-field {
 .landing-hero-orb-2 {
   width: 500px;
   height: 500px;
-  background: rgba(168,85,247,0.1);
+  background: rgba(14,165,233,0.12);
   bottom: -200px;
   right: -150px;
   animation: orbDrift 10s ease-in-out infinite alternate-reverse;
@@ -1684,7 +1716,7 @@ select.input-field {
 .landing-hero-orb-3 {
   width: 400px;
   height: 400px;
-  background: rgba(6,182,212,0.08);
+  background: rgba(59,130,246,0.1);
   top: 40%;
   left: 60%;
   animation: orbDrift 14s ease-in-out infinite alternate;
@@ -1739,7 +1771,7 @@ select.input-field {
 .landing-hero-accent {
   position: absolute;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(37,99,235,0.35), transparent);
   pointer-events: none;
 }
 
@@ -1768,4 +1800,27 @@ select.input-field {
     padding: calc(var(--nav-height) + 80px) 0 70px;
     min-height: 85vh;
   }
+}
+
+/* ===== Dark mode overrides for fixed-white components ===== */
+[data-theme="dark"] .app-header {
+  background: rgba(15, 23, 42, 0.92);
+  border-bottom-color: var(--border-light);
+}
+
+[data-theme="dark"] .bottom-nav {
+  background: rgba(15, 23, 42, 0.95);
+  border-top-color: var(--border-light);
+}
+
+[data-theme="dark"] .search-bar {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .app-header-title {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .nav-badge {
+  border-color: var(--surface);
 }

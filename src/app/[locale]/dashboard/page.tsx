@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
 import {
   Settings, Moon, Sun, Info, HelpCircle, FileText,
-  User, ChevronLeft, ChevronRight, LogOut, Briefcase, Shield
+  User, ChevronLeft, LogOut, Briefcase, Users, Building2
 } from "lucide-react";
 
 type AuthUser = {
@@ -16,19 +15,22 @@ type AuthUser = {
 };
 
 export default function DashboardPage() {
-  const t = useTranslations("dashboard");
   const router = useRouter();
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const stored = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return stored ? stored === "dark" : prefersDark;
+  });
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isDark = stored ? stored === "dark" : prefersDark;
-    setDarkMode(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
 
     fetch("/api/auth/me")
@@ -76,23 +78,56 @@ export default function DashboardPage() {
             color: "text-blue-600",
             bg: "bg-blue-50",
           },
+          {
+            icon: FileText,
+            label: "إعلاناتي",
+            desc: "إدارة إعلاناتك المنشورة",
+            href: "/dashboard/my-ads",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+          },
         ]
-      : []),
-    {
-      icon: FileText,
-      label: "إعلاناتي",
-      desc: "إدارة إعلاناتك المنشورة",
-      href: "/dashboard/my-ads",
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-    },
+      : [
+          {
+            icon: Briefcase,
+            label: "لوحة الشركة",
+            desc: "إدارة إعلاناتك الوظيفية ومتابعة المتقدمين",
+            href: "/dashboard/jobs",
+            color: "text-blue-600",
+            bg: "bg-blue-50",
+          },
+          {
+            icon: FileText,
+            label: "إعلان توظيف جديد",
+            desc: "انشر إعلان وظيفي جديد",
+            href: "/dashboard/jobs/new",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+          },
+          {
+            icon: Users,
+            label: "طلبات التوظيف",
+            desc: "عرض المتقدمين على وظائفك",
+            href: "/dashboard/applications",
+            color: "text-blue-600",
+            bg: "bg-blue-50",
+          },
+          {
+            icon: Building2,
+            label: "ملف الشركة",
+            desc: "تعديل معلومات شركتك وصفحتها العامة",
+            href: "/company/edit",
+            color: "text-indigo-600",
+            bg: "bg-indigo-50",
+          },
+        ]),
     {
       icon: Moon,
       label: "المظهر",
       desc: darkMode ? "الوضع النهاري" : "الوضع الليلي",
       href: null,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
+      color: "text-slate-600",
+      bg: "bg-slate-100",
       toggle: true,
     },
     {

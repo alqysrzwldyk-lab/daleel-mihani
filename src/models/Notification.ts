@@ -8,7 +8,7 @@ export interface INotification {
   type: "info" | "success" | "warning" | "alert"; // نوع الإشعار لشكل الأيقونة
   isRead: boolean;                     // هل قرأ المستخدم الإشعار أم لا؟
   link?: string;                       // رابط اختياري يفتح عند الضغط على الإشعار
-  data?: Record<string, any>;          // بيانات إضافية لأزرار الإجراءات (طلب توظيف، تقييم...)
+  data?: Record<string, unknown>;      // بيانات إضافية لأزرار الإجراءات (طلب توظيف، تقييم...)
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
@@ -14,14 +14,12 @@ function RegisterForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"professional" | "employer">("professional");
+  const [role, setRole] = useState<"professional" | "employer">(() => {
+    const r = searchParams.get("role");
+    return r === "employer" || r === "professional" ? r : "professional";
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const r = searchParams.get("role");
-    if (r === "employer" || r === "professional") setRole(r);
-  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,29 +40,35 @@ function RegisterForm() {
       return;
     }
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmedName, email: trimmedEmail, password, role }),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmedName, email: trimmedEmail, password, role }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      const data = await res.json();
+      setLoading(false);
 
-    if (!res.ok) {
-      const fieldKey = data.field as string | undefined;
-      const errorKey = data.error as string;
-      if (fieldKey && fieldKey !== "validation") {
-        setError(t(`errors.${fieldKey}` as "errors.generic"));
-      } else if (errorKey) {
-        setError(t(`errors.${errorKey}` as "errors.generic"));
-      } else {
-        setError(t("errors.generic"));
+      if (!res.ok) {
+        const fieldKey = data.field as string | undefined;
+        const errorKey = data.error as string;
+        if (fieldKey && fieldKey !== "validation") {
+          setError(t(`errors.${fieldKey}` as "errors.generic"));
+        } else if (errorKey) {
+          setError(t(`errors.${errorKey}` as "errors.generic"));
+        } else {
+          setError(t("errors.generic"));
+        }
+        return;
       }
-      return;
-    }
 
-    window.location.href = "/";
+      window.location.href = role === "employer" ? "/dashboard/jobs" : "/dashboard";
+    } catch (err) {
+      console.error("Register connection error:", err);
+      setLoading(false);
+      setError("تعذر الاتصال بالخادم، تحقق من اتصال الإنترنت وحاول مجدداً");
+    }
   }
 
   return (
@@ -84,16 +88,16 @@ function RegisterForm() {
           onClick={() => setRole("professional")}
           className={`auth-role-btn ${role === "professional" ? "active" : ""}`}
         >
-          <Briefcase className={role === "professional" ? "text-[#6366f1]" : "text-[#9ca3af]"} />
-          <span className={role === "professional" ? "text-[#6366f1]" : "text-[#6b7280]"}>محترف</span>
+          <Briefcase className={role === "professional" ? "text-blue-400" : "text-[#9ca3af]"} />
+          <span className={role === "professional" ? "text-blue-400" : "text-[#6b7280]"}>محترف</span>
         </button>
         <button
           type="button"
           onClick={() => setRole("employer")}
           className={`auth-role-btn ${role === "employer" ? "active" : ""}`}
         >
-          <Building2 className={role === "employer" ? "text-[#6366f1]" : "text-[#9ca3af]"} />
-          <span className={role === "employer" ? "text-[#6366f1]" : "text-[#6b7280]"}>صاحب شركة</span>
+          <Building2 className={role === "employer" ? "text-blue-400" : "text-[#9ca3af]"} />
+          <span className={role === "employer" ? "text-blue-400" : "text-[#6b7280]"}>صاحب شركة</span>
         </button>
       </div>
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Tag, MapPin } from "lucide-react";
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -27,9 +28,11 @@ export default function AdCard({ ad }: Props) {
     <div className="app-card h-scroll-card flex flex-col justify-between overflow-hidden">
       {ad.images && ad.images.length > 0 && ad.images[0] && (
         <div className="relative w-full h-32 bg-slate-100">
-          <img
+          <Image
             src={ad.images[0]}
             alt={ad.title}
+            width={384}
+            height={128}
             className="w-full h-full object-cover"
           />
         </div>
@@ -40,7 +43,7 @@ export default function AdCard({ ad }: Props) {
             <span className={`badge ${ad.type === "professional" ? "badge-primary" : "badge-warning"}`}>
               {ad.type === "professional" ? "خدمة مهنية" : "إعلان تجاري"}
             </span>
-            <span className="badge bg-gray-50 text-gray-500 border border-gray-100">
+            <span className="badge bg-[var(--border-light)] text-[var(--muted)] border border-[var(--border)]">
               {ad.category}
             </span>
           </div>

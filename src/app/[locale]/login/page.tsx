@@ -41,7 +41,8 @@ export default function LoginPage() {
         return;
       }
 
-      window.location.href = "/";
+      const role = (data.user as { role?: string } | undefined)?.role;
+      window.location.href = role === "employer" ? "/dashboard/jobs" : "/dashboard";
     } catch (err) {
       console.error("Login connection error:", err);
       setError(t("errors.generic"));

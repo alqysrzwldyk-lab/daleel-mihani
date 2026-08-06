@@ -72,11 +72,11 @@ export default function WalletPage() {
       )}
 
       <div className="flex gap-3 mb-6">
-        <Link href="/subscription" className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl py-3 px-4 font-bold text-sm hover:bg-gray-50 transition">
+        <Link href="/subscription" className="flex-1 flex items-center justify-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-xl py-3 px-4 font-bold text-sm hover:bg-[var(--border-light)] transition">
           <Star className="w-4 h-4 text-amber-500" />
           الباقة المميزة
         </Link>
-        <Link href="/dashboard/my-ads" className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl py-3 px-4 font-bold text-sm hover:bg-gray-50 transition">
+        <Link href="/dashboard/my-ads" className="flex-1 flex items-center justify-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-xl py-3 px-4 font-bold text-sm hover:bg-[var(--border-light)] transition">
           <Megaphone className="w-4 h-4 text-primary" />
           تعزيز إعلان
         </Link>
@@ -96,9 +96,9 @@ export default function WalletPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {txs.map((tx) => {
-            const st = statusLabels[tx.status] || { label: tx.status, color: "text-gray-600 bg-gray-50" };
+            const st = statusLabels[tx.status] || { label: tx.status, color: "text-[var(--muted)] bg-[var(--border-light)]" };
             return (
-              <div key={tx._id} className="bg-white rounded-xl p-4 border border-gray-100 flex items-center gap-3">
+              <div key={tx._id} className="bg-[var(--card)] rounded-xl p-4 border border-[var(--border-light)] flex items-center gap-3">
                 <span className="text-xl">{typeIcons[tx.type] || "💳"}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm">{tx.note || typeLabels[tx.type] || tx.type}</p>

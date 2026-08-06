@@ -7,44 +7,43 @@ import { signToken, attachAuthCookie } from "@/lib/auth";
 import { loginSchema, validationMessageKey } from "@/lib/validation";
 import { isRateLimited } from "@/lib/rateLimit"; // 💡 استيراد نظام الحماية
 
+const ip = (req: NextRequest) =>
+  req.headers.get("x-forwarded-for") || "127.0.0.1";
+
 export async function POST(req: NextRequest) {
   try {
-    // 1. 💡 حماية مسار تسجيل الدخول ضد التخمين: بحد أقصى 5 محاولات فقط في الدقيقة لكل IP
-    const ip = req.headers.get("x-forwarded-for") || "127.0.0.1";
-    const limited = isRateLimited(ip, { windowMs: 60 * 1000, maxRequests: 5 });
-    if (limited) {
-      return NextResponse.json(
-        { error: "محاولات تسجيل دخول كثيرة. يرجى المحاولة بعد دقيقة." },
-        { status: 429 } // Too Many Requests
-      );
-    }
-
-    // 2. استقبال وتحليل البيانات المرسلة
+    // 1. استقبال وتحليل البيانات المرسلة
     const body = await req.json();
     const data = loginSchema.parse(body);
 
     await connectDB();
-    
-    // 3. البحث عن المستخدم في قاعدة البيانات
+
+    // 2. البحث عن المستخدم في قاعدة البيانات
     const user = await User.findOne({ email: data.email.toLowerCase() });
     if (!user) {
+      if (isRateLimited(ip(req), { windowMs: 60 * 1000, maxRequests: 5 })) {
+        return NextResponse.json({ error: "tooManyAttempts" }, { status: 429 });
+      }
       return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
     }
 
-    // 4. مطابقة كلمة المرور المشفرة
+    // 3. مطابقة كلمة المرور المشفرة
     const valid = await bcrypt.compare(data.password, user.password);
     if (!valid) {
+      if (isRateLimited(ip(req), { windowMs: 60 * 1000, maxRequests: 5 })) {
+        return NextResponse.json({ error: "tooManyAttempts" }, { status: 429 });
+      }
       return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
     }
 
-    // 5. إنشاء الـ Token وحفظه في الكوكيز الآمنة
+    // 4. إنشاء الـ Token وحفظه في الكوكيز الآمنة
     const token = signToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,
     });
 
-    // 6. 💡 إنشاء الاستجابة مع الكوكي وترويسات تمنع الكاش
+    // 5. 💡 إنشاء الاستجابة مع الكوكي وترويسات تمنع الكاش
     const response = NextResponse.json({
       user: {
         id: user._id.toString(),

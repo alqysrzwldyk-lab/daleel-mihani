@@ -78,7 +78,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => setShowUserMenu(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-gray-100 transition"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-[var(--border-light)] transition"
               >
                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                   {user.role === "professional" ? (
@@ -99,13 +99,23 @@ export default function Navbar() {
                 <Home className="w-4 h-4" />
                 <span>الصفحة الرئيسية</span>
               </Link>
-              <Link
-                href="/add-post"
-                className="btn btn-primary btn-sm hidden sm:flex"
-              >
-                <Plus className="w-4 h-4" />
-                <span>إضافة إعلان</span>
-              </Link>
+              {user.role === "employer" ? (
+                <Link
+                  href="/dashboard/jobs/new"
+                  className="btn btn-primary btn-sm hidden sm:flex"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>إضافة إعلان توظيف</span>
+                </Link>
+              ) : (
+                <Link
+                  href="/add-post"
+                  className="btn btn-primary btn-sm hidden sm:flex"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>إضافة إعلان</span>
+                </Link>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-2">

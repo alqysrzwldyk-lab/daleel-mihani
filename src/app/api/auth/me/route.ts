@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { getAuthFromCookies } from "@/lib/auth";
 import { User } from "@/models/User";
 import { Professional } from "@/models/Professional";
+import { Company } from "@/models/Company";
 
 export async function GET() {
   const auth = await getAuthFromCookies();
@@ -17,6 +18,7 @@ export async function GET() {
   }
 
   let profile = null;
+  let company = null;
 
   if (user.role === "professional") {
     const prof = await Professional.findOne({ userId: user._id });
@@ -30,8 +32,16 @@ export async function GET() {
         profession: professions?.[0] || "other",
       };
     }
-  } else if (user.role === "company") {
-    profile = user;
+  } else if (user.role === "employer") {
+    // إرجاع حساب الشركة المرتبط بمستخدم صاحب الشركة
+    const comp = await Company.findOne({ userId: user._id });
+    if (comp) {
+      const obj = comp.toObject();
+      company = {
+        id: obj._id.toString(),
+        ...obj,
+      };
+    }
   }
 
   return NextResponse.json({
@@ -42,5 +52,6 @@ export async function GET() {
       role: user.role,
     },
     profile: profile,
+    company: company,
   });
 }

@@ -8,7 +8,6 @@ import {
   Building2,
   User as UserIcon,
   MessageSquare,
-  Loader2,
   Calendar,
 } from "lucide-react";
 import HireRequestActions from "@/components/HireRequestActions";
@@ -142,9 +141,9 @@ export default function HireDetailPage() {
           })}
         </p>
 
-        <div className="mt-5 bg-slate-50 rounded-xl p-4">
+        <div className="mt-5 bg-[var(--border-light)] rounded-xl p-4">
           <p className="font-bold text-sm mb-1.5">تفاصيل العرض</p>
-          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{hire.message}</p>
+          <p className="text-sm text-[var(--foreground)] leading-relaxed whitespace-pre-wrap">{hire.message}</p>
         </div>
 
         <div className="mt-4 flex items-center gap-2 text-sm text-muted">

@@ -75,17 +75,36 @@ export async function createMessageAndNotify(opts: {
   return { message, conversation };
 }
 
-export async function getOtherUser(conversation: any, myUserId: string) {
-  const participants = Array.isArray(conversation.participants)
-    ? conversation.participants
-    : [];
-  const other = participants.find(
-    (p: any) => String(p?._id ?? p) !== String(myUserId)
-  );
+type ParticipantLike = {
+  _id?: mongoose.Types.ObjectId | string;
+  name?: string;
+  email?: string;
+  role?: string;
+  avatar?: string | null;
+};
 
-  if (!other || typeof other !== "object" || !other.name) {
+type ConversationLike = {
+  participants?: unknown;
+  unreadCount?: unknown;
+};
+
+function asParticipantList(conversation: ConversationLike): ParticipantLike[] {
+  if (!Array.isArray(conversation.participants)) return [];
+  return conversation.participants
+    .map((p) => {
+      if (typeof p === "object" && p !== null) return p as ParticipantLike;
+      return { _id: p as mongoose.Types.ObjectId | string };
+    })
+    .filter((p) => typeof p._id !== "undefined");
+}
+
+export async function getOtherUser(conversation: ConversationLike, myUserId: string) {
+  const participants = asParticipantList(conversation);
+  const other = participants.find((p) => String(p._id) !== String(myUserId));
+
+  if (!other || !other.name) {
     return {
-      _id: String(other?._id ?? other ?? ""),
+      _id: other ? String(other._id) : "",
       name: "مستخدم",
       email: "",
       role: "user",
@@ -103,11 +122,13 @@ export async function getOtherUser(conversation: any, myUserId: string) {
 }
 
 export async function getConversationUnread(
-  conversation: any,
+  conversation: ConversationLike,
   userId: string
 ): Promise<number> {
-  const u = conversation?.unreadCount || {};
+  const u = conversation.unreadCount || {};
   const value =
-    typeof u.get === "function" ? u.get(String(userId)) : u[String(userId)];
+    typeof u === "object" && u !== null && typeof (u as { get?: unknown }).get === "function"
+      ? (u as { get(key: string): number | undefined }).get(String(userId))
+      : (u as Record<string, number>)[String(userId)];
   return typeof value === "number" ? value : 0;
 }

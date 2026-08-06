@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
 import { Briefcase, Loader2, CheckCircle, X, Plus, Upload, User } from "lucide-react";
 import { getAvailableProfessions, getProfessionArabic, getProfessionIcon, isCustomProfession } from "@/lib/professions";
 
 export default function CreateProfilePage() {
-  const tProf = useTranslations("professions");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -215,7 +213,7 @@ export default function CreateProfilePage() {
               ))}
             </div>
 
-            <div className="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-1.5 p-2 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-1.5 p-2 bg-[var(--border-light)] rounded-xl border border-[var(--border)]">
               {allProfessions.map((p) => {
                 const selected = professions.includes(p.key);
                 const disabled = !selected && professions.length >= 2;
@@ -230,7 +228,7 @@ export default function CreateProfilePage() {
                         ? "bg-primary text-white"
                         : disabled
                         ? "opacity-30 cursor-not-allowed"
-                        : "hover:bg-white hover:border-gray-200 border border-transparent"
+                        : "hover:bg-[var(--surface)] hover:border-[var(--border)] border border-transparent"
                     }`}
                   >
                     <span>{p.icon}</span>

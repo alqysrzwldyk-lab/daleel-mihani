@@ -27,7 +27,7 @@ export async function GET() {
       success: true,
       subscription: sub || { plan: "free", status: "active" },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "فشل جلب الاشتراك" }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     await connectDB();
     const price = PLAN_PRICES[plan];
 
-    let wallet = await Wallet.findOne({ userId: auth.userId });
+    const wallet = await Wallet.findOne({ userId: auth.userId });
     if (!wallet || wallet.balance < price) {
       return NextResponse.json({ error: "رصيد غير كافٍ في المحفظة" }, { status: 400 });
     }
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       message: "تم تفعيل الاشتراك بنجاح",
       subscription,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "فشل تفعيل الاشتراك" }, { status: 500 });
   }
 }

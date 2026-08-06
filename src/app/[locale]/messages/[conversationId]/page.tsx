@@ -53,12 +53,15 @@ export default function ConversationPage() {
     fetch(`/api/messages/${conversationId}/read`, { method: "POST" }).catch(() => {});
   }, [conversationId]);
 
-  const loadMessages = useCallback(
-    async (initial = false) => {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
       try {
         const res = await fetch(`/api/messages/${conversationId}`, {
           cache: "no-store",
         });
+        if (cancelled) return;
         if (res.status === 401) {
           router.push("/login");
           return;
@@ -69,6 +72,7 @@ export default function ConversationPage() {
           return;
         }
         const d = await res.json();
+        if (cancelled) return;
         if (d.messages) {
           setMessages(d.messages);
           const hasUnreadFromOther = d.messages.some(
@@ -82,17 +86,17 @@ export default function ConversationPage() {
         if (d.otherUser) setOtherUser(d.otherUser);
         setLoading(false);
       } catch {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    },
-    [conversationId, markRead, router]
-  );
+    }
 
-  useEffect(() => {
-    loadMessages(true);
-    const interval = setInterval(() => loadMessages(false), 3000);
-    return () => clearInterval(interval);
-  }, [loadMessages]);
+    load();
+    const interval = setInterval(load, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [conversationId, markRead, router]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -153,14 +157,14 @@ export default function ConversationPage() {
         </button>
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
           {otherUser?.role === "employer" ? (
-            <Building2 className="w-4 h-4 text-violet-600" />
+            <Building2 className="w-4 h-4 text-sky-600" />
           ) : (
             <User className="w-4 h-4 text-primary" />
           )}
         </div>
         <div className="flex-1 min-w-0">
           <span className="font-bold text-sm block truncate">{otherUser?.name || "المحادثة"}</span>
-          <span className={`text-[11px] font-semibold ${otherUser?.role === "employer" ? "text-violet-600" : "text-primary"}`}>
+          <span className={`text-[11px] font-semibold ${otherUser?.role === "employer" ? "text-sky-600" : "text-primary"}`}>
             {otherUser?.role === "employer" ? "شركة" : otherUser?.role === "professional" ? "محترف" : ""}
           </span>
         </div>
@@ -174,7 +178,7 @@ export default function ConversationPage() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-white rounded-2xl border border-gray-100 p-4 space-y-3 mb-3" style={{ maxHeight: "calc(100dvh - 280px)" }}>
+      <div className="flex-1 overflow-y-auto bg-[var(--surface)] rounded-2xl border border-[var(--border-light)] p-4 space-y-3 mb-3" style={{ maxHeight: "calc(100dvh - 280px)" }}>
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-10">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -199,7 +203,7 @@ export default function ConversationPage() {
               <div key={msg._id}>
                 {showDate && (
                   <div className="text-center my-3">
-                    <span className="text-[10px] text-muted-light bg-gray-50 px-3 py-1 rounded-full">
+                    <span className="text-[10px] text-muted-light bg-[var(--border-light)] px-3 py-1 rounded-full">
                       {new Date(msg.createdAt).toLocaleDateString("ar")}
                     </span>
                   </div>
@@ -209,11 +213,11 @@ export default function ConversationPage() {
                     className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                       isMe
                         ? "bg-primary text-white rounded-br-md"
-                        : "bg-gray-100 text-gray-800 rounded-bl-md"
+                        : "bg-[var(--border-light)] text-[var(--foreground)] rounded-bl-md"
                     }`}
                   >
                     <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                    <div className={`flex items-center gap-1 justify-end mt-1 ${isMe ? "text-white/60" : "text-gray-400"}`}>
+                    <div className={`flex items-center gap-1 justify-end mt-1 ${isMe ? "text-white/60" : "text-[var(--muted-light)]"}`}>
                       <span className="text-[10px]">
                         {new Date(msg.createdAt).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
                       </span>
@@ -233,7 +237,7 @@ export default function ConversationPage() {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex items-center gap-2 bg-white rounded-2xl border border-gray-200 p-1.5">
+      <form onSubmit={handleSend} className="flex items-center gap-2 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-1.5">
         <input
           type="text"
           value={text}

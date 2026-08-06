@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { getAuthFromCookies } from "@/lib/auth";
 import { Ad } from "@/models/Ad";
+import { User } from "@/models/User";
 import mongoose from "mongoose";
 
 export async function POST(request: Request) {
@@ -12,6 +13,14 @@ export async function POST(request: Request) {
     }
 
     await connectDB();
+    const user = await User.findById(auth.userId);
+    if (user?.role === "employer") {
+      return NextResponse.json(
+        { error: "حساب الشركة مخصص لإعلانات التوظيف فقط، أضفها من لوحة الشركة" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { type, category, title, description, price, currency, location, specifications, images } = body;
 

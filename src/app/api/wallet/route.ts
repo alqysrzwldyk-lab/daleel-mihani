@@ -17,7 +17,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ success: true, wallet });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "فشل جلب المحفظة" }, { status: 500 });
   }
 }

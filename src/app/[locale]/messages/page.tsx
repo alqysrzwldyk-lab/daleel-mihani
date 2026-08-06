@@ -45,7 +45,7 @@ function Avatar({ name, role, size = "md" }: { name: string; role?: string; size
     <div
       className={`${cls} rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
         role === "employer"
-          ? "bg-violet-100 text-violet-700"
+          ? "bg-sky-100 text-sky-700"
           : "bg-primary/10 text-primary"
       }`}
     >
@@ -109,11 +109,11 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col" style={{ maxHeight: "85dvh" }}>
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="relative w-full sm:max-w-md bg-[var(--surface)] sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col" style={{ maxHeight: "85dvh" }}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-light)]">
           <h3 className="font-bold text-base">رسالة جديدة</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
-            <X className="w-4 h-4 text-gray-400" />
+          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-[var(--border-light)] flex items-center justify-center">
+            <X className="w-4 h-4 text-[var(--muted-light)]" />
           </button>
         </div>
 
@@ -125,7 +125,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
               placeholder="ابحث عن محترف أو شركة..."
               className="w-full py-2.5 px-4 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/5 transition"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-light)]" />
           </div>
 
           <div className="flex gap-1.5 mt-3">
@@ -138,7 +138,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
                 key={key}
                 onClick={() => setTab(key)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                  tab === key ? "bg-primary text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  tab === key ? "bg-primary text-white" : "bg-[var(--border-light)] text-[var(--muted)] hover:bg-[var(--border)]"
                 }`}
               >
                 {label}
@@ -169,7 +169,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         u.role === "employer"
-                          ? "bg-violet-100 text-violet-700"
+                          ? "bg-sky-100 text-sky-700"
                           : "bg-primary/10 text-primary"
                       }`}
                     >
@@ -280,7 +280,7 @@ export default function MessagesPage() {
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
                           conv.otherUser.role === "employer"
-                            ? "bg-violet-100 text-violet-700"
+                            ? "bg-sky-100 text-sky-700"
                             : "bg-primary/10 text-primary"
                         }`}
                       >

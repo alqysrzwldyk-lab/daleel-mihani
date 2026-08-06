@@ -50,7 +50,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
             className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-semibold transition ${
               pageNum === currentPage
                 ? "bg-primary text-white"
-                : "hover:bg-gray-100 text-muted"
+                : "hover:bg-[var(--border-light)] text-muted"
             }`}
           >
             {pageNum}

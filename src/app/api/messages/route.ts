@@ -9,6 +9,16 @@ import {
   getConversationUnread,
 } from "@/lib/messaging";
 
+type LeanConversation = {
+  _id: unknown;
+  participants?: unknown;
+  lastMessage?: string;
+  lastMessageAt?: unknown;
+  updatedAt?: unknown;
+  refType?: string | null;
+  refId?: unknown;
+};
+
 export async function GET() {
   try {
     const auth = await getAuthFromCookies();
@@ -23,10 +33,10 @@ export async function GET() {
     })
       .sort({ lastMessageAt: -1, updatedAt: -1 })
       .populate("participants", "name email role avatar")
-      .lean();
+      .lean<LeanConversation[]>();
 
     const enriched = await Promise.all(
-      conversations.map(async (c: Record<string, any>) => {
+      conversations.map(async (c: LeanConversation) => {
         const other = await getOtherUser(c, auth.userId!);
         const unread = await getConversationUnread(c, auth.userId!);
         return {

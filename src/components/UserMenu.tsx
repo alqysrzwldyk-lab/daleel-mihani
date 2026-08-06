@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import {
   Home, Mail, Bell, Megaphone, User, LayoutDashboard, Briefcase,
-  Globe, LogOut, X, Building2, ChevronLeft, Settings, Wallet, Star
+  Globe, LogOut, X, Building2, ChevronLeft, Settings, Wallet, Star, Users, Plus, FileText
 } from "lucide-react";
 
 type AuthUser = {
@@ -99,7 +99,7 @@ export default function UserMenu({
                 {user.role === "professional" ? "محترف" : "صاحب عمل"}
               </span>
               {balance !== null && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-[var(--success-light)] px-2 py-0.5 rounded-full">
                   <Wallet className="w-3 h-3" />
                   {balance.toLocaleString()} ﷼
                 </span>
@@ -108,9 +108,9 @@ export default function UserMenu({
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center flex-shrink-0 transition"
+            className="w-8 h-8 rounded-full hover:bg-[var(--border-light)] flex items-center justify-center flex-shrink-0 transition"
           >
-            <X className="w-4 h-4 text-gray-400" />
+            <X className="w-4 h-4 text-[var(--muted-light)]" />
           </button>
         </div>
 
@@ -151,6 +151,25 @@ export default function UserMenu({
             )}
           </Link>
 
+          {user.role === "employer" && (
+            <>
+              <div className="usermenu-divider" />
+              <div className="usermenu-section-label">الشركة</div>
+              <Link href="/dashboard/jobs" className="usermenu-item" onClick={handleClose}>
+                <Building2 className="usermenu-item-icon" />
+                <span className="usermenu-item-text">لوحة الشركة</span>
+              </Link>
+              <Link href="/dashboard/applications" className="usermenu-item" onClick={handleClose}>
+                <Users className="usermenu-item-icon" />
+                <span className="usermenu-item-text">المتقدمين للتوظيف</span>
+              </Link>
+              <Link href="/dashboard/jobs/new" className="usermenu-item" onClick={handleClose}>
+                <Plus className="usermenu-item-icon" />
+                <span className="usermenu-item-text">إعلان توظيف جديد</span>
+              </Link>
+            </>
+          )}
+
           <div className="usermenu-divider" />
 
           <div className="usermenu-section-label">حسابك</div>
@@ -160,6 +179,16 @@ export default function UserMenu({
               <Link href="/dashboard" className="usermenu-item" onClick={handleClose}>
                 <LayoutDashboard className="usermenu-item-icon" />
                 <span className="usermenu-item-text">لوحة التحكم</span>
+              </Link>
+
+              <Link href="/my-applications" className="usermenu-item" onClick={handleClose}>
+                <FileText className="usermenu-item-icon" />
+                <span className="usermenu-item-text">طلباتي</span>
+              </Link>
+
+              <Link href="/jobs" className="usermenu-item" onClick={handleClose}>
+                <Briefcase className="usermenu-item-icon" />
+                <span className="usermenu-item-text">اعلانات التوظيف</span>
               </Link>
 
               {!hasProfile && (
@@ -190,9 +219,9 @@ export default function UserMenu({
             <span className="usermenu-item-text">الباقة المميزة</span>
           </Link>
 
-          <Link href="/dashboard/my-ads" className="usermenu-item" onClick={handleClose}>
+          <Link href={user.role === "employer" ? "/dashboard/jobs" : "/dashboard/my-ads"} className="usermenu-item" onClick={handleClose}>
             <Megaphone className="usermenu-item-icon" />
-            <span className="usermenu-item-text">إعلاناتي</span>
+            <span className="usermenu-item-text">{user.role === "employer" ? "إعلاناتي التوظيفية" : "إعلاناتي"}</span>
           </Link>
 
           <div className="usermenu-divider" />
@@ -202,7 +231,7 @@ export default function UserMenu({
           <div className="usermenu-item opacity-40" onClick={(e) => e.preventDefault()}>
             <Globe className="usermenu-item-icon" />
             <span className="usermenu-item-text">اللغة</span>
-            <span className="text-xs text-gray-400">العربية</span>
+            <span className="text-xs text-[var(--muted-light)]">العربية</span>
           </div>
         </div>
 

@@ -50,7 +50,14 @@ export default function BottomNav() {
     };
     fetchCount();
     const interval = setInterval(fetchCount, 10000);
-    return () => clearInterval(interval);
+
+    const handleReadAll = () => setUnreadCount(0);
+    window.addEventListener("notifications:read", handleReadAll);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("notifications:read", handleReadAll);
+    };
   }, [user]);
 
   useEffect(() => {
@@ -78,7 +85,10 @@ export default function BottomNav() {
     if (href === "/") return pathname === "/";
     if (href === "/search") return pathname.startsWith("/search");
     if (href === "/messages") return pathname.startsWith("/messages");
-    if (href === "/add-post") return pathname.startsWith("/add-post");
+    if (href === "/add-post") {
+      if (user?.role === "employer") return pathname.startsWith("/dashboard/jobs");
+      return pathname.startsWith("/add-post");
+    }
     if (href === "/notifications") return pathname.startsWith("/notifications");
     if (href === "/profile") {
       return pathname.startsWith("/dashboard") || pathname.startsWith("/profile") || pathname.startsWith("/create-profile");
@@ -99,7 +109,13 @@ export default function BottomNav() {
           else finalHref = "/search";
         }
         if ((tab.href === "/notifications" || tab.href === "/messages") && !user) finalHref = "/login";
-        if (tab.href === "/add-post" && !user) finalHref = "/login";
+        if (tab.href === "/add-post") {
+          if (!user) finalHref = "/login";
+          else if (user.role === "employer") finalHref = "/dashboard/jobs/new";
+        }
+
+        const resolvedLabel =
+          tab.href === "/add-post" && user?.role === "employer" ? "إعلان توظيف" : tab.label;
 
         return (
           <Link
@@ -116,7 +132,7 @@ export default function BottomNav() {
                 <span className="nav-badge">{unreadMessages > 99 ? "99+" : unreadMessages}</span>
               )}
             </div>
-            <span>{tab.label}</span>
+            <span>{resolvedLabel}</span>
           </Link>
         );
       })}

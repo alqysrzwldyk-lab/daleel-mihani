@@ -2,8 +2,8 @@
 
 import { Link } from "@/i18n/navigation";
 import {
-  Users, Megaphone, GraduationCap, Star, Briefcase, Building2,
-  Award, Newspaper, UserCheck, MessageSquare
+  Users, Megaphone, GraduationCap, Star, Briefcase,
+  Award, Building2, ClipboardList, PlusCircle, FileText
 } from "lucide-react";
 
 const cards = [
@@ -48,6 +48,34 @@ const cards = [
     color: "teal",
     title: "انضم كمحترف",
     desc: "أنشئ ملفك المهني الآن",
+  },
+  {
+    href: "/jobs",
+    icon: ClipboardList,
+    color: "violet",
+    title: "إعلانات التوظيف",
+    desc: "ابحث عن وظيفة تناسبك",
+  },
+  {
+    href: "/my-applications",
+    icon: FileText,
+    color: "green",
+    title: "طلباتي",
+    desc: "تابع حالة طلبات التوظيف",
+  },
+  {
+    href: "/dashboard/jobs",
+    icon: Building2,
+    color: "blue",
+    title: "لوحة الشركة",
+    desc: "إدارة إعلاناتك الوظيفية",
+  },
+  {
+    href: "/dashboard/jobs/new",
+    icon: PlusCircle,
+    color: "amber",
+    title: "إعلان توظيف جديد",
+    desc: "انشر فرصة عمل جديدة",
   },
 ];
 

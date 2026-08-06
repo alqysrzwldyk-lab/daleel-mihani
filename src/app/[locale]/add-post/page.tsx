@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Tag, MapPin, Send, Upload, X } from "lucide-react";
+import { ArrowLeft, Loader2, MapPin, Send, Upload, X } from "lucide-react";
 
 const CATEGORIES: Record<string, { key: string; label: string }[]> = {
   general: [
@@ -47,6 +47,17 @@ export default function AddPostPage() {
   const [images, setImages] = useState<string[]>([]);
   const [carModel, setCarModel] = useState("");
   const [landArea, setLandArea] = useState("");
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.user?.role === "employer") {
+          router.replace("/dashboard/jobs");
+        }
+      })
+      .catch(() => {});
+  }, [router]);
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -132,7 +143,7 @@ export default function AddPostPage() {
               type="button"
               onClick={() => { setType("general"); setCategory("cars"); }}
               className={`p-3 rounded-xl border-2 text-center text-sm font-semibold transition ${
-                type === "general" ? "border-primary bg-primary-50 text-primary" : "border-gray-100 text-muted"
+                type === "general" ? "border-primary bg-primary-50 text-primary" : "border-[var(--border)] text-muted"
               }`}
             >
               📦 إعلان تجاري
@@ -141,7 +152,7 @@ export default function AddPostPage() {
               type="button"
               onClick={() => { setType("professional"); setCategory("services"); }}
               className={`p-3 rounded-xl border-2 text-center text-sm font-semibold transition ${
-                type === "professional" ? "border-primary bg-primary-50 text-primary" : "border-gray-100 text-muted"
+                type === "professional" ? "border-primary bg-primary-50 text-primary" : "border-[var(--border)] text-muted"
               }`}
             >
               💼 خدمة مهنية
@@ -162,7 +173,7 @@ export default function AddPostPage() {
           <label className="input-label">صور الإعلان</label>
           <div className="flex flex-wrap gap-2 mb-2">
             {images.map((url, i) => (
-              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-100">
+              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[var(--border)]">
                 <Image src={url} alt="" width={80} height={80} className="w-full h-full object-cover" />
                 <button type="button" onClick={() => removeImage(i)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center">
                   <X className="w-3 h-3 text-white" />
@@ -170,7 +181,7 @@ export default function AddPostPage() {
               </div>
             ))}
             {images.length < 5 && (
-              <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-primary transition">
+              <label className="w-20 h-20 rounded-xl border-2 border-dashed border-[var(--border)] flex items-center justify-center cursor-pointer hover:border-primary transition">
                 {uploadingImg ? <Loader2 className="w-5 h-5 animate-spin text-muted" /> : <Upload className="w-5 h-5 text-muted" />}
                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImg} />
               </label>
@@ -207,14 +218,14 @@ export default function AddPostPage() {
         </div>
 
         {category === "cars" && (
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div className="bg-[var(--border-light)] rounded-xl p-4 border border-[var(--border)]">
             <p className="text-xs font-bold text-primary mb-2">مواصفات السيارة</p>
             <input type="text" placeholder="سنة الصنع والموديل" value={carModel} onChange={(e) => setCarModel(e.target.value)} className="input-field" />
           </div>
         )}
 
         {category === "lands" && (
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div className="bg-[var(--border-light)] rounded-xl p-4 border border-[var(--border)]">
             <p className="text-xs font-bold text-primary mb-2">مواصفات الأرض</p>
             <input type="text" placeholder="المساحة بالمتر المربع" value={landArea} onChange={(e) => setLandArea(e.target.value)} className="input-field" />
           </div>

@@ -43,7 +43,7 @@ export default function HowItWorks() {
               }`}
               style={{ transitionDelay: `${i * 150}ms` }}
             >
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 relative z-10 border-2 border-white shadow-md">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 relative z-10 border-2 border-[var(--surface)] shadow-md">
                 <step.icon className="w-7 h-7 text-primary" />
               </div>
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-16">

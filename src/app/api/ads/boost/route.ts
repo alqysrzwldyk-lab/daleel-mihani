@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     const price = BOOST_PRICES[String(days)];
 
-    let wallet = await Wallet.findOne({ userId: auth.userId });
+    const wallet = await Wallet.findOne({ userId: auth.userId });
     if (!wallet || wallet.balance < price) {
       return NextResponse.json({ error: "رصيد غير كافٍ" }, { status: 400 });
     }
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       message: `تم تعزيز الإعلان لمدة ${days} أيام`,
       boost,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "فشل تعزيز الإعلان" }, { status: 500 });
   }
 }
