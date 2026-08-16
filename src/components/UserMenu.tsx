@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import {
   Home, Mail, Bell, Megaphone, User, LayoutDashboard, Briefcase,
-  Globe, LogOut, X, Building2, ChevronLeft, Settings, Wallet, Star, Users, Plus, FileText
+  Globe, LogOut, X, Building2, ChevronLeft, Settings, Wallet, Star, Users, Plus, FileText, Shield
 } from "lucide-react";
 
 type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: "professional" | "employer";
+  role: "professional" | "employer" | "admin";
 };
 
 export default function UserMenu({
@@ -29,6 +30,7 @@ export default function UserMenu({
 }) {
   const [animating, setAnimating] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
+  const T = useT();
 
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -87,6 +89,8 @@ export default function UserMenu({
           <div className="usermenu-avatar">
             {user.role === "professional" ? (
               <User />
+            ) : user.role === "admin" ? (
+              <Shield />
             ) : (
               <Building2 />
             )}
@@ -96,7 +100,7 @@ export default function UserMenu({
             <div className="usermenu-user-email">{user.email}</div>
             <div className="flex items-center gap-2 mt-1">
               <span className="usermenu-role-badge">
-                {user.role === "professional" ? "محترف" : "صاحب عمل"}
+                {user.role === "professional" ? T("محترف") : user.role === "admin" ? T("مدير") : T("صاحب عمل")}
               </span>
               {balance !== null && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-[var(--success-light)] px-2 py-0.5 rounded-full">
@@ -115,35 +119,35 @@ export default function UserMenu({
         </div>
 
         <div className="usermenu-body">
-          <div className="usermenu-section-label">التنقل</div>
+          <div className="usermenu-section-label">{T("التنقل")}</div>
 
           <Link href="/" className="usermenu-item" onClick={handleClose}>
             <Home className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الرئيسية</span>
+            <span className="usermenu-item-text">{T("الرئيسية")}</span>
           </Link>
 
           <Link href="/search" className="usermenu-item" onClick={handleClose}>
             <Briefcase className="usermenu-item-icon" />
-            <span className="usermenu-item-text">المهنيون</span>
+            <span className="usermenu-item-text">{T("المهنيون")}</span>
           </Link>
 
           <Link href="/ads" className="usermenu-item" onClick={handleClose}>
             <Megaphone className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الإعلانات</span>
+            <span className="usermenu-item-text">{T("الإعلانات")}</span>
           </Link>
 
           <div className="usermenu-divider" />
 
-          <div className="usermenu-section-label">التواصل</div>
+          <div className="usermenu-section-label">{T("التواصل")}</div>
 
           <Link href="/notifications" className="usermenu-item" onClick={handleClose}>
             <Bell className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الإشعارات</span>
+            <span className="usermenu-item-text">{T("الإشعارات")}</span>
           </Link>
 
           <Link href="/messages" className="usermenu-item" onClick={handleClose}>
             <Mail className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الرسائل</span>
+            <span className="usermenu-item-text">{T("الرسائل")}</span>
             {unreadMessages > 0 && (
               <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                 {unreadMessages}
@@ -154,48 +158,48 @@ export default function UserMenu({
           {user.role === "employer" && (
             <>
               <div className="usermenu-divider" />
-              <div className="usermenu-section-label">الشركة</div>
+              <div className="usermenu-section-label">{T("الشركة")}</div>
               <Link href="/dashboard/jobs" className="usermenu-item" onClick={handleClose}>
                 <Building2 className="usermenu-item-icon" />
-                <span className="usermenu-item-text">لوحة الشركة</span>
+                <span className="usermenu-item-text">{T("لوحة الشركة")}</span>
               </Link>
               <Link href="/dashboard/applications" className="usermenu-item" onClick={handleClose}>
                 <Users className="usermenu-item-icon" />
-                <span className="usermenu-item-text">المتقدمين للتوظيف</span>
+                <span className="usermenu-item-text">{T("المتقدمين للتوظيف")}</span>
               </Link>
               <Link href="/dashboard/jobs/new" className="usermenu-item" onClick={handleClose}>
                 <Plus className="usermenu-item-icon" />
-                <span className="usermenu-item-text">إعلان توظيف جديد</span>
+                <span className="usermenu-item-text">{T("إعلان توظيف جديد")}</span>
               </Link>
             </>
           )}
 
           <div className="usermenu-divider" />
 
-          <div className="usermenu-section-label">حسابك</div>
+          <div className="usermenu-section-label">{T("حسابك")}</div>
 
           {user.role === "professional" && (
             <>
               <Link href="/dashboard" className="usermenu-item" onClick={handleClose}>
                 <LayoutDashboard className="usermenu-item-icon" />
-                <span className="usermenu-item-text">لوحة التحكم</span>
+                <span className="usermenu-item-text">{T("لوحة التحكم")}</span>
               </Link>
 
               <Link href="/my-applications" className="usermenu-item" onClick={handleClose}>
                 <FileText className="usermenu-item-icon" />
-                <span className="usermenu-item-text">طلباتي</span>
+                <span className="usermenu-item-text">{T("طلباتي")}</span>
               </Link>
 
               <Link href="/jobs" className="usermenu-item" onClick={handleClose}>
                 <Briefcase className="usermenu-item-icon" />
-                <span className="usermenu-item-text">اعلانات التوظيف</span>
+                <span className="usermenu-item-text">{T("اعلانات التوظيف")}</span>
               </Link>
 
               {!hasProfile && (
                 <Link href="/create-profile" className="usermenu-item" onClick={handleClose}>
                   <User className="usermenu-item-icon" />
-                  <span className="usermenu-item-text">إنشاء ملف مهني</span>
-                  <span className="usermenu-item-badge">جديد</span>
+                  <span className="usermenu-item-text">{T("إنشاء ملف مهني")}</span>
+                  <span className="usermenu-item-badge">{T("جديد")}</span>
                 </Link>
               )}
             </>
@@ -203,12 +207,12 @@ export default function UserMenu({
 
           <Link href="/profile" className="usermenu-item" onClick={handleClose}>
             <Settings className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الحساب</span>
+            <span className="usermenu-item-text">{T("الحساب")}</span>
           </Link>
 
           <Link href="/wallet" className="usermenu-item" onClick={handleClose}>
             <Wallet className="usermenu-item-icon" />
-            <span className="usermenu-item-text">المحفظة</span>
+            <span className="usermenu-item-text">{T("المحفظة")}</span>
             {balance !== null && (
               <span className="text-xs font-bold text-emerald-600">{balance.toLocaleString()} ﷼</span>
             )}
@@ -216,22 +220,22 @@ export default function UserMenu({
 
           <Link href="/subscription" className="usermenu-item" onClick={handleClose}>
             <Star className="usermenu-item-icon" />
-            <span className="usermenu-item-text">الباقة المميزة</span>
+            <span className="usermenu-item-text">{T("الباقة المميزة")}</span>
           </Link>
 
-          <Link href={user.role === "employer" ? "/dashboard/jobs" : "/dashboard/my-ads"} className="usermenu-item" onClick={handleClose}>
+          <Link href={user.role === "employer" ? "/dashboard/jobs" : user.role === "admin" ? "/admin" : "/dashboard/my-ads"} className="usermenu-item" onClick={handleClose}>
             <Megaphone className="usermenu-item-icon" />
-            <span className="usermenu-item-text">{user.role === "employer" ? "إعلاناتي التوظيفية" : "إعلاناتي"}</span>
+            <span className="usermenu-item-text">{user.role === "employer" ? T("إعلاناتي التوظيفية") : user.role === "admin" ? T("لوحة الإدارة") : T("إعلاناتي")}</span>
           </Link>
 
           <div className="usermenu-divider" />
 
-          <div className="usermenu-section-label">الإعدادات</div>
+          <div className="usermenu-section-label">{T("الإعدادات")}</div>
 
           <div className="usermenu-item opacity-40" onClick={(e) => e.preventDefault()}>
             <Globe className="usermenu-item-icon" />
-            <span className="usermenu-item-text">اللغة</span>
-            <span className="text-xs text-[var(--muted-light)]">العربية</span>
+            <span className="usermenu-item-text">{T("اللغة")}</span>
+            <span className="text-xs text-[var(--muted-light)]">{T("العربية")}</span>
           </div>
         </div>
 
@@ -242,7 +246,7 @@ export default function UserMenu({
             style={{ padding: "13px 0", justifyContent: "center" }}
           >
             <LogOut className="usermenu-item-icon" />
-            <span>تسجيل الخروج</span>
+            <span>{T("تسجيل الخروج")}</span>
           </button>
         </div>
       </div>

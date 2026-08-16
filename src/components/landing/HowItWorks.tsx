@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { UserPlus, Edit3, Eye, Briefcase } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const steps = [
   { icon: UserPlus, title: "أنشئ حساباً", desc: "سجل بسهولة عبر بريدك الإلكتروني أو عبر Google" },
@@ -11,6 +12,7 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+  const T = useT();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,8 +29,8 @@ export default function HowItWorks() {
     <section className="py-16 md:py-20" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">كيف يعمل الدليل المهني؟</h2>
-          <p className="text-muted max-w-xl mx-auto">أربع خطوات بسيطة لبدء رحلتك المهنية</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">{T("كيف يعمل الدليل المهني؟")}</h2>
+          <p className="text-muted max-w-xl mx-auto">{T("أربع خطوات بسيطة لبدء رحلتك المهنية")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 relative">
@@ -51,8 +53,8 @@ export default function HowItWorks() {
                   {i + 1}
                 </span>
               </div>
-              <h3 className="font-bold text-sm mb-1">{step.title}</h3>
-              <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">{step.desc}</p>
+              <h3 className="font-bold text-sm mb-1">{T(step.title)}</h3>
+              <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">{T(step.desc)}</p>
             </div>
           ))}
         </div>

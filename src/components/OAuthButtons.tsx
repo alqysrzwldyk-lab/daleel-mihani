@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || "";
@@ -13,6 +14,7 @@ export default function OAuthButtons() {
   const [error, setError] = useState("");
   const googleBtnRef = useRef<HTMLButtonElement>(null);
   const scriptLoading = useRef(false);
+  const T = useT();
 
   const handleGoogleCredential = useCallback(async (response: { credential: string }) => {
     setLoading("google");
@@ -28,13 +30,13 @@ export default function OAuthButtons() {
         return;
       }
       const data = await res.json();
-      setError(data.error || "فشل تسجيل الدخول via Google");
+      setError(data.error || T("فشل تسجيل الدخول via Google"));
     } catch {
-      setError("فشل الاتصال بخادم Google");
+      setError(T("فشل الاتصال بخادم Google"));
     } finally {
       setLoading(null);
     }
-  }, []);
+  }, [T]);
 
   // Load GIS script once
   useEffect(() => {
@@ -74,7 +76,7 @@ export default function OAuthButtons() {
 
   function handleGoogleClick() {
     if (!window.google) {
-      setError("لم يتم تحميل مكتبة Google بعد، حاول مرة أخرى");
+      setError(T("لم يتم تحميل مكتبة Google بعد، حاول مرة أخرى"));
       return;
     }
     setError("");
@@ -87,7 +89,7 @@ export default function OAuthButtons() {
 
   function handleFacebookLogin() {
     if (!window.FB) {
-      setError("لم يتم تحميل Facebook SDK");
+      setError(T("لم يتم تحميل Facebook SDK"));
       return;
     }
     setLoading("facebook");
@@ -95,7 +97,7 @@ export default function OAuthButtons() {
     window.FB.login(
       async (response) => {
         if (!response.authResponse) {
-          setError("تم إلغاء تسجيل الدخول via Facebook");
+          setError(T("تم إلغاء تسجيل الدخول via Facebook"));
           setLoading(null);
           return;
         }
@@ -110,9 +112,9 @@ export default function OAuthButtons() {
             return;
           }
           const data = await res.json();
-          setError(data.error || "فشل تسجيل الدخول via Facebook");
+          setError(data.error || T("فشل تسجيل الدخول via Facebook"));
         } catch {
-          setError("فشل الاتصال بخادم Facebook");
+          setError(T("فشل الاتصال بخادم Facebook"));
         } finally {
           setLoading(null);
         }
@@ -127,7 +129,7 @@ export default function OAuthButtons() {
     <div className="space-y-3">
       <div className="relative flex items-center gap-3 py-2">
         <span className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-muted font-medium">أو</span>
+        <span className="text-xs text-muted font-medium">{T("أو")}</span>
         <span className="flex-1 h-px bg-gray-200" />
       </div>
 
@@ -152,7 +154,7 @@ export default function OAuthButtons() {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
           )}
-          {loading === "google" ? "جاري..." : "تابع عبر Google"}
+          {loading === "google" ? T("جاري...") : T("تابع عبر Google")}
         </button>
       )}
 
@@ -169,7 +171,7 @@ export default function OAuthButtons() {
               <path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
           )}
-          {loading === "facebook" ? "جاري..." : "تابع عبر Facebook"}
+          {loading === "facebook" ? T("جاري...") : T("تابع عبر Facebook")}
         </button>
       )}
     </div>

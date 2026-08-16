@@ -12,6 +12,7 @@ import {
   Send,
   MessageCircle,
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 import type { CompanyPublic } from "@/lib/companyTypes";
 
 function normalizeUrl(url: string): string {
@@ -21,6 +22,7 @@ function normalizeUrl(url: string): string {
 
 // بطاقة التواصل مع الشركة: بيانات الاتصال وروابط وسائل التواصل
 export default function CompanyContact({ company }: { company: CompanyPublic }) {
+  const T = useT();
   const social = company.social || {};
   const socialLinks: Array<{ icon: typeof Phone; href: string; label: string; color: string }> = [];
 
@@ -43,7 +45,7 @@ export default function CompanyContact({ company }: { company: CompanyPublic }) 
 
   return (
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6">
-      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">📞 التواصل مع الشركة</h2>
+      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("📞 التواصل مع الشركة")}</h2>
 
       <div className="space-y-3">
         {company.phone && (
@@ -82,7 +84,7 @@ export default function CompanyContact({ company }: { company: CompanyPublic }) 
 
       {socialLinks.length > 0 && (
         <div className="mt-4 pt-4 border-t border-[var(--border-light)]">
-          <p className="text-xs font-bold text-[var(--muted)] mb-3">تابع الشركة على</p>
+          <p className="text-xs font-bold text-[var(--muted)] mb-3">{T("تابع الشركة على")}</p>
           <div className="flex flex-wrap gap-2">
             {socialLinks.map((s) => (
               <a
@@ -93,7 +95,7 @@ export default function CompanyContact({ company }: { company: CompanyPublic }) 
                 className={`${s.color} inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl transition hover:scale-[1.03]`}
               >
                 <s.icon className="w-3.5 h-3.5" />
-                {s.label}
+                {T(s.label)}
               </a>
             ))}
           </div>

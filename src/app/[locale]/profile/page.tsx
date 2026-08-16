@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { User, LogOut, ChevronLeft, Mail, Briefcase, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 
 type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: "professional" | "employer";
+  role: "professional" | "employer" | "admin";
 };
 
 export default function ProfilePage() {
   const router = useRouter();
+  const T = useT();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -52,7 +54,7 @@ export default function ProfilePage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>حسابي</h1>
+        <h1>{T("حسابي")}</h1>
       </div>
 
       <div className="app-card p-6 mb-4">
@@ -65,8 +67,8 @@ export default function ProfilePage() {
             <p className="text-sm text-muted flex items-center gap-1 mt-0.5">
               <Mail className="w-3.5 h-3.5" /> {user.email}
             </p>
-            <span className={`badge mt-1.5 ${user.role === "professional" ? "badge-primary" : "badge-success"}`}>
-              {user.role === "professional" ? "محترف" : "صاحب شركة"}
+            <span className={`badge mt-1.5 ${user.role === "professional" ? "badge-primary" : user.role === "admin" ? "badge-warning" : "badge-success"}`}>
+              {user.role === "professional" ? T("محترف") : user.role === "admin" ? T("مدير النظام") : T("صاحب شركة")}
             </span>
           </div>
         </div>
@@ -80,8 +82,8 @@ export default function ProfilePage() {
                 <Briefcase className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-sm">لوحة التحكم</p>
-                <p className="text-xs text-muted">إدارة ملفك المهني</p>
+                <p className="font-semibold text-sm">{T("لوحة التحكم")}</p>
+                <p className="text-xs text-muted">{T("إدارة ملفك المهني")}</p>
               </div>
             </div>
             <ChevronLeft className="w-4 h-4 text-muted-light" />
@@ -94,8 +96,8 @@ export default function ProfilePage() {
               <Briefcase className="w-5 h-5 text-orange" />
             </div>
             <div>
-              <p className="font-semibold text-sm">محفظتي الإعلانية</p>
-              <p className="text-xs text-muted">إدارة إعلاناتك</p>
+              <p className="font-semibold text-sm">{T("محفظتي الإعلانية")}</p>
+              <p className="text-xs text-muted">{T("إدارة إعلاناتك")}</p>
             </div>
           </div>
           <ChevronLeft className="w-4 h-4 text-muted-light" />
@@ -113,7 +115,7 @@ export default function ProfilePage() {
           ) : (
             <LogOut className="w-4 h-4" />
           )}
-          {loggingOut ? "جاري تسجيل الخروج..." : "تسجيل خروج"}
+          {loggingOut ? T("جاري تسجيل الخروج...") : T("تسجيل خروج")}
         </button>
       </div>
     </div>

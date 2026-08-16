@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getT } from "@/i18n/getT";
 import { connectDB } from "@/lib/mongodb";
 import { Professional, type IProfessional } from "@/models/Professional";
 import { PROFESSIONS } from "@/lib/professions";
@@ -20,6 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
   const tHome = await getTranslations("home");
+  const T = await getT();
 
   let isLoggedIn = false;
 
@@ -82,7 +84,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   className="app-card app-card-hover flex flex-col items-center justify-center p-3 gap-1 text-center h-scroll-card"
                   style={{ width: 100, minWidth: 100 }}
                 >
-                  <span className="text-sm font-bold text-primary">عرض الكل</span>
+                  <span className="text-sm font-bold text-primary">{T("عرض الكل")}</span>
                   <span className="text-xs">←</span>
                 </Link>
               </div>
@@ -97,7 +99,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   <span>{arabic}</span>
                 </h3>
                 <Link href={`/search?profession=${key}`} className="text-sm text-primary font-semibold">
-                  عرض الكل ←
+                  {T("عرض الكل")} ←
                 </Link>
               </div>
               <div className="h-scroll">

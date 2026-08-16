@@ -2,6 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/useT";
 
 const professions = [
   { icon: "👨‍⚕️", name: "أطباء", slug: "doctor" },
@@ -23,6 +24,7 @@ const professions = [
 ];
 
 export default function ProfessionsGrid() {
+  const T = useT();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -39,8 +41,8 @@ export default function ProfessionsGrid() {
     <section className="py-16 md:py-20 bg-[var(--surface)]" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">جميع التخصصات المهنية</h2>
-          <p className="text-muted max-w-xl mx-auto">الدليل المهني يرحب بجميع المهن والتخصصات بدون استثناء</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">{T("جميع التخصصات المهنية")}</h2>
+          <p className="text-muted max-w-xl mx-auto">{T("الدليل المهني يرحب بجميع المهن والتخصصات بدون استثناء")}</p>
         </div>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-2 md:gap-3">
@@ -54,7 +56,7 @@ export default function ProfessionsGrid() {
               style={{ transitionDelay: `${i * 40}ms` }}
             >
               <span className="text-2xl md:text-3xl mb-2">{prof.icon}</span>
-              <span className="text-xs font-semibold text-center">{prof.name}</span>
+              <span className="text-xs font-semibold text-center">{T(prof.name)}</span>
             </Link>
           ))}
         </div>

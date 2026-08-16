@@ -4,9 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { getAvailableProfessions } from "@/lib/professions";
+import { useT } from "@/lib/useT";
 
 export default function ProfessionFilter() {
   const t = useTranslations("search");
+  const T = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const current = searchParams.get("profession") || "all";
@@ -35,7 +37,7 @@ export default function ProfessionFilter() {
           onClick={() => handleChange(p.key)}
           className={`chip ${current === p.key ? "active" : ""}`}
         >
-          {p.icon} {p.arabic}
+          {p.icon} {T(p.arabic)}
         </button>
       ))}
     </div>

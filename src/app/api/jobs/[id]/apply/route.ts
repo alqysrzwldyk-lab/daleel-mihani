@@ -77,7 +77,7 @@ export async function POST(
       education: data.education,
       experience: data.experience,
       coverLetter: data.coverLetter,
-      cvFile: data.cvFile,
+      cvFile: data.cvFile || "",
       photo: data.photo || undefined,
       status: "pending",
     });
@@ -92,7 +92,7 @@ export async function POST(
         await Notification.create({
           recipientId: company.userId,
           title: "📥 طلب توظيف جديد وصل!",
-          message: `تقدّم ${data.fullName} على وظيفة "${job.jobTitle}" بوصفه ${data.profession}. راجع لوحة الطلبات للاطلاع على السيرة الذاتية واتخاذ القرار.`,
+          message: `تقدّم ${data.fullName} على وظيفة "${job.jobTitle}" بوصفه ${data.profession}. راجع لوحة الطلبات للاطلاع على تفاصيل التقديم واتخاذ القرار.`,
           type: "info",
           link: "/dashboard/applications",
         });

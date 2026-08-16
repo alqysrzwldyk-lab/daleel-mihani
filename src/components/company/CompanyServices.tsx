@@ -1,17 +1,19 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import { useT } from "@/lib/useT";
 import type { CompanyPublic } from "@/lib/companyTypes";
 
 // قسم الخدمات الرئيسية التي تقدمها الشركة
 export default function CompanyServices({ company }: { company: CompanyPublic }) {
+  const T = useT();
   if (!company.services || company.services.length === 0) return null;
 
   return (
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8">
       <h2 className="text-lg font-black text-[var(--foreground)] mb-4 flex items-center gap-2">
         <Sparkles className="w-5 h-5 text-[var(--primary)]" />
-        خدمات الشركة
+        {T("خدمات الشركة")}
       </h2>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">

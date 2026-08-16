@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import dynamic from "next/dynamic";
 import CompanySkeleton from "@/components/company/CompanySkeleton";
 import CompanyHeader from "@/components/company/CompanyHeader";
@@ -36,6 +37,7 @@ export default function CompanyPage() {
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
+  const T = useT();
 
   const [data, setData] = useState<CompanyProfileData | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -94,13 +96,13 @@ export default function CompanyPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
         <p className="text-5xl mb-4">🏢</p>
-        <h1 className="text-2xl font-black text-[var(--foreground)]">الشركة غير موجودة</h1>
-        <p className="text-sm text-[var(--muted)] mt-2">قد تكون حُذفت أو أن الرابط غير صحيح.</p>
+        <h1 className="text-2xl font-black text-[var(--foreground)]">{T("الشركة غير موجودة")}</h1>
+        <p className="text-sm text-[var(--muted)] mt-2">{T("قد تكون حُذفت أو أن الرابط غير صحيح.")}</p>
         <button
           onClick={() => router.push("/")}
           className="mt-6 bg-[var(--primary)] text-white font-bold px-6 py-3 rounded-xl transition hover:bg-[var(--primary-dark)]"
         >
-          العودة إلى الرئيسية
+          {T("العودة إلى الرئيسية")}
         </button>
       </div>
     );

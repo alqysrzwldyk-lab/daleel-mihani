@@ -5,6 +5,7 @@ import { Ad } from "@/models/Ad";
 import { Transaction } from "@/models/Transaction";
 import { Notification } from "@/models/Notification";
 import { createMessageAndNotify } from "@/lib/messaging";
+import { incrementAdStat } from "@/lib/adStats";
 
 const COMMISSION_RATE = 0.05;
 
@@ -46,6 +47,10 @@ export async function POST(request: Request) {
       refId: adId,
       note: message?.slice(0, 200),
     });
+
+    // زيادة عداد مرات التواصل مع الإعلان
+    await Ad.findByIdAndUpdate(adId, { $inc: { contactCount: 1 } });
+    await incrementAdStat(ad._id, "contacts");
 
     const inquiryText = message?.trim() || `أنا مهتم بـ "${ad.title}"`;
 

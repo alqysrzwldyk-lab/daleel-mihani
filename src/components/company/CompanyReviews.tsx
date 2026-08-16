@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star, MessageSquare, Loader2, LogIn, ShieldCheck } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import RatingStars from "@/components/RatingStars";
+import { useT } from "@/lib/useT";
 import type { CompanyReview } from "@/lib/companyTypes";
 
 type Props = {
@@ -38,6 +39,7 @@ export default function CompanyReviews({
   isLoggedIn,
   onSubmitted,
 }: Props) {
+  const T = useT();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -47,7 +49,7 @@ export default function CompanyReviews({
 
   const submit = async () => {
     if (rating === 0) {
-      setError("اختر عدد النجوم أولاً");
+      setError(T("اختر عدد النجوم أولاً"));
       return;
     }
     setSubmitting(true);
@@ -60,14 +62,14 @@ export default function CompanyReviews({
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error === "alreadyRated" ? "لقد قيّمت هذه الشركة من قبل" : data.error || "فشل إرسال التقييم");
+        setError(data.error === "alreadyRated" ? T("لقد قيّمت هذه الشركة من قبل") : T(data.error || "فشل إرسال التقييم"));
         return;
       }
       onSubmitted(data.rating, data.averageRating, data.reviewsCount, data.ratingDistribution);
       setRating(0);
       setComment("");
     } catch {
-      setError("حدث خطأ في الاتصال بالخادم");
+      setError(T("حدث خطأ في الاتصال بالخادم"));
     } finally {
       setSubmitting(false);
     }
@@ -79,7 +81,7 @@ export default function CompanyReviews({
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8">
       <h2 className="text-lg font-black text-[var(--foreground)] mb-5 flex items-center gap-2">
         <MessageSquare className="w-5 h-5 text-[var(--primary)]" />
-        التقييمات والمراجعات
+        {T("التقييمات والمراجعات")}
         {reviewsCount > 0 && (
           <span className="text-xs font-bold text-[var(--primary)] bg-[var(--primary)]/10 border border-[var(--primary)]/20 px-2.5 py-0.5 rounded-full">
             {reviewsCount}
@@ -95,7 +97,7 @@ export default function CompanyReviews({
             <div className="flex justify-center mt-1.5">
               <RatingStars rating={averageRating} size="sm" />
             </div>
-            <p className="text-[11px] text-[var(--muted)] mt-1.5">{reviewsCount} تقييم</p>
+            <p className="text-[11px] text-[var(--muted)] mt-1.5">{T("{count} تقييم", { count: reviewsCount })}</p>
           </div>
 
           <div className="space-y-1.5">
@@ -126,40 +128,40 @@ export default function CompanyReviews({
       {isOwner ? (
         <div className="flex items-center gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3.5 mb-6 text-sm text-[var(--muted)]">
           <ShieldCheck className="w-5 h-5 text-[var(--success)] shrink-0" />
-          لا يمكنك تقييم شركتك الخاصة.
+          {T("لا يمكنك تقييم شركتك الخاصة.")}
         </div>
       ) : userRating ? (
         <div className="flex items-center gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3.5 mb-6 text-sm text-[var(--muted)]">
           <Star className="w-5 h-5 text-amber-400 shrink-0" />
-          قيّمت هذه الشركة بتقييم {userRating} من 5. شكراً لمشاركتك!
+          {T("قيّمت هذه الشركة بتقييم {rating} من 5. شكراً لمشاركتك!", { rating: userRating })}
         </div>
       ) : !isLoggedIn ? (
         <div className="flex items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3.5 mb-6 text-sm text-[var(--muted)]">
           <span className="inline-flex items-center gap-2">
             <LogIn className="w-4 h-4" />
-            سجّل دخولك لتقييم هذه الشركة
+            {T("سجّل دخولك لتقييم هذه الشركة")}
           </span>
           <Link href="/login" className="text-[var(--primary)] font-bold hover:underline shrink-0">
-            تسجيل الدخول
+            {T("تسجيل الدخول")}
           </Link>
         </div>
       ) : (
         <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 mb-6">
-          <p className="text-sm font-bold text-[var(--foreground)] mb-3">قيّم تجربتك مع {companyName}</p>
+          <p className="text-sm font-bold text-[var(--foreground)] mb-3">{T("قيّم تجربتك مع {name}", { name: companyName })}</p>
           <div className="mb-3">
             <RatingStars rating={0} interactive value={rating} onChange={setRating} size="lg" />
           </div>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="شارك تجربتك مع الشركة (اختياري)..."
+            placeholder={T("شارك تجربتك مع الشركة (اختياري)...")}
             className="input-field mb-3"
             rows={3}
             maxLength={1000}
           />
           {error && (
             <p className="text-xs text-[var(--danger)] bg-[var(--danger)]/10 border border-[var(--danger)]/20 rounded-lg px-3 py-2 mb-3">
-              {error}
+              {T(error)}
             </p>
           )}
           <button
@@ -168,7 +170,7 @@ export default function CompanyReviews({
             className="inline-flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            إرسال التقييم
+            {T("إرسال التقييم")}
           </button>
         </div>
       )}
@@ -181,7 +183,7 @@ export default function CompanyReviews({
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white flex items-center justify-center font-black text-sm shrink-0">
-                    {review.reviewerName?.trim().charAt(0) || "م"}
+                    {review.reviewerName?.trim().charAt(0) || T("م")}
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[var(--foreground)]">{review.reviewerName}</p>
@@ -199,8 +201,8 @@ export default function CompanyReviews({
       ) : (
         <div className="empty-state">
           <MessageSquare />
-          <h3>لا توجد تقييمات بعد</h3>
-          <p>كن أول من يقيّم هذه الشركة!</p>
+          <h3>{T("لا توجد تقييمات بعد")}</h3>
+          <p>{T("كن أول من يقيّم هذه الشركة!")}</p>
         </div>
       )}
     </div>

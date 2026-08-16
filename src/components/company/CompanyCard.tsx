@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { MapPin, Briefcase, Star } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import type { SimilarCompany } from "@/lib/companyTypes";
 
 // بطاقة شركة للقسم: "شركات مشابهة"
 export default function CompanyCard({ company }: { company: SimilarCompany }) {
+  const T = useT();
   return (
     <Link
       href={`/company/${company._id}`}
@@ -53,13 +55,13 @@ export default function CompanyCard({ company }: { company: SimilarCompany }) {
           {(company.city || company.country) && (
             <span className="inline-flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-[var(--primary)]" />
-              {[company.city, company.country].filter(Boolean).join("، ")}
+              {[company.city, company.country].filter(Boolean).join(T("، "))}
             </span>
           )}
         </div>
         {company.openJobs > 0 && (
           <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-[var(--success)] bg-[var(--success)]/10 border border-[var(--success)]/25 px-2.5 py-1 rounded-full">
-            {company.openJobs} وظيفة مفتوحة
+            {T("{count} وظيفة مفتوحة", { count: company.openJobs })}
           </span>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, BadgeCheck, Search, MessageCircle, UserCheck, Lock } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const reasons = [
   { icon: BadgeCheck, title: "ملفات موثقة", desc: "جميع الحسابات المهنية موثقة لضمان المصداقية والجودة" },
@@ -13,6 +14,7 @@ const reasons = [
 ];
 
 export default function WhyChooseUs() {
+  const T = useT();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -29,8 +31,8 @@ export default function WhyChooseUs() {
     <section className="py-16 md:py-20 bg-[var(--surface)]" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">لماذا الدليل المهني؟</h2>
-          <p className="text-muted max-w-xl mx-auto">نوفر لك كل الأدوات التي تحتاجها لبناء مسيرتك المهنية</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">{T("لماذا الدليل المهني؟")}</h2>
+          <p className="text-muted max-w-xl mx-auto">{T("نوفر لك كل الأدوات التي تحتاجها لبناء مسيرتك المهنية")}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -46,8 +48,8 @@ export default function WhyChooseUs() {
                 <r.icon className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold text-sm mb-1">{r.title}</h3>
-                <p className="text-muted text-xs leading-relaxed">{r.desc}</p>
+                <h3 className="font-bold text-sm mb-1">{T(r.title)}</h3>
+                <p className="text-muted text-xs leading-relaxed">{T(r.desc)}</p>
               </div>
             </div>
           ))}

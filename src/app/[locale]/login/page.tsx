@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Loader2, LogIn, Briefcase, Mail, Lock } from "lucide-react";
 import OAuthButtons from "@/components/OAuthButtons";
+import { useT } from "@/lib/useT";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
+  const T = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -42,7 +44,9 @@ export default function LoginPage() {
       }
 
       const role = (data.user as { role?: string } | undefined)?.role;
-      window.location.href = role === "employer" ? "/dashboard/jobs" : "/dashboard";
+      if (role === "employer") window.location.href = "/dashboard/jobs";
+      else if (role === "admin") window.location.href = "/admin";
+      else window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login connection error:", err);
       setError(t("errors.generic"));
@@ -63,9 +67,9 @@ export default function LoginPage() {
         </div>
 
         <h1 className="auth-title">{t("loginTitle")}</h1>
-        <p className="auth-subtitle">مرحباً بعودتك! سجل دخولك للمتابعة</p>
+        <p className="auth-subtitle">{T("مرحباً بعودتك! سجل دخولك للمتابعة")}</p>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div className="auth-error">{T(error)}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="auth-field">
@@ -104,7 +108,7 @@ export default function LoginPage() {
             ) : (
               <LogIn />
             )}
-            {loading ? "جاري تسجيل الدخول..." : t("loginBtn")}
+            {loading ? T("جاري تسجيل الدخول...") : t("loginBtn")}
           </button>
         </form>
 

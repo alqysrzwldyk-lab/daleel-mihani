@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import {
   Briefcase,
   MessageSquare,
@@ -31,6 +32,7 @@ export default function ProfessionalActions({
   user: AuthUser | null;
 }) {
   const router = useRouter();
+  const T = useT();
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -48,7 +50,7 @@ export default function ProfessionalActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           receiverId: professional.userId,
-          content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
+          content: T("مرحباً {name}، أود التواصل معك بخصوص خدماتك المهنية", { name: professional.name }),
           refType: "professional",
           refId: professional._id,
         }),
@@ -57,10 +59,10 @@ export default function ProfessionalActions({
       if (res.ok) {
         router.push(`/messages/${data.conversationId}`);
       } else {
-        alert(data.error || "فشل إرسال الرسالة");
+        alert(data.error || T("فشل إرسال الرسالة"));
       }
     } catch {
-      alert("فشل الاتصال بالسيرفر");
+      alert(T("فشل الاتصال بالسيرفر"));
     } finally {
       setSending(false);
     }
@@ -70,7 +72,7 @@ export default function ProfessionalActions({
     const url = window.location.href;
     try {
       if (navigator.share) {
-        await navigator.share({ title: professional.name, text: `ملف ${professional.name} المهني`, url });
+        await navigator.share({ title: professional.name, text: T("ملف {name} المهني", { name: professional.name }), url });
         return;
       }
     } catch {}
@@ -84,11 +86,11 @@ export default function ProfessionalActions({
   return (
     <div className="app-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-sm text-[var(--foreground)]">إجراءات سريعة</h2>
+        <h2 className="font-bold text-sm text-[var(--foreground)]">{T("إجراءات سريعة")}</h2>
         {user?.role === "employer" && (
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--primary)] bg-[var(--primary)]/10 border border-[var(--primary)]/20 px-2.5 py-1 rounded-full">
             <Building2 className="w-3 h-3" />
-            عرض من شركة
+            {T("عرض من شركة")}
           </span>
         )}
       </div>
@@ -98,14 +100,14 @@ export default function ProfessionalActions({
           professionalId={professional._id}
           professionalName={professional.name}
           professionalPhoto={professional.photo}
-          professionalProfession={profs.map((p) => getProfessionArabic(p)).join(" • ")}
+          professionalProfession={profs.map((p) => T(getProfessionArabic(p))).join(" • ")}
           trigger={(open) => (
             <button
               onClick={open}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] text-white font-bold py-3.5 rounded-xl transition hover:opacity-95 shadow-md shadow-[var(--primary)]/20 active:scale-[0.98]"
             >
               <Briefcase className="w-5 h-5" />
-              عرض عمل / طلب توظيف
+              {T("عرض عمل / طلب توظيف")}
             </button>
           )}
         />
@@ -116,7 +118,7 @@ export default function ProfessionalActions({
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] text-white font-bold py-3.5 rounded-xl transition hover:opacity-95 shadow-md shadow-[var(--primary)]/20 active:scale-[0.98]"
           >
             <Briefcase className="w-5 h-5" />
-            سجّل دخول كشركة لإرسال عرض عمل
+            {T("سجّل دخول كشركة لإرسال عرض عمل")}
           </button>
         )
       )}
@@ -129,7 +131,7 @@ export default function ProfessionalActions({
             className="inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--primary)]/30 text-[var(--primary)] font-bold text-sm hover:bg-[var(--primary)]/5 transition disabled:opacity-50 active:scale-[0.98]"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
-            رسالة
+            {T("رسالة")}
           </button>
 
           {professional.phone && (
@@ -138,7 +140,7 @@ export default function ProfessionalActions({
               className="inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--border)] text-[var(--foreground)] font-bold text-sm hover:border-[var(--primary)] hover:text-[var(--primary)] transition active:scale-[0.98]"
             >
               <Phone className="w-4 h-4" />
-              اتصال
+              {T("اتصال")}
             </a>
           )}
 
@@ -147,7 +149,7 @@ export default function ProfessionalActions({
             className="inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--border)] text-[var(--foreground)] font-bold text-sm hover:border-[var(--primary)] hover:text-[var(--primary)] transition active:scale-[0.98]"
           >
             {copied ? <Check className="w-4 h-4 text-[var(--success)]" /> : <Share2 className="w-4 h-4" />}
-            {copied ? "تم النسخ" : "مشاركة"}
+            {copied ? T("تم النسخ") : T("مشاركة")}
           </button>
         </div>
       )}
@@ -163,7 +165,7 @@ export default function ProfessionalActions({
         <div className="min-w-0">
           <p className="text-sm font-bold text-[var(--foreground)] truncate">{professional.name}</p>
           <p className="text-xs text-[var(--muted)] truncate">
-            {professional.specialization || profs.map((p) => getProfessionArabic(p)).join(" • ")}
+            {professional.specialization || profs.map((p) => T(getProfessionArabic(p))).join(" • ")}
           </p>
         </div>
       </div>

@@ -14,7 +14,7 @@ export interface IJobApplication {
   education: string;                   // المؤهل العلمي
   experience: string;                  // سنوات الخبرة
   coverLetter: string;                 // رسالة تعريفية
-  cvFile: string;                      // رابط ملف السيرة الذاتية PDF
+  cvFile?: string;                     // رابط ملف السيرة الذاتية PDF (اختياري)
   photo?: string;                      // صورة شخصية (اختياري)
   status: "pending" | "accepted" | "rejected"; // حالة الطلب
   companyNote?: string;                // رسالة من الشركة للمتقدم
@@ -34,7 +34,7 @@ const JobApplicationSchema = new Schema<IJobApplication>(
     education: { type: String, required: true, trim: true },
     experience: { type: String, required: true, trim: true },
     coverLetter: { type: String, required: true },
-    cvFile: { type: String, required: true },
+    cvFile: { type: String },
     photo: { type: String },
     status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending", index: true },
     companyNote: { type: String },

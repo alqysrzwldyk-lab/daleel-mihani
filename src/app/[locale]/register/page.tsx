@@ -6,9 +6,11 @@ import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { Loader2, UserPlus, Briefcase, Building2, Mail, Lock, User } from "lucide-react";
 import OAuthButtons from "@/components/OAuthButtons";
+import { useT } from "@/lib/useT";
 
 function RegisterForm() {
   const t = useTranslations("auth");
+  const T = useT();
   const searchParams = useSearchParams();
 
   const [name, setName] = useState("");
@@ -78,9 +80,9 @@ function RegisterForm() {
       </div>
 
       <h1 className="auth-title">{t("registerTitle")}</h1>
-      <p className="auth-subtitle">انضم إلى الدليل المهني وابدأ رحلتك</p>
+      <p className="auth-subtitle">{T("انضم إلى الدليل المهني وابدأ رحلتك")}</p>
 
-      {error && <div className="auth-error">{error}</div>}
+      {error && <div className="auth-error">{T(error)}</div>}
 
       <div className="auth-role-grid">
         <button
@@ -89,7 +91,7 @@ function RegisterForm() {
           className={`auth-role-btn ${role === "professional" ? "active" : ""}`}
         >
           <Briefcase className={role === "professional" ? "text-blue-400" : "text-[#9ca3af]"} />
-          <span className={role === "professional" ? "text-blue-400" : "text-[#6b7280]"}>محترف</span>
+          <span className={role === "professional" ? "text-blue-400" : "text-[#6b7280]"}>{T("محترف")}</span>
         </button>
         <button
           type="button"
@@ -97,7 +99,7 @@ function RegisterForm() {
           className={`auth-role-btn ${role === "employer" ? "active" : ""}`}
         >
           <Building2 className={role === "employer" ? "text-blue-400" : "text-[#9ca3af]"} />
-          <span className={role === "employer" ? "text-blue-400" : "text-[#6b7280]"}>صاحب شركة</span>
+          <span className={role === "employer" ? "text-blue-400" : "text-[#6b7280]"}>{T("صاحب شركة")}</span>
         </button>
       </div>
 
@@ -105,7 +107,7 @@ function RegisterForm() {
         <div className="auth-field">
           <label className="auth-label">{t("name")}</label>
           <div className="auth-input-wrap">
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="auth-input" placeholder="الاسم الكامل" required />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="auth-input" placeholder={T("الاسم الكامل")} required />
             <User className="auth-input-icon" />
           </div>
         </div>
@@ -124,12 +126,12 @@ function RegisterForm() {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="auth-input" placeholder="••••••••" minLength={6} required />
             <Lock className="auth-input-icon" />
           </div>
-          <p className="auth-field-hint">6 أحرف على الأقل</p>
+          <p className="auth-field-hint">{T("6 أحرف على الأقل")}</p>
         </div>
 
         <button type="submit" disabled={loading} className="auth-btn">
           {loading ? <Loader2 className="animate-spin" /> : <UserPlus />}
-          {loading ? "جاري إنشاء الحساب..." : t("registerBtn")}
+          {loading ? T("جاري إنشاء الحساب...") : t("registerBtn")}
         </button>
       </form>
 

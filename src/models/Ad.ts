@@ -12,7 +12,12 @@ const AdSchema = new Schema(
     location: { type: String, required: true }, // المدينة أو المنطقة
     images: [{ type: String }], // مصفوفة لروابط صور الإعلان
     specifications: { type: Map, of: String }, // حقول ديناميكية للمواصفات (مثل: موديل السيارة، المساحة للأرض)
-    status: { type: String, enum: ["active", "sold", "archived"], default: "active" },
+    status: { type: String, enum: ["active", "paused", "sold", "reserved", "expired", "coming_soon", "archived"], default: "active" }, // حالة الإعلان: متوفر، موقوف، مباع، محجوز، منتهي، قريباً، مؤرشف
+    verified: { type: Boolean, default: false }, // إعلان موثق (شرارة الثقة)
+    views: { type: Number, default: 0 }, // عدد المشاهدات
+    contactCount: { type: Number, default: 0 }, // عدد مرات التواصل مع البائع
+    sharesCount: { type: Number, default: 0 }, // عدد مرات المشاركة
+    favoritesCount: { type: Number, default: 0 }, // عدد مرات الحفظ بالمفضلة
   },
   { timestamps: true }
 );

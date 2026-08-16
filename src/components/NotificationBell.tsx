@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import { Bell } from "lucide-react";
 import HireRequestActions from "@/components/HireRequestActions";
 
@@ -29,6 +30,7 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
+  const T = useT();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -127,16 +129,16 @@ export default function NotificationBell() {
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
           <div className="absolute left-0 mt-2 w-80 bg-[var(--surface)] rounded-xl shadow-xl border border-[var(--border-light)] z-50 overflow-hidden">
             <div className="px-4 py-3 font-bold text-sm border-b border-[var(--border-light)] flex items-center justify-between">
-              <span>الإشعارات</span>
+              <span>{T("الإشعارات")}</span>
               {unreadCount > 0 && (
-                <span className="badge badge-primary text-[11px]">{unreadCount} جديد</span>
+                <span className="badge badge-primary text-[11px]">{unreadCount} {T("جديد")}</span>
               )}
             </div>
 
             <div className="max-h-72 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="px-4 py-8 text-center text-muted text-sm">
-                  لا توجد إشعارات حالياً
+                  {T("لا توجد إشعارات حالياً")}
                 </div>
               ) : (
                 notifications.slice(0, 5).map((notif) => (
@@ -181,7 +183,7 @@ export default function NotificationBell() {
                 onClick={() => { setIsOpen(false); router.push("/notifications"); }}
                 className="w-full py-2.5 text-xs font-semibold text-primary hover:bg-primary-50 transition border-t border-gray-50"
               >
-                عرض الكل
+                {T("عرض الكل")}
               </button>
             )}
           </div>

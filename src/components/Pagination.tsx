@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 
 type Props = {
   currentPage: number;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function Pagination({ currentPage, totalPages, basePath, searchParams }: Props) {
+  const T = useT();
   if (totalPages <= 1) return null;
 
   function buildUrl(page: number) {
@@ -38,7 +40,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
       {currentPage > 1 && (
         <Link href={buildUrl(currentPage - 1)} className="btn btn-outline btn-sm">
           <ChevronRight className="w-4 h-4" />
-          السابق
+          {T("السابق")}
         </Link>
       )}
 
@@ -60,7 +62,7 @@ export default function Pagination({ currentPage, totalPages, basePath, searchPa
 
       {currentPage < totalPages && (
         <Link href={buildUrl(currentPage + 1)} className="btn btn-outline btn-sm">
-          التالي
+          {T("التالي")}
           <ChevronLeft className="w-4 h-4" />
         </Link>
       )}

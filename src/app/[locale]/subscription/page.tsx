@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Star, Check, X as XIcon, Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 
 const PLANS = [
   {
@@ -40,6 +41,7 @@ export default function SubscriptionPage() {
   const [subscribing, setSubscribing] = useState(false);
   const [message, setMessage] = useState("");
   const [endDate, setEndDate] = useState("");
+  const T = useT();
 
   useEffect(() => {
     fetch("/api/subscription")
@@ -68,13 +70,13 @@ export default function SubscriptionPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage("تم تفعيل الباقة المميزة بنجاح!");
+        setMessage(T("تم تفعيل الباقة المميزة بنجاح!"));
         setCurrent("premium");
       } else {
-        setMessage(data.error || "حدث خطأ");
+        setMessage(T(data.error || "حدث خطأ"));
       }
     } catch {
-      setMessage("فشل الاتصال");
+      setMessage(T("فشل الاتصال"));
     }
     setSubscribing(false);
   }
@@ -83,22 +85,22 @@ export default function SubscriptionPage() {
     <div className="page-container">
       <div className="page-header">
         <Star className="w-6 h-6 text-amber-500" />
-        <h1>الباقة المميزة</h1>
+        <h1>{T("الباقة المميزة")}</h1>
       </div>
 
       {current === "premium" && (
         <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 text-white mb-6 shadow-lg">
           <div className="flex items-center gap-2 mb-2">
             <Star className="w-5 h-5 fill-white" />
-            <span className="font-extrabold">أنت مشترك في الباقة المميزة</span>
+            <span className="font-extrabold">{T("أنت مشترك في الباقة المميزة")}</span>
           </div>
-          {endDate && <p className="text-amber-100 text-sm">تنتهي في: {endDate}</p>}
+          {endDate && <p className="text-amber-100 text-sm">{T("تنتهي في: {date}", { date: endDate })}</p>}
         </div>
       )}
 
       {message && (
         <div className={`p-4 rounded-xl mb-4 text-sm font-bold ${
-          message.includes("نجاح") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"
+          message.includes("نجاح") || message.toLowerCase().includes("success") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"
         }`}>
           {message}
         </div>
@@ -121,27 +123,27 @@ export default function SubscriptionPage() {
             >
               {plan.popular && !isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-4 py-1 rounded-full">
-                  الأكثر طلباً
+                  {T("الأكثر طلباً")}
                 </div>
               )}
 
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full">
-                  {isPremium ? "مشترك الآن" : "الحالية"}
+                  {isPremium ? T("مشترك الآن") : T("الحالية")}
                 </div>
               )}
 
-              <h3 className="text-xl font-extrabold mb-1">{plan.name}</h3>
+              <h3 className="text-xl font-extrabold mb-1">{T(plan.name)}</h3>
               <p className="text-3xl font-extrabold mb-4">
-                {plan.price === 0 ? "مجاني" : `${plan.price.toLocaleString()} ﷼`}
-                {plan.price > 0 && <span className="text-sm font-normal text-muted"> / شهرياً</span>}
+                {plan.price === 0 ? T("مجاني") : `${plan.price.toLocaleString()} ﷼`}
+                {plan.price > 0 && <span className="text-sm font-normal text-muted"> {T("/ شهرياً")}</span>}
               </p>
 
               <div className="flex flex-col gap-2 mb-6">
                 {plan.features.map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm">
                     <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span>{f}</span>
+                    <span>{T(f)}</span>
                   </div>
                 ))}
               </div>
@@ -160,9 +162,9 @@ export default function SubscriptionPage() {
                 {subscribing ? (
                   <Loader2 className="w-5 h-5 animate-spin mx-auto" />
                 ) : isCurrent ? (
-                  "مشترك حالياً"
+                  T("مشترك حالياً")
                 ) : (
-                  `اشترك الآن ${plan.price > 0 ? `- ${plan.price.toLocaleString()} ﷼` : ""}`
+                  T("اشترك الآن {price}", { price: plan.price > 0 ? `- ${plan.price.toLocaleString()} ﷼` : "" })
                 )}
               </button>
             </div>
@@ -171,14 +173,14 @@ export default function SubscriptionPage() {
       </div>
 
       <div className="mt-8 bg-gray-50 rounded-2xl p-5">
-        <h3 className="font-extrabold mb-2">مزايا الباقة المميزة</h3>
+        <h3 className="font-extrabold mb-2">{T("مزايا الباقة المميزة")}</h3>
         <ul className="text-sm text-muted space-y-2">
-          <li>• شارة "موثق" تظهر بجانب اسمك في كل مكان</li>
-          <li>• أولوية الظهور في نتائج البحث عن المهنيين</li>
-          <li>• ظهور ملفك في قسم "مميز" بالصفحة الرئيسية</li>
-          <li>• إعلانات غير محدودة</li>
-          <li>• تعزيز إعلان مجاني كل شهر</li>
-          <li>• دعم فني مخصص وأولوية في المعالجة</li>
+          <li>{T('• شارة "موثق" تظهر بجانب اسمك في كل مكان')}</li>
+          <li>{T("• أولوية الظهور في نتائج البحث عن المهنيين")}</li>
+          <li>{T('• ظهور ملفك في قسم "مميز" بالصفحة الرئيسية')}</li>
+          <li>{T("• إعلانات غير محدودة")}</li>
+          <li>{T("• تعزيز إعلان مجاني كل شهر")}</li>
+          <li>{T("• دعم فني مخصص وأولوية في المعالجة")}</li>
         </ul>
       </div>
     </div>

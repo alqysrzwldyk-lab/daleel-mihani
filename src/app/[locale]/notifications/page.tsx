@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Bell, ChevronLeft } from "lucide-react";
 import HireRequestActions from "@/components/HireRequestActions";
+import { useT } from "@/lib/useT";
 
 type INotification = {
   _id: string;
@@ -29,6 +30,7 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(true);
   const markedReadRef = useRef(false);
+  const T = useT();
 
   useEffect(() => {
     fetchNotifications();
@@ -101,10 +103,10 @@ export default function NotificationsPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>الإشعارات</h1>
+        <h1>{T("الإشعارات")}</h1>
         {notifications.filter((n) => !n.isRead).length > 0 && (
           <span className="badge badge-primary">
-            {notifications.filter((n) => !n.isRead).length} غير مقروء
+            {T("{count} غير مقروء", { count: notifications.filter((n) => !n.isRead).length })}
           </span>
         )}
       </div>
@@ -112,8 +114,8 @@ export default function NotificationsPage() {
       {notifications.length === 0 ? (
         <div className="empty-state">
           <Bell />
-          <h3>لا توجد إشعارات</h3>
-          <p>ستظهر هنا الإشعارات عندما يرسل لك أحدهم طلب توظيف أو يقبل طلبك</p>
+          <h3>{T("لا توجد إشعارات")}</h3>
+          <p>{T("ستظهر هنا الإشعارات عندما يرسل لك أحدهم طلب توظيف أو يقبل طلبك")}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -140,7 +142,7 @@ export default function NotificationsPage() {
                       <div className="rounded-lg bg-[var(--border-light)] border border-[var(--border)] px-3 py-2">
                         {notif.data.companyName && (
                           <p className="text-xs font-bold text-[var(--foreground)]">
-                            الشركة: {notif.data.companyName}
+                            {T("الشركة: {name}", { name: notif.data.companyName })}
                           </p>
                         )}
                         {notif.data.title && (

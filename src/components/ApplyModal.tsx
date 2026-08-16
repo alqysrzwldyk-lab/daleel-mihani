@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Upload, X, FileText, Camera, Send } from "lucide-react";
 import { EDUCATION_LEVELS } from "@/lib/jobs";
 import { resolveErrorMessage } from "@/lib/validationMessages";
+import { useT } from "@/lib/useT";
 
 type Props = {
   jobId: string;
@@ -15,7 +16,7 @@ type Props = {
   onClose: () => void;
 };
 
-// نافذة التقديم على وظيفة: بيانات المهني + السيرة الذاتية PDF + صورة شخصية اختيارية
+// نافذة التقديم على وظيفة: بيانات المهني + سيرة ذاتية اختيارية + صورة شخصية اختيارية
 export default function ApplyModal({
   jobId,
   jobTitle,
@@ -41,6 +42,7 @@ export default function ApplyModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const T = useT();
 
   // إغلاق النافذة بزر Escape للوصول بلوحة المفاتيح
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function ApplyModal({
     formData.append("kind", kind);
     const res = await fetch("/api/upload/asset", { method: "POST", body: formData });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "فشل رفع الملف");
+    if (!res.ok) throw new Error(T(data.error || "فشل رفع الملف"));
     return data.url as string;
   }
 
@@ -74,7 +76,7 @@ export default function ApplyModal({
       setCvFile(url);
       setCvName(file.name);
     } catch {
-      setError("فشل رفع السيرة الذاتية. تأكد أنه ملف PDF بحجم أقل من 5MB.");
+      setError(T("فشل رفع السيرة الذاتية. تأكد أنه ملف PDF بحجم أقل من 5MB."));
     } finally {
       setUploadingCv(false);
       e.target.value = "";
@@ -90,7 +92,7 @@ export default function ApplyModal({
       const url = await uploadFile(file, "photo");
       setPhoto(url);
     } catch {
-      setError("فشل رفع الصورة الشخصية.");
+      setError(T("فشل رفع الصورة الشخصية."));
     } finally {
       setUploadingPhoto(false);
       e.target.value = "";
@@ -101,12 +103,6 @@ export default function ApplyModal({
     e.preventDefault();
     setSubmitting(true);
     setError("");
-
-    if (!cvFile) {
-      setError("يرجى رفع السيرة الذاتية بصيغة PDF قبل إرسال الطلب.");
-      setSubmitting(false);
-      return;
-    }
 
     try {
       const res = await fetch(`/api/jobs/${jobId}/apply`, {
@@ -134,7 +130,7 @@ export default function ApplyModal({
 
       setSuccess(true);
     } catch {
-      setError("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً.");
+      setError(T("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً."));
     } finally {
       setSubmitting(false);
     }
@@ -148,12 +144,12 @@ export default function ApplyModal({
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-2xl w-full max-w-lg my-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
           <div>
-            <h3 className="text-lg font-black text-[var(--foreground)]">التقديم على الوظيفة</h3>
+            <h3 className="text-lg font-black text-[var(--foreground)]">{T("التقديم على الوظيفة")}</h3>
             <p className="text-xs text-[var(--muted)] mt-0.5">
               {jobTitle} — {companyName}
             </p>
           </div>
-          <button onClick={onClose} aria-label="إغلاق النافذة" className="p-2 text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface)] rounded-lg transition">
+          <button onClick={onClose} aria-label={T("إغلاق النافذة")} className="p-2 text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface)] rounded-lg transition">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -163,33 +159,33 @@ export default function ApplyModal({
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--success)]/10 border border-[var(--success)]/20 flex items-center justify-center">
               <Send className="w-7 h-7 text-[var(--success)]" />
             </div>
-            <h4 className="text-xl font-black text-[var(--foreground)]">تم إرسال طلبك بنجاح!</h4>
+            <h4 className="text-xl font-black text-[var(--foreground)]">{T("تم إرسال طلبك بنجاح!")}</h4>
             <p className="text-sm text-[var(--muted)]">
-              سيقوم صاحب الشركة بمراجعة سيرتك الذاتية وسيصلك إشعار فوري عند اتخاذ القرار.
+              {T("سيقوم صاحب الشركة بمراجعة طلبك وسيصلك إشعار فوري عند اتخاذ القرار.")}
             </p>
             <button
               onClick={onClose}
               className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-bold py-3 rounded-xl transition"
             >
-              حسناً
+              {T("حسناً")}
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">الاسم الكامل *</label>
+                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("الاسم الكامل *")}</label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="الاسم الثلاثي"
+                  placeholder={T("الاسم الثلاثي")}
                   className={inputClass}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">رقم الهاتف *</label>
+                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("رقم الهاتف *")}</label>
                 <input
                   type="tel"
                   required
@@ -204,7 +200,7 @@ export default function ApplyModal({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">البريد الإلكتروني *</label>
+              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("البريد الإلكتروني *")}</label>
               <input
                 type="email"
                 required
@@ -218,46 +214,46 @@ export default function ApplyModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">المهنة *</label>
+                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("المهنة *")}</label>
                 <input
                   type="text"
                   required
                   value={profession}
                   onChange={(e) => setProfession(e.target.value)}
-                  placeholder="مثال: مبرمج، محاسب..."
+                  placeholder={T("مثال: مبرمج، محاسب...")}
                   className={inputClass}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">سنوات الخبرة *</label>
+                <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("سنوات الخبرة *")}</label>
                 <input
                   type="text"
                   required
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="مثال: 3 سنوات"
+                  placeholder={T("مثال: 3 سنوات")}
                   className={inputClass}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">المؤهل العلمي *</label>
+              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("المؤهل العلمي *")}</label>
               <select required value={education} onChange={(e) => setEducation(e.target.value)} className={inputClass}>
                 <option value="" disabled>
-                  -- اختر المؤهل العلمي --
+                  {T("-- اختر المؤهل العلمي --")}
                 </option>
                 {EDUCATION_LEVELS.map((ed) => (
                   <option key={ed} value={ed}>
-                    {ed}
+                    {T(ed)}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* رفع السيرة الذاتية */}
+            {/* رفع السيرة الذاتية (اختياري) */}
             <div>
-              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">السيرة الذاتية (PDF) *</label>
+              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("السيرة الذاتية (PDF) — اختياري")}</label>
               <label className={`flex items-center justify-center gap-2 border-2 border-dashed rounded-xl p-4 cursor-pointer transition ${cvFile ? "border-[var(--success)]/40 bg-[var(--success)]/10" : "border-[var(--border)] hover:border-[var(--primary)]"}`}>
                 {uploadingCv ? (
                   <Loader2 className="w-5 h-5 animate-spin text-[var(--primary)]" />
@@ -267,7 +263,7 @@ export default function ApplyModal({
                   <Upload className="w-5 h-5 text-[var(--primary)]" />
                 )}
                 <span className="text-xs font-medium text-[var(--muted)] truncate">
-                  {uploadingCv ? "جاري الرفع..." : cvName ? cvName : "اضغط لرفع ملف السيرة الذاتية (PDF)"}
+                  {uploadingCv ? T("جاري الرفع...") : cvName ? cvName : T("اضغط لرفع ملف السيرة الذاتية (PDF)")}
                 </span>
                 <input type="file" accept="application/pdf" className="hidden" onChange={handleCvUpload} disabled={uploadingCv} />
               </label>
@@ -275,7 +271,7 @@ export default function ApplyModal({
 
             {/* الصورة الشخصية الاختيارية */}
             <div>
-              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">صورة شخصية (اختياري)</label>
+              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("صورة شخصية (اختياري)")}</label>
               <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3.5 cursor-pointer transition">
                 {uploadingPhoto ? (
                   <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" />
@@ -283,20 +279,20 @@ export default function ApplyModal({
                   <Camera className="w-4 h-4 text-[var(--primary)]" />
                 )}
                 <span className="text-xs font-medium text-[var(--muted)]">
-                  {uploadingPhoto ? "جاري الرفع..." : photo ? "تم رفع الصورة ✓" : "إرفاق صورة شخصية"}
+                  {uploadingPhoto ? T("جاري الرفع...") : photo ? T("تم رفع الصورة ✓") : T("إرفاق صورة شخصية")}
                 </span>
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
               </label>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">رسالة تعريفية *</label>
+              <label className="block text-xs font-bold text-[var(--foreground)] mb-1.5">{T("رسالة تعريفية *")}</label>
               <textarea
                 required
                 rows={4}
                 value={coverLetter}
                 onChange={(e) => setCoverLetter(e.target.value)}
-                placeholder="عرّف بنفسك، خبراتك، ولماذا تناسبك هذه الوظيفة..."
+                placeholder={T("عرّف بنفسك، خبراتك، ولماذا تناسبك هذه الوظيفة...")}
                 className={`${inputClass} resize-none leading-relaxed`}
               />
             </div>
@@ -314,14 +310,14 @@ export default function ApplyModal({
                 className="flex-1 inline-flex items-center justify-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition active:scale-[0.99]"
               >
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                {submitting ? "جاري إرسال الطلب..." : "التقديم على الوظيفة"}
+                {submitting ? T("جاري إرسال الطلب...") : T("التقديم على الوظيفة")}
               </button>
               <button
                 type="button"
                 onClick={onClose}
                 className="px-5 py-2 bg-[var(--surface)] hover:bg-[var(--border)] text-[var(--muted)] font-medium rounded-xl transition"
               >
-                إلغاء
+                {T("إلغاء")}
               </button>
             </div>
           </form>

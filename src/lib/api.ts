@@ -64,6 +64,15 @@ export type ProfessionalPublic = {
     website?: string;
   };
   availability?: "available" | "busy" | "away";
+  reviews?: {
+    _id: string;
+    score: number;
+    comment?: string;
+    reviewerName: string;
+    createdAt?: string;
+  }[];
+  ratingDistribution?: { 1: number; 2: number; 3: number; 4: number; 5: number };
+  completedJobs?: number;
 };
 
 export async function fetchProfessionals(params?: {

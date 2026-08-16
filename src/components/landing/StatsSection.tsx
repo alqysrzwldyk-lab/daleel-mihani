@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Users, Building2, Briefcase, Star } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const stats = [
   { icon: Users, label: "محترف", value: 10000, suffix: "+" },
@@ -50,6 +51,7 @@ function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: stri
 }
 
 export default function StatsSection() {
+  const T = useT();
   return (
     <section className="py-16 md:py-20 relative">
       <div className="page-container">
@@ -58,7 +60,7 @@ export default function StatsSection() {
             <div key={stat.label} className="text-center p-6 md:p-8 rounded-2xl bg-[var(--card)] border border-[var(--border-light)] shadow-sm hover:shadow-md transition-shadow">
               <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
               <AnimatedNumber target={stat.value} suffix={stat.suffix} />
-              <p className="text-muted text-sm mt-1">{stat.label}</p>
+              <p className="text-muted text-sm mt-1">{T(stat.label)}</p>
             </div>
           ))}
         </div>

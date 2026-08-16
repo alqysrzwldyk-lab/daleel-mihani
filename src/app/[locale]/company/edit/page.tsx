@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import {
   Loader2,
   Save,
@@ -144,6 +145,7 @@ const sectionTitle = "text-sm font-black text-[var(--primary)] mb-4 flex items-c
 // صفحة تعديل ملف الشركة (لأصحاب الشركات فقط)
 export default function CompanyEditPage() {
   const router = useRouter();
+  const T = useT();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -202,7 +204,7 @@ export default function CompanyEditPage() {
         set(kind, data.url as string);
       }
     } catch {
-      setError("فشل رفع الصورة. تأكد من الصيغة والحجم المسموح.");
+      setError(T("فشل رفع الصورة. تأكد من الصيغة والحجم المسموح."));
     } finally {
       setUploading("");
       e.target.value = "";
@@ -258,7 +260,7 @@ export default function CompanyEditPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.field === "name" ? "اسم الشركة قصير جداً" : data.error || "حدث خطأ أثناء الحفظ");
+        setError(data.field === "name" ? T("اسم الشركة قصير جداً") : T(data.error || "حدث خطأ أثناء الحفظ"));
         setSubmitting(false);
         return;
       }
@@ -267,7 +269,7 @@ export default function CompanyEditPage() {
         router.push(`/company/${data.company._id}`);
       }, 1500);
     } catch {
-      setError("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً.");
+      setError(T("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً."));
       setSubmitting(false);
     }
   }
@@ -294,15 +296,15 @@ export default function CompanyEditPage() {
           <Building2 className="w-5 h-5 text-[var(--primary)]" />
         </div>
         <div>
-          <h1 className="text-xl font-extrabold text-[var(--foreground)]">ملف الشركة</h1>
-          <p className="text-xs text-[var(--muted)]">أكمل معلومات شركتك لتظهر بشكل احترافي في دليل مهني</p>
+          <h1 className="text-xl font-extrabold text-[var(--foreground)]">{T("ملف الشركة")}</h1>
+          <p className="text-xs text-[var(--muted)]">{T("أكمل معلومات شركتك لتظهر بشكل احترافي في دليل مهني")}</p>
         </div>
       </div>
 
       {done && (
         <div className="bg-[var(--success)]/15 border border-[var(--success)]/25 text-[var(--success)] px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mb-6 animate-pulse">
           <CheckCircle2 className="w-5 h-5" />
-          تم حفظ ملف الشركة بنجاح! جاري فتح الصفحة...
+          {T("تم حفظ ملف الشركة بنجاح! جاري فتح الصفحة...")}
         </div>
       )}
 
@@ -310,145 +312,145 @@ export default function CompanyEditPage() {
         {/* ─── المعلومات الأساسية ─── */}
         <section>
           <h3 className={sectionTitle}>
-            <Building2 className="w-4 h-4" /> المعلومات الأساسية
+            <Building2 className="w-4 h-4" /> {T("المعلومات الأساسية")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className={labelClass}>اسم الشركة *</label>
-              <input type="text" required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="اسم الشركة" className={inputClass} />
+              <label className={labelClass}>{T("اسم الشركة *")}</label>
+              <input type="text" required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={T("اسم الشركة")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>شعار الشركة</label>
+              <label className={labelClass}>{T("شعار الشركة")}</label>
               <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3 cursor-pointer transition">
                 {uploading === "logo" ? <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" /> : <Upload className="w-4 h-4 text-[var(--primary)]" />}
-                <span className="text-xs font-medium text-[var(--muted)]">{form.logo ? "تم رفع الشعار ✓" : "رفع الشعار"}</span>
+                <span className="text-xs font-medium text-[var(--muted)]">{form.logo ? T("تم رفع الشعار ✓") : T("رفع الشعار")}</span>
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadImage(e, "logo")} disabled={uploading !== ""} />
               </label>
             </div>
             <div>
-              <label className={labelClass}>صورة الغلاف</label>
+              <label className={labelClass}>{T("صورة الغلاف")}</label>
               <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3 cursor-pointer transition">
                 {uploading === "cover" ? <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" /> : <ImagePlus className="w-4 h-4 text-[var(--primary)]" />}
-                <span className="text-xs font-medium text-[var(--muted)]">{form.cover ? "تم رفع الغلاف ✓" : "رفع الغلاف"}</span>
+                <span className="text-xs font-medium text-[var(--muted)]">{form.cover ? T("تم رفع الغلاف ✓") : T("رفع الغلاف")}</span>
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadImage(e, "cover")} disabled={uploading !== ""} />
               </label>
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>الشعار النصي (Tagline)</label>
-              <input type="text" maxLength={300} value={form.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="جملة قصيرة تصف شركتك، مثال: شريكك الموثوق في الحلول الرقمية" className={inputClass} />
+              <label className={labelClass}>{T("الشعار النصي (Tagline)")}</label>
+              <input type="text" maxLength={300} value={form.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder={T("جملة قصيرة تصف شركتك، مثال: شريكك الموثوق في الحلول الرقمية")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>القطاع / المجال</label>
-              <input type="text" value={form.industry} onChange={(e) => set("industry", e.target.value)} placeholder="مثال: تكنولوجيا المعلومات، البناء، الصحة..." className={inputClass} />
+              <label className={labelClass}>{T("القطاع / المجال")}</label>
+              <input type="text" value={form.industry} onChange={(e) => set("industry", e.target.value)} placeholder={T("مثال: تكنولوجيا المعلومات، البناء، الصحة...")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>حجم الشركة</label>
+              <label className={labelClass}>{T("حجم الشركة")}</label>
               <select value={form.companySize} onChange={(e) => set("companySize", e.target.value)} className={inputClass}>
-                <option value="">-- اختر الحجم --</option>
-                <option value="صغيرة (1-10 موظف)">صغيرة (1-10 موظف)</option>
-                <option value="متوسطة (11-50 موظف)">متوسطة (11-50 موظف)</option>
-                <option value="كبيرة (أكثر من 50 موظف)">كبيرة (أكثر من 50 موظف)</option>
+                <option value="">{T("-- اختر الحجم --")}</option>
+                <option value="صغيرة (1-10 موظف)">{T("صغيرة (1-10 موظف)")}</option>
+                <option value="متوسطة (11-50 موظف)">{T("متوسطة (11-50 موظف)")}</option>
+                <option value="كبيرة (أكثر من 50 موظف)">{T("كبيرة (أكثر من 50 موظف)")}</option>
               </select>
             </div>
             <div>
-              <label className={labelClass}>سنة التأسيس</label>
-              <input type="number" min={1500} max={new Date().getFullYear()} value={form.foundedYear} onChange={(e) => set("foundedYear", e.target.value)} placeholder="مثال: 2015" className={inputClass} />
+              <label className={labelClass}>{T("سنة التأسيس")}</label>
+              <input type="number" min={1500} max={new Date().getFullYear()} value={form.foundedYear} onChange={(e) => set("foundedYear", e.target.value)} placeholder={T("مثال: 2015")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>عدد الموظفين</label>
-              <input type="number" min={1} value={form.employeesCount} onChange={(e) => set("employeesCount", e.target.value)} placeholder="مثال: 45" className={inputClass} />
+              <label className={labelClass}>{T("عدد الموظفين")}</label>
+              <input type="number" min={1} value={form.employeesCount} onChange={(e) => set("employeesCount", e.target.value)} placeholder={T("مثال: 45")} className={inputClass} />
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>نبذة عن الشركة</label>
-              <textarea rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="عرّف بالشركة وتاريخها ومجال عملها..." className={`${inputClass} resize-none leading-relaxed`} />
+              <label className={labelClass}>{T("نبذة عن الشركة")}</label>
+              <textarea rows={4} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={T("عرّف بالشركة وتاريخها ومجال عملها...")} className={`${inputClass} resize-none leading-relaxed`} />
             </div>
           </div>
         </section>
 
         {/* ─── الرسالة والرؤية ─── */}
         <section className="border-t border-[var(--border)] pt-8">
-          <h3 className={sectionTitle}>الرسالة والرؤية</h3>
+          <h3 className={sectionTitle}>{T("الرسالة والرؤية")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>رسالة الشركة</label>
-              <textarea rows={3} value={form.mission} onChange={(e) => set("mission", e.target.value)} placeholder="ما الذي تقدمه الشركة؟" className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("رسالة الشركة")}</label>
+              <textarea rows={3} value={form.mission} onChange={(e) => set("mission", e.target.value)} placeholder={T("ما الذي تقدمه الشركة؟")} className={`${inputClass} resize-none`} />
             </div>
             <div>
-              <label className={labelClass}>رؤية الشركة</label>
-              <textarea rows={3} value={form.vision} onChange={(e) => set("vision", e.target.value)} placeholder="ما طموح الشركة المستقبلي؟" className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("رؤية الشركة")}</label>
+              <textarea rows={3} value={form.vision} onChange={(e) => set("vision", e.target.value)} placeholder={T("ما طموح الشركة المستقبلي؟")} className={`${inputClass} resize-none`} />
             </div>
           </div>
         </section>
 
         {/* ─── القوائم ─── */}
         <section className="border-t border-[var(--border)] pt-8">
-          <h3 className={sectionTitle}>التخصصات والخدمات والقيم</h3>
+          <h3 className={sectionTitle}>{T("التخصصات والخدمات والقيم")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>التخصصات (سطر لكل تخصص)</label>
-              <textarea rows={4} value={form.specializations} onChange={(e) => set("specializations", e.target.value)} placeholder={"تطوير مواقع\nتطبيقات موبايل\nاستشارات تقنية"} className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("التخصصات (سطر لكل تخصص)")}</label>
+              <textarea rows={4} value={form.specializations} onChange={(e) => set("specializations", e.target.value)} placeholder={T("تطوير مواقع\nتطبيقات موبايل\nاستشارات تقنية")} className={`${inputClass} resize-none`} />
             </div>
             <div>
-              <label className={labelClass}>الأنشطة التجارية (سطر لكل نشاط)</label>
-              <textarea rows={4} value={form.businessActivities} onChange={(e) => set("businessActivities", e.target.value)} placeholder={"استيراد وتصدير\nتوزيع مواد غذائية\nخدمات لوجستية"} className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("الأنشطة التجارية (سطر لكل نشاط)")}</label>
+              <textarea rows={4} value={form.businessActivities} onChange={(e) => set("businessActivities", e.target.value)} placeholder={T("استيراد وتصدير\nتوزيع مواد غذائية\nخدمات لوجستية")} className={`${inputClass} resize-none`} />
             </div>
             <div>
-              <label className={labelClass}>الخدمات الرئيسية (سطر لكل خدمة)</label>
-              <textarea rows={4} value={form.services} onChange={(e) => set("services", e.target.value)} placeholder={"تصميم المواقع\nالتسويق الرقمي\nالدعم الفني"} className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("الخدمات الرئيسية (سطر لكل خدمة)")}</label>
+              <textarea rows={4} value={form.services} onChange={(e) => set("services", e.target.value)} placeholder={T("تصميم المواقع\nالتسويق الرقمي\nالدعم الفني")} className={`${inputClass} resize-none`} />
             </div>
             <div>
-              <label className={labelClass}>قيم الشركة (سطر لكل قيمة)</label>
-              <textarea rows={4} value={form.values} onChange={(e) => set("values", e.target.value)} placeholder={"الجودة\nالشفافية\nالابتكار"} className={`${inputClass} resize-none`} />
+              <label className={labelClass}>{T("قيم الشركة (سطر لكل قيمة)")}</label>
+              <textarea rows={4} value={form.values} onChange={(e) => set("values", e.target.value)} placeholder={T("الجودة\nالشفافية\nالابتكار")} className={`${inputClass} resize-none`} />
             </div>
           </div>
         </section>
 
         {/* ─── الموقع والتواصل ─── */}
         <section className="border-t border-[var(--border)] pt-8">
-          <h3 className={sectionTitle}>الموقع والتواصل</h3>
+          <h3 className={sectionTitle}>{T("الموقع والتواصل")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelClass}>الدولة</label>
-              <input type="text" value={form.country} onChange={(e) => set("country", e.target.value)} placeholder="مثال: الأردن" className={inputClass} />
+              <label className={labelClass}>{T("الدولة")}</label>
+              <input type="text" value={form.country} onChange={(e) => set("country", e.target.value)} placeholder={T("مثال: الأردن")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>المدينة</label>
-              <input type="text" value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="مثال: عمان" className={inputClass} />
+              <label className={labelClass}>{T("المدينة")}</label>
+              <input type="text" value={form.city} onChange={(e) => set("city", e.target.value)} placeholder={T("مثال: عمان")} className={inputClass} />
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>العنوان التفصيلي</label>
-              <input type="text" value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="الشارع، المنطقة، رقم المبنى" className={inputClass} />
+              <label className={labelClass}>{T("العنوان التفصيلي")}</label>
+              <input type="text" value={form.address} onChange={(e) => set("address", e.target.value)} placeholder={T("الشارع، المنطقة، رقم المبنى")} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>خط العرض</label>
-              <input type="number" step="any" min={-90} max={90} value={form.latitude} onChange={(e) => set("latitude", e.target.value)} placeholder="مثال: 31.9539" className={inputClass} dir="ltr" />
+              <label className={labelClass}>{T("خط العرض")}</label>
+              <input type="number" step="any" min={-90} max={90} value={form.latitude} onChange={(e) => set("latitude", e.target.value)} placeholder={T("مثال: 31.9539")} className={inputClass} dir="ltr" />
             </div>
             <div>
-              <label className={labelClass}>خط الطول</label>
-              <input type="number" step="any" min={-180} max={180} value={form.longitude} onChange={(e) => set("longitude", e.target.value)} placeholder="مثال: 35.9106" className={inputClass} dir="ltr" />
+              <label className={labelClass}>{T("خط الطول")}</label>
+              <input type="number" step="any" min={-180} max={180} value={form.longitude} onChange={(e) => set("longitude", e.target.value)} placeholder={T("مثال: 35.9106")} className={inputClass} dir="ltr" />
             </div>
             <div>
-              <label className={labelClass}>رقم الهاتف</label>
+              <label className={labelClass}>{T("رقم الهاتف")}</label>
               <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="07XXXXXXXX" className={inputClass} dir="ltr" />
             </div>
             <div>
-              <label className={labelClass}>البريد الإلكتروني</label>
+              <label className={labelClass}>{T("البريد الإلكتروني")}</label>
               <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="info@company.com" className={inputClass} dir="ltr" />
             </div>
             <div>
-              <label className={labelClass}>الموقع الإلكتروني</label>
+              <label className={labelClass}>{T("الموقع الإلكتروني")}</label>
               <input type="url" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://..." className={inputClass} dir="ltr" />
             </div>
             <div>
-              <label className={labelClass}>ساعات العمل</label>
-              <input type="text" value={form.workingHours} onChange={(e) => set("workingHours", e.target.value)} placeholder="مثال: السبت - الخميس، 9 صباحاً - 5 مساءً" className={inputClass} />
+              <label className={labelClass}>{T("ساعات العمل")}</label>
+              <input type="text" value={form.workingHours} onChange={(e) => set("workingHours", e.target.value)} placeholder={T("مثال: السبت - الخميس، 9 صباحاً - 5 مساءً")} className={inputClass} />
             </div>
           </div>
         </section>
 
         {/* ─── وسائل التواصل ─── */}
         <section className="border-t border-[var(--border)] pt-8">
-          <h3 className={sectionTitle}>وسائل التواصل الاجتماعي</h3>
+          <h3 className={sectionTitle}>{T("وسائل التواصل الاجتماعي")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {(
               [
@@ -461,7 +463,7 @@ export default function CompanyEditPage() {
               ] as Array<[keyof FormState["social"], string]>
             ).map(([key, label]) => (
               <div key={key}>
-                <label className={labelClass}>{label}</label>
+                <label className={labelClass}>{T(label)}</label>
                 <input
                   type="text"
                   value={form.social[key]}
@@ -477,10 +479,10 @@ export default function CompanyEditPage() {
 
         {/* ─── معرض الصور ─── */}
         <section className="border-t border-[var(--border)] pt-8">
-          <h3 className={sectionTitle}>معرض الصور (حتى 12 صورة)</h3>
+          <h3 className={sectionTitle}>{T("معرض الصور (حتى 12 صورة)")}</h3>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-4 cursor-pointer transition">
             {uploading === "gallery" ? <Loader2 className="w-5 h-5 animate-spin text-[var(--primary)]" /> : <ImagePlus className="w-5 h-5 text-[var(--primary)]" />}
-            <span className="text-xs font-medium text-[var(--muted)]">اضغط لإضافة صورة للمعرض</span>
+            <span className="text-xs font-medium text-[var(--muted)]">{T("اضغط لإضافة صورة للمعرض")}</span>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadImage(e, "gallery")} disabled={uploading !== ""} />
           </label>
           {form.gallery.length > 0 && (
@@ -488,7 +490,7 @@ export default function CompanyEditPage() {
               {form.gallery.map((img, i) => (
                 <div key={img} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-[var(--border)] group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt={`صورة ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={T("صورة {n}", { n: i + 1 })} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => set("gallery", form.gallery.filter((_, idx) => idx !== i))}
@@ -504,7 +506,7 @@ export default function CompanyEditPage() {
 
         {error && (
           <div className="text-xs font-semibold text-[var(--danger)] bg-[var(--danger)]/10 border border-[var(--danger)]/20 rounded-xl px-3 py-2.5 text-center">
-            {error}
+            {T(error)}
           </div>
         )}
 
@@ -515,13 +517,13 @@ export default function CompanyEditPage() {
             className="flex-1 inline-flex items-center justify-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition shadow-md shadow-[var(--primary)]/10 active:scale-[0.99]"
           >
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-            {submitting ? "جاري الحفظ..." : "حفظ ملف الشركة"}
+            {submitting ? T("جاري الحفظ...") : T("حفظ ملف الشركة")}
           </button>
           <Link
             href={companyId ? `/company/${companyId}` : "/dashboard"}
             className="px-5 py-2 bg-[var(--surface)] hover:bg-[var(--border)] text-[var(--muted)] font-medium rounded-xl transition inline-flex items-center"
           >
-            عرض الملف
+            {T("عرض الملف")}
           </Link>
         </div>
       </form>

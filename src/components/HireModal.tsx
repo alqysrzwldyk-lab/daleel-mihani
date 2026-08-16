@@ -18,6 +18,7 @@ import {
   Sparkles,
   ListChecks,
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 interface HireModalProps {
   professionalId: string;
@@ -54,6 +55,7 @@ export default function HireModal({
   trigger,
 }: HireModalProps) {
   const router = useRouter();
+  const T = useT();
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<"form" | "success">("form");
 
@@ -157,37 +159,37 @@ export default function HireModal({
 
   function validate(): boolean {
     const next: typeof errors = {};
-    if (!companyName.trim()) next.companyName = "اسم الشركة مطلوب";
-    if (!jobTitle.trim()) next.jobTitle = "المسمى الوظيفي مطلوب";
-    if (!description.trim()) next.description = "وصف الوظيفة مطلوب";
+    if (!companyName.trim()) next.companyName = T("اسم الشركة مطلوب");
+    if (!jobTitle.trim()) next.jobTitle = T("المسمى الوظيفي مطلوب");
+    if (!description.trim()) next.description = T("وصف الوظيفة مطلوب");
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
   function buildMessage(): string {
     const parts: string[] = [];
-    parts.push(`📋 المسمى الوظيفي: ${jobTitle.trim()}`);
-    if (employmentType) parts.push(`🕒 نوع التوظيف: ${employmentType}`);
-    if (salary.trim()) parts.push(`💰 الراتب: ${salary.trim()}`);
+    parts.push(T("📋 المسمى الوظيفي: {title}", { title: jobTitle.trim() }));
+    if (employmentType) parts.push(T("🕒 نوع التوظيف: {type}", { type: T(employmentType) }));
+    if (salary.trim()) parts.push(T("💰 الراتب: {salary}", { salary: salary.trim() }));
     const locationParts = [country, governorate, city].filter((v) => v.trim());
-    if (locationParts.length > 0) parts.push(`📍 الموقع: ${locationParts.join("، ")}`);
-    if (workLocation.trim()) parts.push(`🏢 مكان العمل: ${workLocation.trim()}`);
-    if (description.trim()) parts.push(`\n📝 وصف الوظيفة:\n${description.trim()}`);
-    if (responsibilities.trim()) parts.push(`\n🔹 المسؤوليات:\n${responsibilities.trim()}`);
-    if (requirements.trim()) parts.push(`\n🔸 المتطلبات:\n${requirements.trim()}`);
-    if (skills.trim()) parts.push(`\n🛠️ المهارات المطلوبة:\n${skills.trim()}`);
-    if (jobBenefits.trim()) parts.push(`\n✨ مزايا الوظيفة:\n${jobBenefits.trim()}`);
-    const selectedBenefits = BENEFITS_OPTIONS.filter((b) => benefits[b.key]).map((b) => b.label);
-    if (selectedBenefits.length > 0) parts.push(`🎁 مزايا إضافية: ${selectedBenefits.join("، ")}`);
+    if (locationParts.length > 0) parts.push(T("📍 الموقع: {location}", { location: locationParts.join(T("، ")) }));
+    if (workLocation.trim()) parts.push(T("🏢 مكان العمل: {location}", { location: workLocation.trim() }));
+    if (description.trim()) parts.push(T("\n📝 وصف الوظيفة:\n{description}", { description: description.trim() }));
+    if (responsibilities.trim()) parts.push(T("\n🔹 المسؤوليات:\n{responsibilities}", { responsibilities: responsibilities.trim() }));
+    if (requirements.trim()) parts.push(T("\n🔸 المتطلبات:\n{requirements}", { requirements: requirements.trim() }));
+    if (skills.trim()) parts.push(T("\n🛠️ المهارات المطلوبة:\n{skills}", { skills: skills.trim() }));
+    if (jobBenefits.trim()) parts.push(T("\n✨ مزايا الوظيفة:\n{benefits}", { benefits: jobBenefits.trim() }));
+    const selectedBenefits = BENEFITS_OPTIONS.filter((b) => benefits[b.key]).map((b) => T(b.label));
+    if (selectedBenefits.length > 0) parts.push(T("🎁 مزايا إضافية: {list}", { list: selectedBenefits.join(T("، ")) }));
     if (companyPhone.trim() || companyEmail.trim()) {
-      parts.push(`\n📞 بيانات التواصل:`);
-      if (companyPhone.trim()) parts.push(`الهاتف: ${companyPhone.trim()}`);
-      if (companyEmail.trim()) parts.push(`البريد: ${companyEmail.trim()}`);
+      parts.push(T("\n📞 بيانات التواصل:"));
+      if (companyPhone.trim()) parts.push(T("الهاتف: {phone}", { phone: companyPhone.trim() }));
+      if (companyEmail.trim()) parts.push(T("البريد: {email}", { email: companyEmail.trim() }));
     }
     if (interviewDate.trim() || interviewLocation.trim()) {
-      parts.push(`\n🗓️ المقابلة:`);
-      if (interviewDate.trim()) parts.push(`التاريخ: ${interviewDate.trim()}`);
-      if (interviewLocation.trim()) parts.push(`المكان: ${interviewLocation.trim()}`);
+      parts.push(T("\n🗓️ المقابلة:"));
+      if (interviewDate.trim()) parts.push(T("التاريخ: {date}", { date: interviewDate.trim() }));
+      if (interviewLocation.trim()) parts.push(T("المكان: {place}", { place: interviewLocation.trim() }));
     }
     return parts.join("\n");
   }
@@ -216,10 +218,10 @@ export default function HireModal({
         setSubmitted(true);
         setView("success");
       } else {
-        setErrors({ jobTitle: data.error || "حدث خطأ ما" });
+        setErrors({ jobTitle: T(data.error || "حدث خطأ ما") });
       }
     } catch {
-      setErrors({ jobTitle: "فشل الاتصال بالسيرفر" });
+      setErrors({ jobTitle: T("فشل الاتصال بالسيرفر") });
     } finally {
       setLoading(false);
     }
@@ -231,7 +233,7 @@ export default function HireModal({
       className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] text-white font-bold py-3 px-6 rounded-xl hover:opacity-95 transition shadow-md shadow-[var(--primary)]/20 active:scale-[0.98]"
     >
       <Briefcase className="w-4 h-4" />
-      طلب توظيف / تقديم عرض عمل
+      {T("طلب توظيف / تقديم عرض عمل")}
     </button>
   );
 
@@ -246,7 +248,7 @@ export default function HireModal({
             ref={modalRef}
             role="dialog"
             aria-modal="true"
-            aria-label="إرسال عرض عمل"
+            aria-label={T("إرسال عرض عمل")}
             className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-[var(--card)] sm:rounded-3xl rounded-t-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-200"
           >
             {view === "success" ? (
@@ -255,11 +257,11 @@ export default function HireModal({
                 <div className="w-20 h-20 mx-auto rounded-full bg-[var(--success)]/15 flex items-center justify-center mb-5 animate-in zoom-in duration-300">
                   <CheckCircle2 className="w-10 h-10 text-[var(--success)]" />
                 </div>
-                <h3 className="text-2xl font-black text-[var(--foreground)]">تم إرسال عرض العمل بنجاح</h3>
+                <h3 className="text-2xl font-black text-[var(--foreground)]">{T("تم إرسال عرض العمل بنجاح")}</h3>
                 <p className="text-sm text-[var(--muted)] mt-3 leading-relaxed">
-                  تم إشعار {professionalName} بعرضك مباشرة.
+                  {T("تم إشعار {name} بعرضك مباشرة.", { name: professionalName })}
                   <br />
-                  يمكنك متابعة حالة الطلب من لوحة تحكم الشركة.
+                  {T("يمكنك متابعة حالة الطلب من لوحة تحكم الشركة.")}
                 </p>
                 <div className="mt-7 flex flex-col sm:flex-row gap-3">
                   <button
@@ -267,13 +269,13 @@ export default function HireModal({
                     className="flex-1 inline-flex items-center justify-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-bold py-3 rounded-xl transition active:scale-[0.98]"
                   >
                     <ListChecks className="w-4 h-4" />
-                    الذهاب إلى طلبات التوظيف
+                    {T("الذهاب إلى طلبات التوظيف")}
                   </button>
                   <button
                     onClick={handleClose}
                     className="px-5 py-3 bg-[var(--border-light)] hover:bg-[var(--border)] rounded-xl font-bold text-[var(--foreground)] transition"
                   >
-                    إغلاق
+                    {T("إغلاق")}
                   </button>
                 </div>
               </div>
@@ -285,28 +287,28 @@ export default function HireModal({
                   <button
                     onClick={handleClose}
                     disabled={loading}
-                    aria-label="إغلاق"
+                    aria-label={T("إغلاق")}
                     className="absolute top-4 end-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition disabled:opacity-50"
                   >
                     <X className="w-4 h-4" />
                   </button>
                   <p className="text-xs font-bold opacity-80 mb-1 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
-                    توظيف مباشر
+                    {T("توظيف مباشر")}
                   </p>
-                  <h3 className="text-xl font-black">إرسال عرض عمل إلى {professionalName}</h3>
+                  <h3 className="text-xl font-black">{T("إرسال عرض عمل إلى {name}", { name: professionalName })}</h3>
 
                   {/* الشركة + المهني */}
                   <div className="flex items-center gap-3 mt-4">
                     <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-xl px-3 py-2 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
                         {company.logo ? (
-                          <Image src={company.logo} alt={company.name || "الشركة"} width={32} height={32} className="w-full h-full object-cover" unoptimized />
+                          <Image src={company.logo} alt={company.name || T("الشركة")} width={32} height={32} className="w-full h-full object-cover" unoptimized />
                         ) : (
                           <Building2 className="w-4 h-4" />
                         )}
                       </div>
-                      <span className="text-sm font-bold truncate">{company.name || "شركتك"}</span>
+                      <span className="text-sm font-bold truncate">{company.name || T("شركتك")}</span>
                     </div>
                     <div className="w-px h-8 bg-white/25" />
                     <div className="flex items-center gap-2 min-w-0">
@@ -331,19 +333,19 @@ export default function HireModal({
                   {/* معلومات الوظيفة */}
                   <section>
                     <h4 className="flex items-center gap-2 font-black text-sm text-[var(--foreground)] mb-3">
-                      <Briefcase className="w-4 h-4 text-[var(--primary)]" /> معلومات الوظيفة
+                      <Briefcase className="w-4 h-4 text-[var(--primary)]" /> {T("معلومات الوظيفة")}
                     </h4>
                     <div className="space-y-3">
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                            اسم الشركة أو المشروع <span className="text-[var(--danger)]">*</span>
+                            {T("اسم الشركة أو المشروع")} <span className="text-[var(--danger)]">*</span>
                           </label>
                           <input
                             type="text"
                             value={companyName}
                             onChange={(e) => setCompanyName(e.target.value)}
-                            placeholder="مثال: شركة الحلول المتقدمة"
+                            placeholder={T("مثال: شركة الحلول المتقدمة")}
                             className={`w-full px-3.5 py-2.5 border rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition ${
                               touched && errors.companyName ? "border-[var(--danger)]" : "border-[var(--border)]"
                             }`}
@@ -354,13 +356,13 @@ export default function HireModal({
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                            المسمى الوظيفي <span className="text-[var(--danger)]">*</span>
+                            {T("المسمى الوظيفي")} <span className="text-[var(--danger)]">*</span>
                           </label>
                           <input
                             type="text"
                             value={jobTitle}
                             onChange={(e) => setJobTitle(e.target.value)}
-                            placeholder="مثال: مطور تطبيقات فلاتر"
+                            placeholder={T("مثال: مطور تطبيقات فلاتر")}
                             className={`w-full px-3.5 py-2.5 border rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition ${
                               touched && errors.jobTitle ? "border-[var(--danger)]" : "border-[var(--border)]"
                             }`}
@@ -373,27 +375,27 @@ export default function HireModal({
 
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">نوع التوظيف</label>
+                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("نوع التوظيف")}</label>
                           <select
                             value={employmentType}
                             onChange={(e) => setEmploymentType(e.target.value)}
                             className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition"
                           >
-                            <option value="">اختر النوع...</option>
+                            <option value="">{T("اختر النوع...")}</option>
                             {EMPLOYMENT_TYPES.map((t) => (
-                              <option key={t} value={t}>{t}</option>
+                              <option key={t} value={t}>{T(t)}</option>
                             ))}
                           </select>
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                            <span className="inline-flex items-center gap-1"><Banknote className="w-3 h-3" /> الراتب (اختياري)</span>
+                            <span className="inline-flex items-center gap-1"><Banknote className="w-3 h-3" /> {T("الراتب (اختياري)")}</span>
                           </label>
                           <input
                             type="text"
                             value={salary}
                             onChange={(e) => setSalary(e.target.value)}
-                            placeholder="مثال: 800 - 1200$"
+                            placeholder={T("مثال: 800 - 1200$")}
                             className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition"
                           />
                         </div>
@@ -401,24 +403,24 @@ export default function HireModal({
 
                       <div className="grid grid-cols-3 gap-3">
                         <div>
-                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">الدولة</label>
-                          <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="اليمن" className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
+                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("الدولة")}</label>
+                          <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder={T("اليمن")} className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">المحافظة</label>
-                          <input type="text" value={governorate} onChange={(e) => setGovernorate(e.target.value)} placeholder="صنعاء" className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
+                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("المحافظة")}</label>
+                          <input type="text" value={governorate} onChange={(e) => setGovernorate(e.target.value)} placeholder={T("صنعاء")} className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">المدينة</label>
-                          <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="صنعاء" className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
+                          <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("المدينة")}</label>
+                          <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder={T("صنعاء")} className="w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                         </div>
                       </div>
 
                       <div>
                         <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                          <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> موقع العمل (اختياري)</span>
+                            <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {T("موقع العمل (اختياري)")}</span>
                         </label>
-                        <input type="text" value={workLocation} onChange={(e) => setWorkLocation(e.target.value)} placeholder="عنوان المكتب أو (عن بعد)" className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
+                        <input type="text" value={workLocation} onChange={(e) => setWorkLocation(e.target.value)} placeholder={T("عنوان المكتب أو (عن بعد)")} className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                       </div>
                     </div>
                   </section>
@@ -426,18 +428,18 @@ export default function HireModal({
                   {/* وصف الوظيفة */}
                   <section>
                     <h4 className="flex items-center gap-2 font-black text-sm text-[var(--foreground)] mb-3">
-                      <ListChecks className="w-4 h-4 text-[var(--primary)]" /> وصف الوظيفة
+                      <ListChecks className="w-4 h-4 text-[var(--primary)]" /> {T("وصف الوظيفة")}
                     </h4>
                     <div className="space-y-3">
                       <div>
                         <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                          وصف الوظيفة <span className="text-[var(--danger)]">*</span>
+                          {T("وصف الوظيفة")} <span className="text-[var(--danger)]">*</span>
                         </label>
                         <textarea
                           rows={3}
                           value={description}
                           onChange={(e) => setDescription(e.target.value.slice(0, 800))}
-                          placeholder="اكتب نبذة واضحة عن الوظيفة ومهامها العامة..."
+                          placeholder={T("اكتب نبذة واضحة عن الوظيفة ومهامها العامة...")}
                           className={`w-full px-3.5 py-2.5 border rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition resize-none ${
                             touched && errors.description ? "border-[var(--danger)]" : "border-[var(--border)]"
                           }`}
@@ -451,47 +453,47 @@ export default function HireModal({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">المسؤوليات</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("المسؤوليات")}</label>
                         <textarea
                           rows={2}
                           value={responsibilities}
                           onChange={(e) => setResponsibilities(e.target.value.slice(0, 600))}
-                          placeholder="المهام والمسؤوليات الأساسية..."
+                          placeholder={T("المهام والمسؤوليات الأساسية...")}
                           className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition resize-none"
                         />
                         <div className="text-end text-[10px] text-[var(--muted-light)] mt-1">{responsibilities.length}/600</div>
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">المتطلبات</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("المتطلبات")}</label>
                         <textarea
                           rows={2}
                           value={requirements}
                           onChange={(e) => setRequirements(e.target.value.slice(0, 600))}
-                          placeholder="المؤهلات والخبرات المطلوبة..."
+                          placeholder={T("المؤهلات والخبرات المطلوبة...")}
                           className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition resize-none"
                         />
                         <div className="text-end text-[10px] text-[var(--muted-light)] mt-1">{requirements.length}/600</div>
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">المهارات المطلوبة</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("المهارات المطلوبة")}</label>
                         <input
                           type="text"
                           value={skills}
                           onChange={(e) => setSkills(e.target.value)}
-                          placeholder="افصل المهارات بفاصلة: Flutter, Firebase, Git"
+                          placeholder={T("افصل المهارات بفاصلة: Flutter, Firebase, Git")}
                           className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">مزايا الوظيفة</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("مزايا الوظيفة")}</label>
                         <textarea
                           rows={2}
                           value={jobBenefits}
                           onChange={(e) => setJobBenefits(e.target.value.slice(0, 400))}
-                          placeholder="مثال: إجازات مدفوعة، بيئة عمل حديثة، ترقيات سريعة..."
+                          placeholder={T("مثال: إجازات مدفوعة، بيئة عمل حديثة، ترقيات سريعة...")}
                           className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition resize-none"
                         />
                       </div>
@@ -501,7 +503,7 @@ export default function HireModal({
                   {/* مزايا إضافية */}
                   <section>
                     <h4 className="flex items-center gap-2 font-black text-sm text-[var(--foreground)] mb-3">
-                      <Sparkles className="w-4 h-4 text-[var(--accent)]" /> مزايا إضافية
+                      <Sparkles className="w-4 h-4 text-[var(--accent)]" /> {T("مزايا إضافية")}
                     </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {BENEFITS_OPTIONS.map((b) => (
@@ -516,7 +518,7 @@ export default function HireModal({
                           }`}
                         >
                           <span className="text-base">{b.icon}</span>
-                          {b.label}
+                          {T(b.label)}
                           {benefits[b.key] && (
                             <span className="ms-auto w-4 h-4 rounded-full bg-[var(--primary)] text-white text-[10px] flex items-center justify-center">✓</span>
                           )}
@@ -528,28 +530,28 @@ export default function HireModal({
                   {/* معلومات التواصل */}
                   <section>
                     <h4 className="flex items-center gap-2 font-black text-sm text-[var(--foreground)] mb-3">
-                      <Phone className="w-4 h-4 text-[var(--primary)]" /> معلومات التواصل
+                      <Phone className="w-4 h-4 text-[var(--primary)]" /> {T("معلومات التواصل")}
                     </h4>
                     <div className="grid sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">هاتف الشركة</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("هاتف الشركة")}</label>
                         <input type="tel" value={companyPhone} onChange={(e) => setCompanyPhone(e.target.value)} placeholder="05xxxxxxxx" className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">بريد الشركة</label>
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("بريد الشركة")}</label>
                         <input type="email" value={companyEmail} onChange={(e) => setCompanyEmail(e.target.value)} placeholder="hr@company.com" className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-3 mt-3">
                       <div>
                         <label className="block text-xs font-bold text-[var(--foreground)] mb-1">
-                          <span className="inline-flex items-center gap-1"><CalendarDays className="w-3 h-3" /> موعد المقابلة (اختياري)</span>
+                            <span className="inline-flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {T("موعد المقابلة (اختياري)")}</span>
                         </label>
                         <input type="date" value={interviewDate} onChange={(e) => setInterviewDate(e.target.value)} className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">مكان المقابلة (اختياري)</label>
-                        <input type="text" value={interviewLocation} onChange={(e) => setInterviewLocation(e.target.value)} placeholder="مقر الشركة أو رابط مكالمة" className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
+                        <label className="block text-xs font-bold text-[var(--foreground)] mb-1">{T("مكان المقابلة (اختياري)")}</label>
+                        <input type="text" value={interviewLocation} onChange={(e) => setInterviewLocation(e.target.value)} placeholder={T("مقر الشركة أو رابط مكالمة")} className="w-full px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 transition" />
                       </div>
                     </div>
                   </section>
@@ -564,12 +566,12 @@ export default function HireModal({
                       {loading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          جاري الإرسال...
+                          {T("جاري الإرسال...")}
                         </>
                       ) : (
                         <>
                           <Send className="w-4 h-4" />
-                          إرسال عرض العمل
+                          {T("إرسال عرض العمل")}
                         </>
                       )}
                     </button>
@@ -579,7 +581,7 @@ export default function HireModal({
                       disabled={loading}
                       className="px-5 py-3 bg-[var(--border-light)] hover:bg-[var(--border)] rounded-xl font-bold text-[var(--foreground)] transition disabled:opacity-50"
                     >
-                      إلغاء
+                      {T("إلغاء")}
                     </button>
                   </div>
                 </form>

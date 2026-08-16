@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Share2, Link2, Copy, X } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useT } from "@/lib/useT";
 
 type Props = {
   open: boolean;
@@ -13,6 +14,7 @@ type Props = {
 // نافذة مشاركة ملف الشركة عبر الروابط ووسائل التواصل
 export default function ShareCompany({ open, onClose, companyName }: Props) {
   const params = useParams();
+  const T = useT();
   const [copied, setCopied] = useState(false);
 
   if (!open) return null;
@@ -64,7 +66,7 @@ export default function ShareCompany({ open, onClose, companyName }: Props) {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-black text-[var(--foreground)] flex items-center gap-2">
             <Share2 className="w-5 h-5 text-[var(--primary)]" />
-            مشاركة الشركة
+            {T("مشاركة الشركة")}
           </h3>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--border-light)] transition">
             <X className="w-5 h-5 text-[var(--muted)]" />
@@ -72,7 +74,7 @@ export default function ShareCompany({ open, onClose, companyName }: Props) {
         </div>
 
         <p className="text-sm text-[var(--muted)] mb-5">
-          شارك ملف {companyName} مع الآخرين عبر الروابط التالية:
+          {T("شارك ملف {name} مع الآخرين عبر الروابط التالية:", { name: companyName })}
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
@@ -84,7 +86,7 @@ export default function ShareCompany({ open, onClose, companyName }: Props) {
               rel="noopener noreferrer"
               className={`${l.color} rounded-xl py-3 flex flex-col items-center gap-1.5 font-bold text-xs transition hover:scale-[1.03]`}
             >
-              <span className="text-lg leading-none">{l.name}</span>
+              <span className="text-lg leading-none">{T(l.name)}</span>
             </a>
           ))}
         </div>
@@ -99,7 +101,7 @@ export default function ShareCompany({ open, onClose, companyName }: Props) {
             className="shrink-0 inline-flex items-center gap-1.5 bg-[var(--primary)] text-white text-xs font-bold px-3.5 py-2 rounded-lg transition hover:bg-[var(--primary-dark)]"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? "تم النسخ" : "نسخ الرابط"}
+            {copied ? T("تم النسخ") : T("نسخ الرابط")}
           </button>
         </div>
 
@@ -109,7 +111,7 @@ export default function ShareCompany({ open, onClose, companyName }: Props) {
             className="mt-4 w-full flex items-center justify-center gap-2 text-sm font-bold text-[var(--primary)] border border-[var(--primary)]/30 bg-[var(--primary)]/5 py-3 rounded-xl transition hover:bg-[var(--primary)]/10"
           >
             <Share2 className="w-4 h-4" />
-            مشاركة عبر التطبيقات الأخرى
+            {T("مشاركة عبر التطبيقات الأخرى")}
           </button>
         )}
       </div>

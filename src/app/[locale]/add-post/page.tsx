@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, MapPin, Send, Upload, X } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const CATEGORIES: Record<string, { key: string; label: string }[]> = {
   general: [
@@ -33,9 +34,11 @@ const CURRENCIES = [
 
 export default function AddPostPage() {
   const router = useRouter();
+  const T = useT();
   const [loading, setLoading] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
+  const [statusSuccess, setStatusSuccess] = useState(false);
 
   const [type, setType] = useState("general");
   const [category, setCategory] = useState("cars");
@@ -73,11 +76,13 @@ export default function AddPostPage() {
       if (res.ok && data.url) {
         setImages((prev) => [...prev, data.url]);
       } else {
-        setStatusMsg("فشل رفع الصورة");
+        setStatusMsg(T("فشل رفع الصورة"));
+        setStatusSuccess(false);
       }
     } catch (err) {
       console.error("Image upload failed:", err);
-      setStatusMsg("فشل رفع الصورة");
+      setStatusMsg(T("فشل رفع الصورة"));
+      setStatusSuccess(false);
     } finally {
       setUploadingImg(false);
     }
@@ -91,6 +96,7 @@ export default function AddPostPage() {
     e.preventDefault();
     setLoading(true);
     setStatusMsg("");
+    setStatusSuccess(false);
 
     const specifications: Record<string, string> = {};
     if (category === "cars") specifications.model = carModel;
@@ -113,14 +119,17 @@ export default function AddPostPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setStatusMsg("تم نشر الإعلان بنجاح!");
+        setStatusMsg(T("تم نشر الإعلان بنجاح!"));
+        setStatusSuccess(true);
         setTimeout(() => router.push("/dashboard/my-ads"), 2000);
       } else {
-        setStatusMsg(data.error || "حدث خطأ ما");
+        setStatusMsg(data.error ? T(data.error) : T("حدث خطأ ما"));
+        setStatusSuccess(false);
       }
     } catch (error) {
       console.error(error);
-      setStatusMsg("فشل الاتصال بالسيرفر");
+      setStatusMsg(T("فشل الاتصال بالسيرفر"));
+      setStatusSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -132,12 +141,12 @@ export default function AddPostPage() {
         <button onClick={() => router.back()} className="back-btn">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <h1>إضافة إعلان جديد</h1>
+        <h1>{T("إضافة إعلان جديد")}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="app-card p-5 space-y-5">
         <div className="input-group">
-          <label className="input-label">نوع الإعلان</label>
+          <label className="input-label">{T("نوع الإعلان")}</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -146,7 +155,7 @@ export default function AddPostPage() {
                 type === "general" ? "border-primary bg-primary-50 text-primary" : "border-[var(--border)] text-muted"
               }`}
             >
-              📦 إعلان تجاري
+              {T("📦 إعلان تجاري")}
             </button>
             <button
               type="button"
@@ -155,22 +164,22 @@ export default function AddPostPage() {
                 type === "professional" ? "border-primary bg-primary-50 text-primary" : "border-[var(--border)] text-muted"
               }`}
             >
-              💼 خدمة مهنية
+              {T("💼 خدمة مهنية")}
             </button>
           </div>
         </div>
 
         <div className="input-group">
-          <label className="input-label">القسم</label>
+          <label className="input-label">{T("القسم")}</label>
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field">
             {(CATEGORIES[type] || CATEGORIES.general).map((cat) => (
-              <option key={cat.key} value={cat.key}>{cat.label}</option>
+              <option key={cat.key} value={cat.key}>{T(cat.label)}</option>
             ))}
           </select>
         </div>
 
         <div className="input-group">
-          <label className="input-label">صور الإعلان</label>
+          <label className="input-label">{T("صور الإعلان")}</label>
           <div className="flex flex-wrap gap-2 mb-2">
             {images.map((url, i) => (
               <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[var(--border)]">
@@ -187,24 +196,24 @@ export default function AddPostPage() {
               </label>
             )}
           </div>
-          <p className="text-[11px] text-muted">يمكنك إضافة حتى 5 صور</p>
+          <p className="text-[11px] text-muted">{T("يمكنك إضافة حتى 5 صور")}</p>
         </div>
 
         <div className="input-group">
-          <label className="input-label">عنوان الإعلان</label>
-          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} className="input-field" placeholder="مثال: تويوتا كامري 2022 بحالة الوكالة" />
+          <label className="input-label">{T("عنوان الإعلان")}</label>
+          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} className="input-field" placeholder={T("مثال: تويوتا كامري 2022 بحالة الوكالة")} />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="input-group">
-            <label className="input-label">السعر</label>
+            <label className="input-label">{T("السعر")}</label>
             <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="input-field" placeholder="0" />
           </div>
           <div className="input-group">
-            <label className="input-label">العملة</label>
+            <label className="input-label">{T("العملة")}</label>
             <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="input-field">
               {CURRENCIES.map((c) => (
-                <option key={c.key} value={c.key}>{c.label}</option>
+                <option key={c.key} value={c.key}>{T(c.label)}</option>
               ))}
             </select>
           </div>
@@ -212,33 +221,33 @@ export default function AddPostPage() {
 
         <div className="input-group">
           <label className="input-label flex items-center gap-1">
-            <MapPin className="w-4 h-4 text-muted" /> الموقع
+            <MapPin className="w-4 h-4 text-muted" /> {T("الموقع")}
           </label>
-          <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className="input-field" placeholder="اكتب المدينة أو المنطقة" />
+          <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className="input-field" placeholder={T("اكتب المدينة أو المنطقة")} />
         </div>
 
         {category === "cars" && (
           <div className="bg-[var(--border-light)] rounded-xl p-4 border border-[var(--border)]">
-            <p className="text-xs font-bold text-primary mb-2">مواصفات السيارة</p>
-            <input type="text" placeholder="سنة الصنع والموديل" value={carModel} onChange={(e) => setCarModel(e.target.value)} className="input-field" />
+            <p className="text-xs font-bold text-primary mb-2">{T("مواصفات السيارة")}</p>
+            <input type="text" placeholder={T("سنة الصنع والموديل")} value={carModel} onChange={(e) => setCarModel(e.target.value)} className="input-field" />
           </div>
         )}
 
         {category === "lands" && (
           <div className="bg-[var(--border-light)] rounded-xl p-4 border border-[var(--border)]">
-            <p className="text-xs font-bold text-primary mb-2">مواصفات الأرض</p>
-            <input type="text" placeholder="المساحة بالمتر المربع" value={landArea} onChange={(e) => setLandArea(e.target.value)} className="input-field" />
+            <p className="text-xs font-bold text-primary mb-2">{T("مواصفات الأرض")}</p>
+            <input type="text" placeholder={T("المساحة بالمتر المربع")} value={landArea} onChange={(e) => setLandArea(e.target.value)} className="input-field" />
           </div>
         )}
 
         <div className="input-group">
-          <label className="input-label">الوصف والتفاصيل</label>
-          <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" placeholder="اكتب تفاصيل الإعلان كاملة..." />
+          <label className="input-label">{T("الوصف والتفاصيل")}</label>
+          <textarea required rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" placeholder={T("اكتب تفاصيل الإعلان كاملة...")} />
         </div>
 
         {statusMsg && (
           <div className={`text-sm font-medium p-3 rounded-xl text-center ${
-            statusMsg.includes("نجاح") ? "bg-success-light text-success" : "bg-danger-light text-danger"
+            statusSuccess ? "bg-success-light text-success" : "bg-danger-light text-danger"
           }`}>
             {statusMsg}
           </div>
@@ -246,7 +255,7 @@ export default function AddPostPage() {
 
         <button type="submit" disabled={loading} className="btn btn-primary btn-block btn-lg">
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-          {loading ? "جاري النشر..." : "انشر الإعلان"}
+          {loading ? T("جاري النشر...") : T("انشر الإعلان")}
         </button>
       </form>
     </div>

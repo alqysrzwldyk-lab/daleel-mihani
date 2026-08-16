@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { Wallet as WalletIcon, ArrowLeft, History, CreditCard, Plus, Star, Megaphone } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 type Tx = {
   _id: string;
@@ -18,6 +19,7 @@ export default function WalletPage() {
   const [balance, setBalance] = useState(0);
   const [txs, setTxs] = useState<Tx[]>([]);
   const [loading, setLoading] = useState(true);
+  const T = useT();
 
   useEffect(() => {
     Promise.all([
@@ -58,40 +60,40 @@ export default function WalletPage() {
     <div className="page-container">
       <div className="page-header">
         <WalletIcon className="w-6 h-6 text-primary" />
-        <h1>المحفظة</h1>
+        <h1>{T("المحفظة")}</h1>
       </div>
 
       {loading ? (
         <div className="skeleton h-40 rounded-2xl mb-6" />
       ) : (
         <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-6 text-white mb-6 shadow-lg">
-          <p className="text-emerald-100 text-sm mb-1">رصيد المحفظة</p>
+          <p className="text-emerald-100 text-sm mb-1">{T("رصيد المحفظة")}</p>
           <p className="text-3xl font-extrabold">{balance.toLocaleString()} <span className="text-lg">﷼</span></p>
-          <p className="text-emerald-200 text-xs mt-2">يمكنك استخدام الرصيد لتفعيل الباقة المميزة أو تعزيز الإعلانات</p>
+          <p className="text-emerald-200 text-xs mt-2">{T("يمكنك استخدام الرصيد لتفعيل الباقة المميزة أو تعزيز الإعلانات")}</p>
         </div>
       )}
 
       <div className="flex gap-3 mb-6">
         <Link href="/subscription" className="flex-1 flex items-center justify-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-xl py-3 px-4 font-bold text-sm hover:bg-[var(--border-light)] transition">
           <Star className="w-4 h-4 text-amber-500" />
-          الباقة المميزة
+          {T("الباقة المميزة")}
         </Link>
         <Link href="/dashboard/my-ads" className="flex-1 flex items-center justify-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-xl py-3 px-4 font-bold text-sm hover:bg-[var(--border-light)] transition">
           <Megaphone className="w-4 h-4 text-primary" />
-          تعزيز إعلان
+          {T("تعزيز إعلان")}
         </Link>
       </div>
 
       <div className="flex items-center gap-2 mb-4">
         <History className="w-5 h-5 text-muted" />
-        <h2 className="font-extrabold">سجل المعاملات</h2>
+        <h2 className="font-extrabold">{T("سجل المعاملات")}</h2>
       </div>
 
       {txs.length === 0 ? (
         <div className="empty-state">
           <CreditCard />
-          <h3>لا توجد معاملات</h3>
-          <p>سجل معاملاتك المالية سيظهر هنا</p>
+          <h3>{T("لا توجد معاملات")}</h3>
+          <p>{T("سجل معاملاتك المالية سيظهر هنا")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -101,10 +103,10 @@ export default function WalletPage() {
               <div key={tx._id} className="bg-[var(--card)] rounded-xl p-4 border border-[var(--border-light)] flex items-center gap-3">
                 <span className="text-xl">{typeIcons[tx.type] || "💳"}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm">{tx.note || typeLabels[tx.type] || tx.type}</p>
+                  <p className="font-bold text-sm">{tx.note || T(typeLabels[tx.type] || "") || tx.type}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-muted">{new Date(tx.createdAt).toLocaleDateString("ar")}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${st.color}`}>{st.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${st.color}`}>{T(st.label)}</span>
                   </div>
                 </div>
                 <span className={`font-extrabold text-sm ${tx.type === "deposit" ? "text-emerald-600" : "text-red-500"}`}>

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import RatingStars from "@/components/RatingStars";
+import { useT } from "@/lib/useT";
 import type { CompanyPublic, CompanyStats } from "@/lib/companyTypes";
 
 type Props = {
@@ -27,6 +28,7 @@ type Props = {
 
 // ترويسة ملف الشركة: الغلاف + الشعار + الإجراءات
 export default function CompanyHeader({ company, stats, isOwner, onShare, onMessage }: Props) {
+  const T = useT();
   return (
     <div className="rounded-3xl overflow-hidden border border-[var(--border)] card-shadow bg-[var(--card)]">
       {/* صورة الغلاف */}
@@ -45,7 +47,7 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         <div className="absolute top-4 end-4 inline-flex items-center gap-1.5 bg-black/30 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1.5 rounded-full">
           <Eye className="w-3.5 h-3.5" />
-          {stats.views} مشاهدة
+          {T("{count} مشاهدة", { count: stats.views })}
         </div>
       </div>
 
@@ -92,19 +94,19 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
                   <span className="text-xs font-bold text-[var(--foreground)]">
                     {stats.averageRating.toFixed(1)}
                   </span>
-                  <span className="text-[11px] text-[var(--muted)]">({stats.reviewsCount} تقييم)</span>
+                  <span className="text-[11px] text-[var(--muted)]">{T("({count} تقييم)", { count: stats.reviewsCount })}</span>
                 </div>
               )}
               {(company.city || company.country) && (
                 <span className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)]">
                   <MapPin className="w-3.5 h-3.5 text-[var(--primary)]" />
-                  {[company.city, company.country].filter(Boolean).join("، ")}
+                  {[company.city, company.country].filter(Boolean).join(T("، "))}
                 </span>
               )}
               {stats.jobsCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)]">
                   <Briefcase className="w-3.5 h-3.5 text-[var(--primary)]" />
-                  {stats.jobsCount} وظيفة مفتوحة
+                  {T("{count} وظيفة مفتوحة", { count: stats.jobsCount })}
                 </span>
               )}
             </div>
@@ -119,7 +121,7 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
               className="inline-flex items-center gap-2 bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] hover:opacity-95 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition active:scale-[0.98]"
             >
               <Briefcase className="w-4 h-4" />
-              التقدم إلى الوظائف
+              {T("التقدم إلى الوظائف")}
             </a>
           )}
 
@@ -131,7 +133,7 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
               className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground)] border border-[var(--border)] hover:border-[var(--primary)] hover:text-[var(--primary)] px-4 py-2.5 rounded-xl transition"
             >
               <Globe className="w-4 h-4" />
-              الموقع الرسمي
+              {T("الموقع الرسمي")}
             </a>
           )}
 
@@ -140,7 +142,7 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
             className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground)] border border-[var(--border)] hover:border-[var(--primary)] hover:text-[var(--primary)] px-4 py-2.5 rounded-xl transition"
           >
             <Share2 className="w-4 h-4" />
-            مشاركة
+            {T("مشاركة")}
           </button>
 
           {!isOwner && (
@@ -149,7 +151,7 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
               className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground)] border border-[var(--border)] hover:border-[var(--primary)] hover:text-[var(--primary)] px-4 py-2.5 rounded-xl transition"
             >
               <MessageSquare className="w-4 h-4" />
-              مراسلة الشركة
+              {T("مراسلة الشركة")}
             </button>
           )}
 
@@ -160,14 +162,14 @@ export default function CompanyHeader({ company, stats, isOwner, onShare, onMess
                 className="ms-auto inline-flex items-center gap-2 text-sm font-bold text-white bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] hover:opacity-95 px-4 py-2.5 rounded-xl transition active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" />
-                إضافة إعلان توظيف
+                {T("إضافة إعلان توظيف")}
               </Link>
               <Link
                 href="/dashboard"
                 className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)] bg-[var(--primary)]/10 border border-[var(--primary)]/25 hover:bg-[var(--primary)]/15 px-4 py-2.5 rounded-xl transition"
               >
                 <PenLine className="w-4 h-4" />
-                تعديل الملف من لوحة التحكم
+                {T("تعديل الملف من لوحة التحكم")}
               </Link>
             </>
           )}

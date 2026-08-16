@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { MapPin, Clock, Banknote, Building2, CalendarDays, Eye, Users, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import type { JobItem } from "@/lib/jobTypes";
 
 function formatDate(value: string | undefined) {
@@ -14,6 +15,7 @@ function formatDate(value: string | undefined) {
 
 // بطاقة وظيفة عصرية مشابهة لمنصات LinkedIn و Indeed و Bayt
 export default function JobCard({ job }: { job: JobItem }) {
+  const T = useT();
   return (
     <div className="group relative bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 card-shadow hover:shadow-xl hover:-translate-y-0.5 hover:border-[var(--primary)] transition-all duration-300 flex flex-col gap-4 overflow-hidden">
       {/* شريط علوي متوهج عند التمرير */}
@@ -24,7 +26,7 @@ export default function JobCard({ job }: { job: JobItem }) {
         <Link
           href={`/company/${job.companyId}`}
           className="w-14 h-14 shrink-0 rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden flex items-center justify-center hover:border-[var(--primary)] transition-colors"
-          title="ملف الشركة"
+          title={T("ملف الشركة")}
         >
           {job.companyLogo ? (
             <Image
@@ -48,7 +50,7 @@ export default function JobCard({ job }: { job: JobItem }) {
           <Link
             href={`/company/${job.companyId}`}
             className="text-sm text-[var(--muted)] font-medium mt-0.5 line-clamp-1 hover:text-[var(--primary)] transition-colors inline-block"
-            title={`عرض ملف شركة ${job.companyName}`}
+            title={T("عرض ملف شركة {name}", { name: job.companyName })}
           >
             {job.companyName}
           </Link>
@@ -58,11 +60,11 @@ export default function JobCard({ job }: { job: JobItem }) {
         {job.status === "open" ? (
           <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold text-[var(--success)] bg-[var(--success)]/15 border border-[var(--success)]/25 px-2.5 py-1 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-            مفتوح
+            {T("مفتوح")}
           </span>
         ) : (
           <span className="shrink-0 text-[11px] font-bold text-[var(--muted)] bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1 rounded-full">
-            مغلق
+            {T("مغلق")}
           </span>
         )}
       </div>
@@ -109,7 +111,7 @@ export default function JobCard({ job }: { job: JobItem }) {
             href={`/jobs/${job._id}`}
             className="inline-flex items-center gap-1 text-xs font-bold bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20 px-3.5 py-2 rounded-xl group-hover:bg-[var(--primary)] group-hover:text-white transition-colors"
           >
-            عرض التفاصيل
+            {T("عرض التفاصيل")}
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
           </Link>
         </div>

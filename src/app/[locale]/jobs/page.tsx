@@ -7,10 +7,12 @@ import { Briefcase, Loader2, ChevronLeft, ChevronRight, SearchX } from "lucide-r
 import JobsFilter from "@/components/JobsFilter";
 import JobCard from "@/components/JobCard";
 import type { JobItem } from "@/lib/jobTypes";
+import { useT } from "@/lib/useT";
 
 const PAGE_SIZE = 12;
 
 function JobsPageInner() {
+  const T = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [jobs, setJobs] = useState<JobItem[]>([]);
@@ -71,10 +73,10 @@ function JobsPageInner() {
             <div className="p-2.5 bg-white/15 rounded-2xl backdrop-blur-sm">
               <Briefcase className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-black">طلبات التوظيف</h1>
+            <h1 className="text-2xl md:text-3xl font-black">{T("طلبات التوظيف")}</h1>
           </div>
           <p className="text-sm md:text-base text-blue-100 max-w-2xl leading-relaxed">
-            تصفح أحدث فرص العمل المنشورة من الشركات المعتمدة على المنصة، وقدّم على الوظيفة التي تناسب مهاراتك مباشرة خلال دقائق.
+            {T("تصفح أحدث فرص العمل المنشورة من الشركات المعتمدة على المنصة، وقدّم على الوظيفة التي تناسب مهاراتك مباشرة خلال دقائق.")}
           </p>
         </div>
       </div>
@@ -88,18 +90,18 @@ function JobsPageInner() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 text-[var(--muted)] gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
-          <span className="text-sm font-bold">جاري تحميل الوظائف...</span>
+          <span className="text-sm font-bold">{T("جاري تحميل الوظائف...")}</span>
         </div>
       ) : jobs.length === 0 ? (
         <div className="text-center py-20 border-2 border-dashed border-[var(--border)] rounded-2xl bg-[var(--card)]">
           <SearchX className="w-12 h-12 text-[var(--muted)] mx-auto mb-3" />
-          <p className="font-bold text-[var(--foreground)]">لا توجد وظائف مطابقة لبحثك</p>
-          <p className="text-sm text-[var(--muted)] mt-1.5">جرّب تعديل الفلاتر أو البحث بكلمات أخرى</p>
+          <p className="font-bold text-[var(--foreground)]">{T("لا توجد وظائف مطابقة لبحثك")}</p>
+          <p className="text-sm text-[var(--muted)] mt-1.5">{T("جرّب تعديل الفلاتر أو البحث بكلمات أخرى")}</p>
         </div>
       ) : (
         <>
           <p className="text-xs font-bold text-[var(--muted)] mb-4">
-            {total} وظيفة متاحة
+            {T("{total} وظيفة متاحة", { total })}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {jobs.map((job) => (
@@ -118,7 +120,7 @@ function JobsPageInner() {
                 <ChevronRight className="w-4 h-4" />
               </button>
               <span className="text-sm font-bold text-[var(--foreground)] bg-[var(--card)] border border-[var(--border)] px-4 py-2 rounded-xl">
-                الصفحة {page} من {totalPages}
+                {T("الصفحة {page} من {totalPages}", { page, totalPages })}
               </span>
               <button
                 onClick={() => goToPage(page + 1)}

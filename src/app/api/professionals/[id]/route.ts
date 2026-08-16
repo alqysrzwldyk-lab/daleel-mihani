@@ -6,6 +6,7 @@ import { Professional, type IProfessional } from "@/models/Professional";
 import { Rating, type IRating } from "@/models/Rating";
 import { HireRequest } from "@/models/HireRequest";
 import { User } from "@/models/User";
+import { Company } from "@/models/Company";
 
 const projectSchema = z.object({
   title: z.string().min(1).max(200),
@@ -156,7 +157,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const [ratings, completedJobs] = await Promise.all([
       Rating.find({ professionalId: professional._id })
         .sort({ createdAt: -1 })
-        .limit(6)
         .lean<IRating[]>(),
       HireRequest.countDocuments({
         professionalId: professional.userId,
@@ -165,11 +165,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     ]);
 
     const reviewerIds = ratings.map((r) => r.raterUserId);
-    const reviewers = await User.find({ _id: { $in: reviewerIds } })
-      .select("name")
-      .lean<{ _id: string; name: string }[]>();
+    const [reviewers, companies] = await Promise.all([
+      User.find({ _id: { $in: reviewerIds } })
+        .select("name")
+        .lean<{ _id: string; name: string }[]>(),
+      Company.find({ userId: { $in: reviewerIds } })
+        .select("name")
+        .lean<{ userId: string; name: string }[]>(),
+    ]);
 
     const reviewerMap = new Map(reviewers.map((u) => [String(u._id), u.name]));
+    const companyMap = new Map(companies.map((c) => [String(c.userId), c.name]));
 
     const allRatings = await Rating.find({ professionalId: professional._id })
       .select("score")
@@ -188,7 +194,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         _id: String(r._id),
         score: r.score,
         comment: r.comment,
-        reviewerName: reviewerMap.get(String(r.raterUserId)) || "مستخدم",
+        reviewerName:
+          companyMap.get(String(r.raterUserId)) ||
+          reviewerMap.get(String(r.raterUserId)) ||
+          "شركة",
         createdAt: r.createdAt,
       })),
       ratingDistribution: distribution,

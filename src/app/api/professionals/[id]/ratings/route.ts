@@ -5,6 +5,7 @@ import { getAuthFromRequest } from "@/lib/auth";
 import { Professional } from "@/models/Professional";
 import { Rating } from "@/models/Rating";
 import { User } from "@/models/User";
+import { Company } from "@/models/Company";
 import { Notification } from "@/models/Notification";
 
 const schema = z.object({
@@ -63,14 +64,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (professional.userId) {
       try {
-        const rater = await User.findById(auth.userId).select("name");
+        const [rater, company] = await Promise.all([
+          User.findById(auth.userId).select("name"),
+          Company.findOne({ userId: auth.userId }).select("name"),
+        ]);
+        const senderName = company?.name || rater?.name || "شركة";
         await Notification.create({
           recipientId: professional.userId,
-          title: `⭐ تقييم جديد من ${rater?.name || "شركة"}`,
-          message: `حصلت على تقييم ${data.score} من 5${data.comment ? ` مع تعليق: "${data.comment}"` : ""}.`,
+          title: `⭐ تقييم جديد من ${senderName}`,
+          message: `قامت شركة "${senderName}" بتقييمك ${data.score} من 5${data.comment ? ` مع تعليق: "${data.comment}"` : ""}.`,
           type: "info",
           link: `/professionals/${professional._id}`,
-          data: { action: "rating", senderName: rater?.name || "", score: data.score },
+          data: { action: "rating", senderName, score: data.score },
         });
       } catch {}
     }

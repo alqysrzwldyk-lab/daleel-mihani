@@ -16,11 +16,17 @@ export function validationMessageKey(error: z.ZodError): string {
   return error.errors[0]?.message || "validation";
 }
 
+// رابط مقبول: فارغ، مسار نسبي يبدأ بـ "/" (مثل روابط رفع الملفات)، أو رابط مطلق http/https
+const urlOrEmpty = z
+  .string()
+  .trim()
+  .refine((v) => v === "" || v.startsWith("/") || /^https?:\/\//i.test(v), "invalidUrl");
+
 // Schema لإنشاء وتحديث إعلان وظيفي
 export const jobAdvertisementSchema = z.object({
   jobTitle: z.string().trim().min(2, "jobTitleShort"),
   companyName: z.string().trim().min(1, "companyNameRequired"),
-  companyLogo: z.string().url().optional().or(z.literal("")),
+  companyLogo: urlOrEmpty.optional(),
   jobType: z.string().trim().min(1, "jobTypeRequired"),
   department: z.string().trim().min(1, "departmentRequired"),
   description: z.string().trim().min(10, "descriptionShort"),
@@ -42,7 +48,7 @@ export const jobAdvertisementSchema = z.object({
   contactEmail: z.string().trim().email("emailInvalid"),
   website: z.string().trim().optional().or(z.literal("")),
   benefits: z.string().trim().optional().or(z.literal("")),
-  banner: z.string().url().optional().or(z.literal("")),
+  banner: urlOrEmpty.optional(),
   status: z.enum(["open", "closed"]).default("open"),
 });
 
@@ -58,6 +64,6 @@ export const jobApplicationSchema = z.object({
   education: z.string().trim().min(1, "educationRequired"),
   experience: z.string().trim().min(1, "experienceRequired"),
   coverLetter: z.string().trim().min(10, "coverLetterShort"),
-  cvFile: z.string().url("cvRequired"),
-  photo: z.string().url().optional().or(z.literal("")),
+  cvFile: urlOrEmpty.optional(),
+  photo: urlOrEmpty.optional(),
 });

@@ -11,10 +11,12 @@ import {
   Globe,
   LayoutGrid,
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 import type { CompanyPublic } from "@/lib/companyTypes";
 
 // بطاقة معلومات أساسية عن الشركة (تُعرض في العمود الجانبي)
 export default function CompanyInfo({ company }: { company: CompanyPublic }) {
+  const T = useT();
   const items: Array<{ icon: typeof MapPin; label: string; value?: string }> = [];
 
   if (company.industry) items.push({ icon: LayoutGrid, label: "القطاع", value: company.industry });
@@ -31,7 +33,7 @@ export default function CompanyInfo({ company }: { company: CompanyPublic }) {
 
   return (
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6">
-      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">📌 معلومات الشركة</h2>
+      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("📌 معلومات الشركة")}</h2>
       <div className="space-y-3">
         {items.map((item) => (
           <div
@@ -42,7 +44,7 @@ export default function CompanyInfo({ company }: { company: CompanyPublic }) {
               <item.icon className="w-4 h-4 text-[var(--primary)]" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] text-[var(--muted)] font-bold">{item.label}</p>
+              <p className="text-[11px] text-[var(--muted)] font-bold">{T(item.label)}</p>
               <p className="text-sm font-bold text-[var(--foreground)] truncate">{item.value || "—"}</p>
             </div>
           </div>

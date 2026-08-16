@@ -55,7 +55,7 @@ export type JobApplicationItem = {
   education: string;
   experience: string;
   coverLetter: string;
-  cvFile: string;
+  cvFile?: string;
   photo?: string;
   status: ApplicationStatus;
   companyNote?: string;

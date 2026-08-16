@@ -1,10 +1,12 @@
 "use client";
 
 import { Target, Eye, ListChecks, Puzzle, HeartHandshake } from "lucide-react";
+import { useT } from "@/lib/useT";
 import type { CompanyPublic } from "@/lib/companyTypes";
 
 // قسم نبذة عن الشركة: الوصف + الرسالة والرؤية + الأنشطة والتخصصات والقيم
 export default function CompanyAbout({ company }: { company: CompanyPublic }) {
+  const T = useT();
   const hasMission = !!company.mission || !!company.vision;
   const hasLists =
     company.businessActivities.length > 0 ||
@@ -15,7 +17,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
 
   return (
     <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8">
-      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">🏢 عن الشركة</h2>
+      <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("🏢 عن الشركة")}</h2>
 
       {company.description && (
         <p className="text-[var(--muted)] leading-loose text-sm md:text-base whitespace-pre-line">
@@ -31,7 +33,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
                 <div className="p-2 bg-[var(--primary)]/10 rounded-lg">
                   <Target className="w-4 h-4 text-[var(--primary)]" />
                 </div>
-                <h3 className="font-bold text-sm text-[var(--foreground)]">رسالتنا</h3>
+                <h3 className="font-bold text-sm text-[var(--foreground)]">{T("رسالتنا")}</h3>
               </div>
               <p className="text-sm text-[var(--muted)] leading-relaxed whitespace-pre-line">
                 {company.mission}
@@ -44,7 +46,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
                 <div className="p-2 bg-[var(--accent)]/10 rounded-lg">
                   <Eye className="w-4 h-4 text-[var(--accent)]" />
                 </div>
-                <h3 className="font-bold text-sm text-[var(--foreground)]">رؤيتنا</h3>
+                <h3 className="font-bold text-sm text-[var(--foreground)]">{T("رؤيتنا")}</h3>
               </div>
               <p className="text-sm text-[var(--muted)] leading-relaxed whitespace-pre-line">
                 {company.vision}
@@ -58,7 +60,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
         <div className="mt-5">
           <h3 className="flex items-center gap-2 font-bold text-sm text-[var(--foreground)] mb-2.5">
             <ListChecks className="w-4 h-4 text-[var(--primary)]" />
-            الأنشطة التجارية
+            {T("الأنشطة التجارية")}
           </h3>
           <ul className="grid sm:grid-cols-2 gap-2">
             {company.businessActivities.map((activity) => (
@@ -78,7 +80,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
         <div className="mt-5">
           <h3 className="flex items-center gap-2 font-bold text-sm text-[var(--foreground)] mb-2.5">
             <Puzzle className="w-4 h-4 text-[var(--primary)]" />
-            التخصصات
+            {T("التخصصات")}
           </h3>
           <div className="flex flex-wrap gap-2">
             {company.specializations.map((spec) => (
@@ -97,7 +99,7 @@ export default function CompanyAbout({ company }: { company: CompanyPublic }) {
         <div className="mt-5">
           <h3 className="flex items-center gap-2 font-bold text-sm text-[var(--foreground)] mb-2.5">
             <HeartHandshake className="w-4 h-4 text-[var(--primary)]" />
-            قيمنا
+            {T("قيمنا")}
           </h3>
           <div className="flex flex-wrap gap-2">
             {company.values.map((value) => (

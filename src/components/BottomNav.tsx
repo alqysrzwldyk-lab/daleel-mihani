@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import { Home, Search, PlusSquare, Bell, MessageCircle, User } from "lucide-react";
 
 type AuthUser = {
   id: string;
-  role: "professional" | "employer";
+  role: "professional" | "employer" | "admin";
 };
 
 type Tab = {
@@ -26,6 +27,7 @@ const tabs: Tab[] = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const T = useT();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -106,6 +108,7 @@ export default function BottomNav() {
         if (tab.href === "/profile") {
           if (!user) finalHref = "/login";
           else if (user.role === "professional") finalHref = "/dashboard";
+          else if (user.role === "admin") finalHref = "/admin";
           else finalHref = "/search";
         }
         if ((tab.href === "/notifications" || tab.href === "/messages") && !user) finalHref = "/login";
@@ -132,7 +135,7 @@ export default function BottomNav() {
                 <span className="nav-badge">{unreadMessages > 99 ? "99+" : unreadMessages}</span>
               )}
             </div>
-            <span>{resolvedLabel}</span>
+            <span>{T(resolvedLabel)}</span>
           </Link>
         );
       })}

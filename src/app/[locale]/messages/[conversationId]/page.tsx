@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Send, Loader2, MessageSquare, User, Building2 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 type Msg = {
   _id: string;
@@ -20,6 +21,7 @@ type OtherUser = {
 };
 
 export default function ConversationPage() {
+  const T = useT();
   const router = useRouter();
   const params = useParams();
   const conversationId = params.conversationId as string;
@@ -67,7 +69,7 @@ export default function ConversationPage() {
           return;
         }
         if (res.status === 403 || res.status === 404) {
-          setError("لا يمكن الوصول إلى هذه المحادثة");
+          setError(T("لا يمكن الوصول إلى هذه المحادثة"));
           setLoading(false);
           return;
         }
@@ -129,7 +131,7 @@ export default function ConversationPage() {
         ]);
         setText("");
       } else {
-        alert(data.error || "فشل إرسال الرسالة");
+        alert(data.error ? T(data.error) : T("فشل إرسال الرسالة"));
       }
     } catch {}
     setSending(false);
@@ -140,9 +142,9 @@ export default function ConversationPage() {
       <div className="page-container max-w-2xl mx-auto">
         <div className="empty-state">
           <MessageSquare />
-          <h3>{error}</h3>
+          <h3>{T(error)}</h3>
           <button onClick={() => router.push("/messages")} className="btn btn-primary mt-4">
-            العودة إلى الرسائل
+            {T("العودة إلى الرسائل")}
           </button>
         </div>
       </div>
@@ -163,9 +165,9 @@ export default function ConversationPage() {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <span className="font-bold text-sm block truncate">{otherUser?.name || "المحادثة"}</span>
+          <span className="font-bold text-sm block truncate">{otherUser?.name || T("المحادثة")}</span>
           <span className={`text-[11px] font-semibold ${otherUser?.role === "employer" ? "text-sky-600" : "text-primary"}`}>
-            {otherUser?.role === "employer" ? "شركة" : otherUser?.role === "professional" ? "محترف" : ""}
+            {otherUser?.role === "employer" ? T("شركة") : otherUser?.role === "professional" ? T("محترف") : ""}
           </span>
         </div>
         {otherUser?.role === "professional" && otherUser?._id && (
@@ -173,7 +175,7 @@ export default function ConversationPage() {
             onClick={() => router.push("/search")}
             className="text-[11px] font-bold text-primary border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition"
           >
-            الملف المهني
+            {T("الملف المهني")}
           </button>
         )}
       </div>
@@ -182,13 +184,13 @@ export default function ConversationPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-10">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            <p className="text-sm text-muted">جاري تحميل الرسائل...</p>
+            <p className="text-sm text-muted">{T("جاري تحميل الرسائل...")}</p>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-10">
             <MessageSquare className="w-10 h-10 text-gray-200 mb-3" />
-            <p className="text-sm text-muted">لا توجد رسائل بعد</p>
-            <p className="text-xs text-muted-light mt-1">أرسل أول رسالة لبدء المحادثة</p>
+            <p className="text-sm text-muted">{T("لا توجد رسائل بعد")}</p>
+            <p className="text-xs text-muted-light mt-1">{T("أرسل أول رسالة لبدء المحادثة")}</p>
           </div>
         ) : (
           messages.map((msg, i) => {
@@ -242,7 +244,7 @@ export default function ConversationPage() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="اكتب رسالتك..."
+          placeholder={T("اكتب رسالتك...")}
           className="flex-1 py-2.5 px-4 outline-none text-sm bg-transparent"
         />
         <button

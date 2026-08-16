@@ -5,6 +5,7 @@ import {
   UserCheck, Search, Star, Award, FolderOpen, Building2,
   ShieldCheck, MessageSquare, TrendingUp, Bookmark, Heart, FileText
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const features = [
   { icon: UserCheck, title: "ملفات مهنية احترافية", desc: "أنشئ ملفاً شخصياً يعرض خبراتك ومهاراتك وشهاداتك بشكل احترافي" },
@@ -22,6 +23,7 @@ const features = [
 ];
 
 export default function FeaturesSection() {
+  const T = useT();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,8 +40,8 @@ export default function FeaturesSection() {
     <section className="py-16 md:py-20 bg-[var(--surface)]" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">مميزات الدليل المهني</h2>
-          <p className="text-muted max-w-xl mx-auto">كل ما تحتاجه لبناء هويتك المهنية والتواصل مع أصحاب العمل</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">{T("مميزات الدليل المهني")}</h2>
+          <p className="text-muted max-w-xl mx-auto">{T("كل ما تحتاجه لبناء هويتك المهنية والتواصل مع أصحاب العمل")}</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
@@ -52,8 +54,8 @@ export default function FeaturesSection() {
               style={{ transitionDelay: `${i * 50}ms` }}
             >
               <feat.icon className="w-6 h-6 text-primary mb-3 group-hover:scale-110 transition-transform" />
-              <h3 className="font-bold text-sm mb-1">{feat.title}</h3>
-              <p className="text-muted text-xs leading-relaxed">{feat.desc}</p>
+              <h3 className="font-bold text-sm mb-1">{T(feat.title)}</h3>
+              <p className="text-muted text-xs leading-relaxed">{T(feat.desc)}</p>
             </div>
           ))}
         </div>

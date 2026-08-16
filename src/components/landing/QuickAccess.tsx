@@ -5,6 +5,7 @@ import {
   Users, Megaphone, GraduationCap, Star, Briefcase,
   Award, Building2, ClipboardList, PlusCircle, FileText
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const cards = [
   {
@@ -80,6 +81,7 @@ const cards = [
 ];
 
 export default function QuickAccess() {
+  const T = useT();
   return (
     <section className="quick-access">
       <div className="page-container">
@@ -91,8 +93,8 @@ export default function QuickAccess() {
                 <div className={`quick-card-icon quick-card-icon-${card.color}`}>
                   <card.icon className="w-5 h-5" />
                 </div>
-                <div className="quick-card-title">{card.title}</div>
-                <div className="quick-card-desc">{card.desc}</div>
+                <div className="quick-card-title">{T(card.title)}</div>
+                <div className="quick-card-desc">{T(card.desc)}</div>
               </>
             );
             if (isHash) {

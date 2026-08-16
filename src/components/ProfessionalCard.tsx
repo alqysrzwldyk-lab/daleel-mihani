@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { MapPin, Briefcase, Star, MessageSquare } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import type { ProfessionalPublic } from "@/lib/api";
 import { getProfessionIcon, getProfessionArabic } from "@/lib/professions";
 
@@ -14,6 +15,7 @@ type Props = {
 
 export default function ProfessionalCard({ professional }: Props) {
   const t = useTranslations("card");
+  const T = useT();
   const router = useRouter();
   const [sending, setSending] = useState(false);
 
@@ -48,7 +50,7 @@ export default function ProfessionalCard({ professional }: Props) {
           <div className="flex items-center justify-center gap-1.5 mt-0.5 flex-wrap">
             {profs.map((p, i) => (
               <span key={p} className="text-primary font-medium text-xs">
-                {getProfessionIcon(p)} {getProfessionArabic(p)}
+                {getProfessionIcon(p)} {T(getProfessionArabic(p))}
                 {i < profs.length - 1 && <span className="text-muted-light mx-0.5">|</span>}
               </span>
             ))}
@@ -117,7 +119,7 @@ export default function ProfessionalCard({ professional }: Props) {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     receiverId: professional.userId,
-                    content: `مرحباً ${professional.name}، أود التواصل معك بخصوص خدماتك المهنية`,
+                    content: T("مرحباً {name}، أود التواصل معك بخصوص خدماتك المهنية", { name: professional.name }),
                     refType: "professional",
                     refId: professional._id,
                   }),
@@ -126,7 +128,7 @@ export default function ProfessionalCard({ professional }: Props) {
                 if (msgRes.ok) {
                   router.push(`/messages/${msgData.conversationId}`);
                 } else {
-                  alert(msgData.error || "فشل إرسال الرسالة");
+                  alert(msgData.error || T("فشل إرسال الرسالة"));
                 }
               } catch {}
               setSending(false);
@@ -134,7 +136,7 @@ export default function ProfessionalCard({ professional }: Props) {
             className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 bg-primary/5 hover:bg-primary/10 text-primary rounded-xl text-xs font-bold transition"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            {sending ? "جاري..." : "تواصل"}
+            {sending ? T("جاري...") : T("تواصل")}
           </button>
         </div>
       </article>

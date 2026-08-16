@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Tag, MapPin } from "lucide-react";
+import { getT } from "@/i18n/getT";
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   YER: "﷼",
@@ -21,7 +22,8 @@ type Props = {
   };
 };
 
-export default function AdCard({ ad }: Props) {
+export default async function AdCard({ ad }: Props) {
+  const T = await getT();
   const symbol = CURRENCY_SYMBOLS[ad.currency || "YER"] || "﷼";
 
   return (
@@ -41,7 +43,7 @@ export default function AdCard({ ad }: Props) {
         <div>
           <div className="flex gap-1.5 mb-2">
             <span className={`badge ${ad.type === "professional" ? "badge-primary" : "badge-warning"}`}>
-              {ad.type === "professional" ? "خدمة مهنية" : "إعلان تجاري"}
+              {ad.type === "professional" ? T("خدمة مهنية") : T("إعلان تجاري")}
             </span>
             <span className="badge bg-[var(--border-light)] text-[var(--muted)] border border-[var(--border)]">
               {ad.category}
@@ -55,7 +57,7 @@ export default function AdCard({ ad }: Props) {
         <div className="border-t border-gray-50 pt-2 flex justify-between items-center">
           <span className="price-tag flex items-center gap-1">
             <Tag className="w-3.5 h-3.5" />
-            {ad.price ? `${ad.price.toLocaleString()} ${symbol}` : "حسب الاتفاق"}
+            {ad.price ? `${ad.price.toLocaleString()} ${symbol}` : T("حسب الاتفاق")}
           </span>
           <span className="text-[11px] text-muted-light flex items-center gap-0.5">
             <MapPin className="w-3 h-3" /> {ad.location}

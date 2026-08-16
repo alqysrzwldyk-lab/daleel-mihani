@@ -8,6 +8,7 @@ export const VALIDATION_MESSAGES: Record<string, string> = {
   educationRequired: "المؤهل العلمي مطلوب",
   experienceRequired: "سنوات الخبرة مطلوبة",
   coverLetterShort: "الرسالة التعريفية قصيرة جداً (10 أحرف على الأقل)",
+  invalidUrl: "رابط الملف غير صالح",
   cvRequired: "يرجى رفع السيرة الذاتية بصيغة PDF صحيحة",
   // نموذج إعلان الوظيفة (JobAdvertisement)
   jobTitleShort: "المسمى الوظيفي يجب أن يكون حرفين على الأقل",
@@ -21,13 +22,25 @@ export const VALIDATION_MESSAGES: Record<string, string> = {
   countryRequired: "الدولة مطلوبة",
 };
 
+// ترجمة مفاتيح الأخطاء العامة القادمة من الخادم
+export const GENERIC_ERROR_MESSAGES: Record<string, string> = {
+  generic: "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.",
+  notFound: "العنصر المطلوب غير موجود",
+  unauthorized: "غير مصرح بالدخول",
+  forbidden: "ليس لديك صلاحية للقيام بهذا الإجراء",
+  databaseUnavailable: "تعذر الاتصال بقاعدة البيانات، يرجى المحاولة لاحقاً.",
+  tooManyAttempts: "طلبات كثيرة جداً، يرجى المحاولة بعد قليل.",
+  alreadyRated: "لقد قيّمت هذا المحترف مسبقاً",
+};
+
 // تحويل استجابة الخطأ من الخادم إلى رسالة عربية قابلة للعرض
 export function resolveErrorMessage(data: { error?: string; field?: string }): string {
   if (data.field && data.field !== "validation") {
     return VALIDATION_MESSAGES[data.field] || "تأكد من صحة البيانات ثم أعد المحاولة";
   }
   if (data.error && data.error !== "validation") {
-    return data.error;
+    // رسائل عربية جاهزة تُعرض كما هي، أما المفاتيح فتُترجم
+    return GENERIC_ERROR_MESSAGES[data.error] || data.error;
   }
   return "حدث خطأ أثناء إرسال البيانات";
 }

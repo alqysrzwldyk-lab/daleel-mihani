@@ -1,0 +1,119 @@
+{
+  "app": {
+    "name": "Daleel Mihani",
+    "tagline": "Find the best professionals — or showcase your skills to employers"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "login": "Sign in",
+    "register": "Create account",
+    "dashboard": "Dashboard",
+    "logout": "Log out"
+  },
+  "home": {
+    "browseProfessions": "Browse by profession",
+    "featured": "Featured professionals"
+  },
+  "hero": {
+    "title": "The Comprehensive Professional Directory",
+    "subtitle": "A platform connecting professionals from all trades with companies looking for talent",
+    "searchPlaceholder": "Search by name, profession, or skill...",
+    "searchBtn": "Search",
+    "ctaProfessional": "I'm a professional — create my profile",
+    "ctaEmployer": "I'm a company — find employees"
+  },
+  "professions": {
+    "programmer": "Programmer",
+    "accountant": "Accountant",
+    "doctor": "Doctor",
+    "engineer": "Engineer",
+    "teacher": "Teacher",
+    "designer": "Designer",
+    "lawyer": "Lawyer",
+    "nurse": "Nurse",
+    "chef": "Chef",
+    "electrician": "Electrician",
+    "plumber": "Plumber",
+    "driver": "Driver",
+    "marketing": "Marketing",
+    "sales": "Sales",
+    "other": "Other"
+  },
+  "card": {
+    "viewProfile": "View profile",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "experience": "Experience",
+    "location": "Location"
+  },
+  "search": {
+    "title": "Search results",
+    "filterProfession": "Filter by profession",
+    "allProfessions": "All professions",
+    "noResults": "No matching results",
+    "resultsCount": "{count} professionals"
+  },
+  "profile": {
+    "about": "About",
+    "skills": "Skills",
+    "workHistory": "Work history",
+    "contact": "Contact",
+    "rateThis": "Rate this professional",
+    "yourRating": "Your rating",
+    "comment": "Comment (optional)",
+    "submitRating": "Submit rating",
+    "loginToRate": "Log in as an employer to rate professionals",
+    "alreadyRated": "You have already rated this professional",
+    "reviewsTitle": "Company reviews"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create a new account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full name",
+    "role": "Account type",
+    "roleProfessional": "Professional — I want to showcase my skills",
+    "roleEmployer": "Company — I'm looking for employees",
+    "loginBtn": "Sign in",
+    "registerBtn": "Create account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "errors": {
+      "invalidCredentials": "Incorrect email or password",
+      "emailExists": "This email is already registered",
+      "validation": "Please check the entered data",
+      "nameShort": "Name must be at least 2 characters",
+      "emailInvalid": "Invalid email address",
+      "passwordShort": "Password must be at least 6 characters",
+      "databaseUnavailable": "Database unavailable. Make sure MongoDB is running and try again",
+      "tooManyAttempts": "Too many login attempts. Please try again in a minute",
+      "generic": "Something went wrong, try again"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your professional profile",
+    "photo": "Profile photo",
+    "profession": "Profession",
+    "bio": "About you",
+    "bioPlaceholder": "Write a short bio about your experience and skills...",
+    "skills": "Skills (comma separated)",
+    "location": "Location",
+    "phone": "Phone number",
+    "workHistory": "Work history",
+    "addExperience": "Add work experience",
+    "company": "Company name",
+    "position": "Job title",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "description": "Description",
+    "save": "Save changes",
+    "saved": "Saved successfully",
+    "remove": "Delete"
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import { Check, X, Loader2, MessageSquare } from "lucide-react";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 
 export default function HireRequestActions({ hireRequestId, status, onResolved }: Props) {
   const router = useRouter();
+  const T = useT();
   const [loading, setLoading] = useState<"accepted" | "rejected" | null>(null);
   const [error, setError] = useState("");
   const [resolvedStatus, setResolvedStatus] = useState<string | null>(status || null);
@@ -28,7 +30,7 @@ export default function HireRequestActions({ hireRequestId, status, onResolved }
           }`}
         >
           {finalStatus === "accepted" ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
-          {finalStatus === "accepted" ? "تم قبول العرض" : "تم رفض العرض"}
+          {finalStatus === "accepted" ? T("تم قبول العرض") : T("تم رفض العرض")}
         </span>
         {finalStatus === "accepted" && (conversationId || status === "accepted") && (
           <button
@@ -39,7 +41,7 @@ export default function HireRequestActions({ hireRequestId, status, onResolved }
             className="flex items-center gap-1.5 text-xs font-bold text-primary border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            فتح المحادثة
+            {T("فتح المحادثة")}
           </button>
         )}
       </div>
@@ -64,10 +66,10 @@ export default function HireRequestActions({ hireRequestId, status, onResolved }
           router.push(`/messages/${data.conversationId}`);
         }
       } else {
-        setError(data.error || "حدث خطأ أثناء الرد");
+        setError(data.error || T("حدث خطأ أثناء الرد"));
       }
     } catch {
-      setError("فشل الاتصال بالسيرفر");
+      setError(T("فشل الاتصال بالسيرفر"));
     }
     setLoading(null);
   }
@@ -85,7 +87,7 @@ export default function HireRequestActions({ hireRequestId, status, onResolved }
           className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition disabled:opacity-50"
         >
           {loading === "accepted" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-          قبول الطلب
+          {T("قبول الطلب")}
         </button>
         <button
           onClick={(e) => {
@@ -96,7 +98,7 @@ export default function HireRequestActions({ hireRequestId, status, onResolved }
           className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition disabled:opacity-50"
         >
           {loading === "rejected" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
-          رفض الطلب
+          {T("رفض الطلب")}
         </button>
       </div>
     </div>

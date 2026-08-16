@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { Search, RotateCcw } from "lucide-react";
 import { JOB_DEPARTMENTS, WORK_TYPES, JORDAN_GOVERNORATES } from "@/lib/jobs";
+import { useT } from "@/lib/useT";
 
 // شريط بحث وتصفية الوظائف (المهنة، التخصص، المدينة، الراتب، نوع الدوام، اسم الشركة)
 export default function JobsFilter() {
@@ -18,6 +19,7 @@ export default function JobsFilter() {
   const [workType, setWorkType] = useState(searchParams.get("workType") || "all");
   const [salaryMin, setSalaryMin] = useState(searchParams.get("salaryMin") || "all");
   const [company, setCompany] = useState(searchParams.get("company") || "");
+  const T = useT();
 
   function pushFilter() {
     const params = new URLSearchParams();
@@ -59,7 +61,7 @@ export default function JobsFilter() {
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ابحث بالوظيفة، المهنة، الشركة، أو المهارة..."
+            placeholder={T("ابحث بالوظيفة، المهنة، الشركة، أو المهارة...")}
             className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl ps-10 pe-3 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10 transition"
           />
         </div>
@@ -68,12 +70,12 @@ export default function JobsFilter() {
           className="shrink-0 inline-flex items-center gap-1.5 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition active:scale-95"
         >
           <Search className="w-4 h-4" />
-          بحث
+          {T("بحث")}
         </button>
         <button
           type="button"
           onClick={reset}
-          title="إعادة تعيين"
+          title={T("إعادة تعيين")}
           className="shrink-0 p-2.5 bg-[var(--surface)] hover:bg-[var(--border)] text-[var(--muted)] rounded-xl transition"
         >
           <RotateCcw className="w-4 h-4" />
@@ -82,43 +84,43 @@ export default function JobsFilter() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <select value={profession} onChange={(e) => setProfession(e.target.value)} className={selectClass}>
-          <option value="all">كل التخصصات</option>
+          <option value="all">{T("كل التخصصات")}</option>
           {JOB_DEPARTMENTS.map((d) => (
             <option key={d} value={d}>
-              {d}
+              {T(d)}
             </option>
           ))}
         </select>
 
         <select value={city} onChange={(e) => setCity(e.target.value)} className={selectClass}>
-          <option value="all">كل المدن</option>
+          <option value="all">{T("كل المدن")}</option>
           {JORDAN_GOVERNORATES.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {T(c)}
             </option>
           ))}
         </select>
 
         <select value={governorate} onChange={(e) => setGovernorate(e.target.value)} className={selectClass}>
-          <option value="all">كل المحافظات</option>
+          <option value="all">{T("كل المحافظات")}</option>
           {JORDAN_GOVERNORATES.map((g) => (
             <option key={g} value={g}>
-              {g}
+              {T(g)}
             </option>
           ))}
         </select>
 
         <select value={workType} onChange={(e) => setWorkType(e.target.value)} className={selectClass}>
-          <option value="all">كل أنواع الدوام</option>
+          <option value="all">{T("كل أنواع الدوام")}</option>
           {WORK_TYPES.map((w) => (
             <option key={w} value={w}>
-              {w}
+              {T(w)}
             </option>
           ))}
         </select>
 
         <select value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} className={selectClass}>
-          <option value="all">كل الرواتب</option>
+          <option value="all">{T("كل الرواتب")}</option>
           <option value="300">300+</option>
           <option value="500">500+</option>
           <option value="700">700+</option>
@@ -131,7 +133,7 @@ export default function JobsFilter() {
           type="text"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
-          placeholder="اسم الشركة..."
+          placeholder={T("اسم الشركة...")}
           className="w-full bg-[var(--card)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-xs font-medium text-[var(--foreground)] placeholder:text-[var(--muted)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10 transition"
         />
       </div>

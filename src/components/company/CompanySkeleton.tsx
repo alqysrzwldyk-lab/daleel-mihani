@@ -1,5 +1,8 @@
 // هيكل تحميل لصفحة ملف الشركة
+import { useT } from "@/lib/useT";
+
 export default function CompanySkeleton() {
+  const T = useT();
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 space-y-6 animate-pulse">
       {/* الغلاف والرأس */}

@@ -4,18 +4,20 @@ import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/i18n/navigation";
 import {
   Settings, Moon, Sun, Info, HelpCircle, FileText,
-  User, ChevronLeft, LogOut, Briefcase, Users, Building2
+  User, ChevronLeft, LogOut, Briefcase, Users, Building2, Heart, Shield
 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: "professional" | "employer";
+  role: "professional" | "employer" | "admin";
 };
 
 export default function DashboardPage() {
   const router = useRouter();
+  const T = useT();
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
@@ -87,7 +89,8 @@ export default function DashboardPage() {
             bg: "bg-emerald-50",
           },
         ]
-      : [
+      : user?.role === "employer"
+      ? [
           {
             icon: Briefcase,
             label: "لوحة الشركة",
@@ -120,7 +123,25 @@ export default function DashboardPage() {
             color: "text-indigo-600",
             bg: "bg-indigo-50",
           },
+        ]
+      : [
+          {
+            icon: Shield,
+            label: "لوحة الإدارة",
+            desc: "إدارة المستخدمين والمحتوى والبلاغات",
+            href: "/admin",
+            color: "text-purple-600",
+            bg: "bg-purple-50",
+          },
         ]),
+    {
+      icon: Heart,
+      label: "إعلاناتي المفضلة",
+      desc: "إعلانات حفظتها للعودة إليها لاحقاً",
+      href: "/dashboard/my-favorites",
+      color: "text-rose-600",
+      bg: "bg-rose-50",
+    },
     {
       icon: Moon,
       label: "المظهر",
@@ -155,7 +176,7 @@ export default function DashboardPage() {
           <Settings className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-extrabold">الإعدادات</h1>
+          <h1 className="text-xl font-extrabold">{T("الإعدادات")}</h1>
           <p className="text-xs text-muted">{user?.name}</p>
         </div>
       </div>
@@ -174,8 +195,8 @@ export default function DashboardPage() {
                   {darkMode ? <Sun className={`w-5 h-5 ${item.color}`} /> : <Moon className={`w-5 h-5 ${item.color}`} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold">{item.label}</p>
-                  <p className="text-xs text-muted">{darkMode ? "الوضع النهاري" : "الوضع الليلي"}</p>
+                  <p className="text-sm font-bold">{T(item.label)}</p>
+                  <p className="text-xs text-muted">{T(darkMode ? "الوضع النهاري" : "الوضع الليلي")}</p>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors relative ${darkMode ? "bg-primary" : "bg-gray-200"}`}>
                   <div className={`w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 transition-all ${darkMode ? "left-0.5" : "right-0.5"}`} />
@@ -193,8 +214,8 @@ export default function DashboardPage() {
                   <Icon className={`w-5 h-5 ${item.color}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold">{item.label}</p>
-                  <p className="text-xs text-muted">{item.desc}</p>
+                  <p className="text-sm font-bold">{T(item.label)}</p>
+                  <p className="text-xs text-muted">{T(item.desc)}</p>
                 </div>
               </div>
             );
@@ -209,8 +230,8 @@ export default function DashboardPage() {
                 <Icon className={`w-5 h-5 ${item.color}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold">{item.label}</p>
-                <p className="text-xs text-muted">{item.desc}</p>
+                <p className="text-sm font-bold">{T(item.label)}</p>
+                <p className="text-xs text-muted">{T(item.desc)}</p>
               </div>
               <ChevronLeft className="w-5 h-5 text-muted-light flex-shrink-0" />
             </Link>
@@ -224,9 +245,9 @@ export default function DashboardPage() {
           className="btn btn-ghost text-danger text-sm flex items-center gap-2 mx-auto"
         >
           <LogOut className="w-4 h-4" />
-          تسجيل خروج
+          {T("تسجيل خروج")}
         </button>
-        <p className="text-[11px] text-muted-light mt-4">الإصدار 1.0.0</p>
+        <p className="text-[11px] text-muted-light mt-4">{T("الإصدار 1.0.0")}</p>
       </div>
     </div>
   );

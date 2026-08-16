@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MessageSquare, Mail, User, Building2, Plus, X, Search, Loader2 } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 type ConversationItem = {
   _id: string;
@@ -55,6 +56,7 @@ function Avatar({ name, role, size = "md" }: { name: string; role?: string; size
 }
 
 function NewConversationModal({ onClose }: { onClose: () => void }) {
+  const T = useT();
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<"all" | "professional" | "employer">("all");
   const [users, setUsers] = useState<ContactUser[]>([]);
@@ -88,7 +90,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           receiverId: u._id,
-          content: `مرحباً ${u.name}، أود التواصل معك`,
+          content: T("مرحباً {name}، أود التواصل معك", { name: u.name }),
           refType: u.refType || undefined,
           refId: u.refId || undefined,
         }),
@@ -98,10 +100,10 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
         onClose();
         window.location.href = `/messages/${data.conversationId}`;
       } else {
-        alert(data.error || "فشل بدء المحادثة");
+        alert(data.error ? T(data.error) : T("فشل بدء المحادثة"));
       }
     } catch {
-      alert("فشل الاتصال");
+      alert(T("فشل الاتصال"));
     }
     setStartingId(null);
   }
@@ -111,7 +113,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full sm:max-w-md bg-[var(--surface)] sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col" style={{ maxHeight: "85dvh" }}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-light)]">
-          <h3 className="font-bold text-base">رسالة جديدة</h3>
+          <h3 className="font-bold text-base">{T("رسالة جديدة")}</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-[var(--border-light)] flex items-center justify-center">
             <X className="w-4 h-4 text-[var(--muted-light)]" />
           </button>
@@ -122,7 +124,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="ابحث عن محترف أو شركة..."
+              placeholder={T("ابحث عن محترف أو شركة...")}
               className="w-full py-2.5 px-4 pr-10 rounded-xl border border-gray-200 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/5 transition"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-light)]" />
@@ -141,7 +143,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
                   tab === key ? "bg-primary text-white" : "bg-[var(--border-light)] text-[var(--muted)] hover:bg-[var(--border)]"
                 }`}
               >
-                {label}
+                {T(label)}
               </button>
             ))}
           </div>
@@ -153,7 +155,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
             </div>
           ) : users.length === 0 ? (
-            <div className="text-center py-10 text-muted text-sm">لا يوجد مستخدمون</div>
+            <div className="text-center py-10 text-muted text-sm">{T("لا يوجد مستخدمون")}</div>
           ) : (
             users.map((u) => (
               <button
@@ -173,11 +175,11 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
                           : "bg-primary/10 text-primary"
                       }`}
                     >
-                      {ROLE_LABELS[u.role] || u.role}
+                      {T(ROLE_LABELS[u.role]) || u.role}
                     </span>
                   </div>
                   <p className="text-xs text-muted mt-0.5 line-clamp-1">
-                    {u.profession ? `المهنة: ${u.profession}` : u.location || u.role === "employer" ? "شركة" : ""}
+                    {u.profession ? T("المهنة: {profession}", { profession: u.profession }) : u.location || u.role === "employer" ? T("شركة") : ""}
                   </p>
                 </div>
                 {startingId === u._id ? (
@@ -195,6 +197,7 @@ function NewConversationModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function MessagesPage() {
+  const T = useT();
   const router = useRouter();
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -223,12 +226,12 @@ export default function MessagesPage() {
     if (!dateStr) return "";
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "الآن";
-    if (mins < 60) return `منذ ${mins} د`;
+    if (mins < 1) return T("الآن");
+    if (mins < 60) return T("منذ {mins} د", { mins });
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `منذ ${hours} س`;
+    if (hours < 24) return T("منذ {hours} س", { hours });
     const days = Math.floor(hours / 24);
-    if (days < 7) return `منذ ${days} ي`;
+    if (days < 7) return T("منذ {days} ي", { days });
     return new Date(dateStr).toLocaleDateString("ar");
   }
 
@@ -239,7 +242,7 @@ export default function MessagesPage() {
           <MessageSquare className="w-4 h-4" />
         </button>
         <MessageSquare className="w-6 h-6 text-primary" />
-        <h1>الرسائل</h1>
+        <h1>{T("الرسائل")}</h1>
       </div>
 
       <button
@@ -247,7 +250,7 @@ export default function MessagesPage() {
         className="w-full mb-5 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-primary font-bold text-sm transition border border-primary/10"
       >
         <Plus className="w-4 h-4" />
-        رسالة جديدة
+        {T("رسالة جديدة")}
       </button>
 
       {loading ? (
@@ -257,10 +260,10 @@ export default function MessagesPage() {
       ) : conversations.length === 0 ? (
         <div className="empty-state">
           <Mail />
-          <h3>لا توجد رسائل</h3>
-          <p>ابدأ محادثة مع محترف أو شركة وسوف تظهر هنا</p>
+          <h3>{T("لا توجد رسائل")}</h3>
+          <p>{T("ابدأ محادثة مع محترف أو شركة وسوف تظهر هنا")}</p>
           <button onClick={() => setShowNew(true)} className="btn btn-primary mt-4">
-            بدء محادثة جديدة
+            {T("بدء محادثة جديدة")}
           </button>
         </div>
       ) : (
@@ -271,11 +274,11 @@ export default function MessagesPage() {
               onClick={() => router.push(`/messages/${conv._id}`)}
               className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition text-right w-full"
             >
-              <Avatar name={conv.otherUser?.name || "مستخدم"} role={conv.otherUser?.role} />
+              <Avatar name={conv.otherUser?.name || T("مستخدم")} role={conv.otherUser?.role} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-bold text-sm truncate">{conv.otherUser?.name || "مستخدم"}</span>
+                    <span className="font-bold text-sm truncate">{conv.otherUser?.name || T("مستخدم")}</span>
                     {conv.otherUser?.role && (
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
@@ -284,7 +287,7 @@ export default function MessagesPage() {
                             : "bg-primary/10 text-primary"
                         }`}
                       >
-                        {ROLE_LABELS[conv.otherUser.role] || conv.otherUser.role}
+                        {T(ROLE_LABELS[conv.otherUser.role]) || conv.otherUser.role}
                       </span>
                     )}
                   </div>

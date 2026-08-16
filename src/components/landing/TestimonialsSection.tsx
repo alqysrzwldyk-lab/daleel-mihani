@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Star } from "lucide-react";
+import { useT } from "@/lib/useT";
 
 const testimonials = [
   {
@@ -41,6 +42,7 @@ function Stars({ count }: { count: number }) {
 }
 
 export default function TestimonialsSection() {
+  const T = useT();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -57,8 +59,8 @@ export default function TestimonialsSection() {
     <section id="success-stories" className="py-16 md:py-20" ref={ref}>
       <div className="page-container">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">قصص نجاح</h2>
-          <p className="text-muted max-w-xl mx-auto">ماذا يقول المستخدمون عن الدليل المهني؟</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-3">{T("قصص نجاح")}</h2>
+          <p className="text-muted max-w-xl mx-auto">{T("ماذا يقول المستخدمون عن الدليل المهني؟")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -71,14 +73,14 @@ export default function TestimonialsSection() {
               style={{ transitionDelay: `${i * 150}ms` }}
             >
               <Stars count={t.rating} />
-              <p className="text-sm text-[var(--muted)] mt-3 mb-4 leading-relaxed">&ldquo;{t.text}&rdquo;</p>
+              <p className="text-sm text-[var(--muted)] mt-3 mb-4 leading-relaxed">&ldquo;{T(t.text)}&rdquo;</p>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white text-sm font-bold`}>
-                  {t.avatar}
+                  {T(t.avatar)}
                 </div>
                 <div>
-                  <p className="font-bold text-sm">{t.name}</p>
-                  <p className="text-muted text-xs">{t.role}</p>
+                  <p className="font-bold text-sm">{T(t.name)}</p>
+                  <p className="text-muted text-xs">{T(t.role)}</p>
                 </div>
               </div>
             </div>

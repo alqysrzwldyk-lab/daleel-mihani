@@ -67,6 +67,7 @@ export interface IProfessional {
   averageRating: number;
   ratingCount: number;
   isActive: boolean;
+  verified: boolean;
   // ─── حقول الملف الاحترافي المميز ───
   cover?: string;                  // صورة الغلاف
   specialization?: string;         // التخصص الدقيق
@@ -186,6 +187,7 @@ const ProfessionalSchema = new Schema<IProfessional>(
     averageRating: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
+    verified: { type: Boolean, default: false },
     // ─── حقول الملف الاحترافي المميز ───
     cover: { type: String },
     specialization: { type: String, maxlength: 200 },

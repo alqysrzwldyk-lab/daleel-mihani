@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Briefcase, Users, Eye, UserCheck } from "lucide-react";
+import { useT } from "@/lib/useT";
 import type { CompanyStats as Stats } from "@/lib/companyTypes";
 
 function useCountUp(target: number, duration = 900) {
@@ -27,6 +28,7 @@ function useCountUp(target: number, duration = 900) {
 
 // بطاقات إحصائيات الشركة بأرقام متحركة
 export default function CompanyStats({ stats }: { stats: Stats }) {
+  const T = useT();
   const jobs = useCountUp(stats.jobsCount);
   const applications = useCountUp(stats.applicationsCount);
   const views = useCountUp(stats.views);
@@ -71,7 +73,7 @@ export default function CompanyStats({ stats }: { stats: Stats }) {
           </div>
           <div className="min-w-0">
             <p className="text-2xl font-black text-[var(--foreground)] tabular-nums">{item.value.toLocaleString("ar-EG")}</p>
-            <p className="text-[11px] text-[var(--muted)] font-bold">{item.label}</p>
+            <p className="text-[11px] text-[var(--muted)] font-bold">{T(item.label)}</p>
           </div>
         </div>
       ))}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Briefcase, Search, Plus, Home, User, Building2 } from "lucide-react";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Briefcase, Search, Plus, Home, User, Building2, Shield, Languages } from "lucide-react";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import NotificationBell from "@/components/NotificationBell";
 import UserMenu from "@/components/UserMenu";
 
@@ -11,13 +12,15 @@ type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: "professional" | "employer";
+  role: "professional" | "employer" | "admin";
 };
 
 export default function Navbar() {
-  const t = useTranslations("nav");
   const tApp = useTranslations("app");
+  const T = useT();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +66,7 @@ export default function Navbar() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ابحث عن مهنيين، خدمات، أو إعلانات..."
+              placeholder={T("ابحث عن مهنيين، خدمات، أو إعلانات...")}
             />
             <button type="submit">
               <Search className="w-4 h-4" />
@@ -72,6 +75,16 @@ export default function Navbar() {
         </form>
 
         <div className="flex items-center gap-1 me-auto md:me-0">
+          <button
+            type="button"
+            onClick={() => router.replace(pathname, { locale: locale === "ar" ? "en" : "ar" })}
+            className="btn btn-ghost btn-sm"
+            aria-label={locale === "ar" ? "English" : T("العربية")}
+          >
+            <Languages className="w-4 h-4" />
+            <span>{locale === "ar" ? "EN" : T("عربي")}</span>
+          </button>
+
           {user ? (
             <div className="flex items-center gap-1">
               <NotificationBell />
@@ -83,6 +96,8 @@ export default function Navbar() {
                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                   {user.role === "professional" ? (
                     <User className="w-4 h-4 text-primary" />
+                  ) : user.role === "admin" ? (
+                    <Shield className="w-4 h-4 text-primary" />
                   ) : (
                     <Building2 className="w-4 h-4 text-primary" />
                   )}
@@ -97,7 +112,7 @@ export default function Navbar() {
                 className="btn btn-ghost btn-sm hidden sm:flex"
               >
                 <Home className="w-4 h-4" />
-                <span>الصفحة الرئيسية</span>
+                <span>{T("الصفحة الرئيسية")}</span>
               </Link>
               {user.role === "employer" ? (
                 <Link
@@ -105,7 +120,15 @@ export default function Navbar() {
                   className="btn btn-primary btn-sm hidden sm:flex"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>إضافة إعلان توظيف</span>
+                  <span>{T("إضافة إعلان توظيف")}</span>
+                </Link>
+              ) : user.role === "admin" ? (
+                <Link
+                  href="/admin"
+                  className="btn btn-primary btn-sm hidden sm:flex"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>{T("لوحة الإدارة")}</span>
                 </Link>
               ) : (
                 <Link
@@ -113,17 +136,17 @@ export default function Navbar() {
                   className="btn btn-primary btn-sm hidden sm:flex"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>إضافة إعلان</span>
+                  <span>{T("إضافة إعلان")}</span>
                 </Link>
               )}
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login" className="btn btn-ghost btn-sm">
-                دخول
+                {T("دخول")}
               </Link>
               <Link href="/register" className="btn btn-primary btn-sm">
-                إنشاء حساب
+                {T("إنشاء حساب")}
               </Link>
             </div>
           )}

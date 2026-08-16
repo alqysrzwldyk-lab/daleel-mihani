@@ -13,7 +13,7 @@ export async function GET() {
 
   await connectDB();
   const user = await User.findById(auth.userId).select("-password");
-  if (!user) {
+  if (!user || user.status === "disabled") {
     return NextResponse.json({ user: null });
   }
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Loader2, User as UserIcon, Building2, Briefcase, Megaphone, X } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 
 type SearchResultItem = {
   key: string;
@@ -51,6 +52,7 @@ type Props = {
 
 export default function GlobalSearch({ variant = "desktop" }: Props) {
   const router = useRouter();
+  const T = useT();
   const [query, setQuery] = useState("");
   const [searchedQuery, setSearchedQuery] = useState("");
   const [results, setResults] = useState<Results>(EMPTY);
@@ -140,7 +142,7 @@ export default function GlobalSearch({ variant = "desktop" }: Props) {
         key: `pro-${p._id}`,
         type: "professional",
         title: p.name,
-        subtitle: p.professions.join("، ") || p.location || "",
+        subtitle: p.professions.join(T("، ")) || p.location || "",
         href: `/professionals/${p._id}`,
         icon: <UserIcon className="w-4 h-4" />,
       });
@@ -223,8 +225,8 @@ export default function GlobalSearch({ variant = "desktop" }: Props) {
           aria-expanded={open}
           aria-controls="global-search-results"
           aria-activedescendant={activeIndex >= 0 ? `global-search-item-${activeIndex}` : undefined}
-          aria-label="البحث في الموقع"
-          placeholder={variant === "desktop" ? "ابحث عن مهنيين، شركات، وظائف، أو خدمات..." : "ابحث هنا..."}
+          aria-label={T("البحث في الموقع")}
+          placeholder={variant === "desktop" ? T("ابحث عن مهنيين، شركات، وظائف، أو خدمات...") : T("ابحث هنا...")}
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={onKeyDown}
@@ -237,7 +239,7 @@ export default function GlobalSearch({ variant = "desktop" }: Props) {
         {query && (
           <button
             type="button"
-            aria-label="مسح البحث"
+            aria-label={T("مسح البحث")}
             onClick={clearSearch}
             className="shrink-0 p-1.5 text-[var(--muted)] hover:text-[var(--foreground)] transition"
           >
@@ -250,20 +252,20 @@ export default function GlobalSearch({ variant = "desktop" }: Props) {
         <div
           id="global-search-results"
           role="listbox"
-          aria-label="نتائج البحث"
+          aria-label={T("نتائج البحث")}
           className="absolute top-full mt-2 w-full bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-2xl z-50 overflow-hidden text-right"
           style={{ direction: "rtl" }}
         >
           {status === "loading" ? (
             <div className="flex items-center gap-3 px-4 py-6 text-sm text-[var(--muted)]">
               <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" aria-hidden />
-              جاري البحث...
+              {T("جاري البحث...")}
             </div>
           ) : totalCount === 0 ? (
             <div className="px-4 py-8 text-center">
               <div className="text-3xl mb-2">🔍</div>
-              <p className="text-sm font-bold text-[var(--foreground)]">لا توجد نتائج مطابقة</p>
-              <p className="text-xs text-[var(--muted)] mt-1">جرّب كلمات بحث أخرى أو عبارات أقصر.</p>
+              <p className="text-sm font-bold text-[var(--foreground)]">{T("لا توجد نتائج مطابقة")}</p>
+              <p className="text-xs text-[var(--muted)] mt-1">{T("جرّب كلمات بحث أخرى أو عبارات أقصر.")}</p>
             </div>
           ) : (
             <>
@@ -296,21 +298,21 @@ export default function GlobalSearch({ variant = "desktop" }: Props) {
                     </span>
                     <span className="text-[10px] font-bold text-[var(--muted)] shrink-0">
                       {item.type === "professional"
-                        ? "مهني"
+                        ? T("مهني")
                         : item.type === "company"
-                        ? "شركة"
+                        ? T("شركة")
                         : item.type === "job"
-                        ? "وظيفة"
-                        : "إعلان"}
+                        ? T("وظيفة")
+                        : T("إعلان")}
                     </span>
                   </button>
                 ))}
               </div>
               <div className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)] flex items-center justify-between bg-[var(--surface)]">
-                <span>{totalCount} نتيجة</span>
+                <span>{totalCount} {T("نتيجة")}</span>
                 <span className="flex items-center gap-2">
-                  <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] text-[10px]">↑↓</kbd> تنقّل
-                  <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] text-[10px]">Enter</kbd> فتح
+                  <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] text-[10px]">↑↓</kbd> {T("تنقّل")}
+                  <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] text-[10px]">Enter</kbd> {T("فتح")}
                 </span>
               </div>
             </>

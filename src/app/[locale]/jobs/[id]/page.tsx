@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { JobItem } from "@/lib/jobTypes";
+import { useT } from "@/lib/useT";
 
 // تحميل كسول لنافذة التقديم — لا تُعرض إلا عند ضغط المستخدم على زر التقديم
 const ApplyModal = dynamic(() => import("@/components/ApplyModal"), { ssr: false });
@@ -44,6 +45,7 @@ type AuthUser = {
 };
 
 export default function JobDetailPage() {
+  const T = useT();
   const params = useParams();
   const id = params.id as string;
   const router = useRouter();
@@ -109,10 +111,10 @@ export default function JobDetailPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
         <p className="text-5xl mb-4">🔍</p>
-        <h1 className="text-2xl font-black text-[var(--foreground)]">الوظيفة غير موجودة</h1>
-        <p className="text-sm text-[var(--muted)] mt-2">قد تكون حُذفت أو أن الرابط غير صحيح.</p>
+        <h1 className="text-2xl font-black text-[var(--foreground)]">{T("الوظيفة غير موجودة")}</h1>
+        <p className="text-sm text-[var(--muted)] mt-2">{T("قد تكون حُذفت أو أن الرابط غير صحيح.")}</p>
         <button onClick={() => router.push("/jobs")} className="mt-6 bg-[var(--primary)] text-white font-bold px-6 py-3 rounded-xl transition hover:bg-[var(--primary-dark)]">
-          العودة إلى الوظائف
+          {T("العودة إلى الوظائف")}
         </button>
       </div>
     );
@@ -133,7 +135,7 @@ export default function JobDetailPage() {
     infoItems.push({
       icon: UserIcon,
       label: "العمر",
-      value: `${job.ageFrom || "—"} - ${job.ageTo || "—"} سنة`,
+      value: T("{from} - {to} سنة", { from: job.ageFrom || "—", to: job.ageTo || "—" }),
     });
   }
 
@@ -153,7 +155,7 @@ export default function JobDetailPage() {
           <Link
             href={`/company/${job.companyId}`}
             className="w-20 h-20 shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden flex items-center justify-center hover:border-[var(--primary)] transition-colors"
-            title="ملف الشركة"
+            title={T("ملف الشركة")}
           >
             {job.companyLogo ? (
               <Image src={job.companyLogo} alt={job.companyName} width={80} height={80} className="w-full h-full object-cover" />
@@ -165,16 +167,16 @@ export default function JobDetailPage() {
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${job.status === "open" ? "bg-[var(--success)]/15 text-[var(--success)] border border-[var(--success)]/25" : "bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)]"}`}>
-                {job.status === "open" ? "🟢 مفتوح للتقديم" : "🔴 مغلق"}
+                {job.status === "open" ? T("🟢 مفتوح للتقديم") : T("🔴 مغلق")}
               </span>
               <span className="text-[11px] font-bold text-[var(--muted)] bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1 rounded-full">
-                تم النشر: {formatDate(job.createdAt)}
+                {T("تم النشر: {date}", { date: formatDate(job.createdAt) })}
               </span>
               <span className="text-[11px] font-bold text-[var(--muted)] bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                <Eye className="w-3 h-3" /> {job.views} مشاهدة
+                <Eye className="w-3 h-3" /> {T("{count} مشاهدة", { count: job.views })}
               </span>
               <span className="text-[11px] font-bold text-[var(--muted)] bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                <Users className="w-3 h-3" /> {job.applicationsCount} متقدم
+                <Users className="w-3 h-3" /> {T("{count} متقدم", { count: job.applicationsCount })}
               </span>
             </div>
 
@@ -182,19 +184,19 @@ export default function JobDetailPage() {
             <Link
               href={`/company/${job.companyId}`}
               className="inline-block text-[var(--muted)] font-bold mt-1 hover:text-[var(--primary)] transition-colors"
-              title={`عرض ملف شركة ${job.companyName}`}
+              title={T("عرض ملف شركة {name}", { name: job.companyName })}
             >
               {job.companyName} ←
             </Link>
 
             <div className="flex flex-wrap items-center gap-3 mt-3">
               <span className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)]">
-                <MapPin className="w-4 h-4 text-[var(--primary)]" /> {job.city} — {job.governorate}، {job.country}
+                <MapPin className="w-4 h-4 text-[var(--primary)]" /> {job.city} — {job.governorate}{T("،")} {job.country}
               </span>
               {job.salary && (
                 <span className="inline-flex items-center gap-1.5 text-sm font-black text-[var(--primary)]">
                   <Banknote className="w-4 h-4" /> {job.salary}
-                  {job.salaryType ? ` ${job.salaryType}` : ""}
+                  {job.salaryType ? ` ${T(job.salaryType)}` : ""}
                 </span>
               )}
             </div>
@@ -206,12 +208,12 @@ export default function JobDetailPage() {
           {alreadyApplied ? (
             <div className="flex items-center justify-center gap-2 bg-[var(--success)]/15 border border-[var(--success)]/25 text-[var(--success)] font-bold py-4 rounded-2xl">
               <CheckCircle2 className="w-5 h-5" />
-              لقد تقدمت لهذه الوظيفة مسبقاً — سنبلغك عند اتخاذ القرار
+              {T("لقد تقدمت لهذه الوظيفة مسبقاً — سنبلغك عند اتخاذ القرار")}
             </div>
           ) : checkingApplied ? (
             <button disabled className="w-full flex items-center justify-center gap-2 bg-[var(--surface)] text-[var(--muted)] font-bold py-4 rounded-2xl">
               <Loader2 className="w-5 h-5 animate-spin" />
-              جاري التحقق...
+              {T("جاري التحقق...")}
             </button>
           ) : job.status === "open" ? (
             <button
@@ -219,11 +221,11 @@ export default function JobDetailPage() {
               className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-l from-[var(--primary)] to-[var(--accent)] hover:opacity-95 text-white text-lg font-black py-4 rounded-2xl shadow-lg shadow-[var(--primary)]/20 transition active:scale-[0.99]"
             >
               <Send className="w-6 h-6" />
-              التقديم على الوظيفة
+              {T("التقديم على الوظيفة")}
             </button>
           ) : (
             <div className="text-center bg-[var(--surface)] border border-[var(--border)] text-[var(--muted)] font-bold py-4 rounded-2xl">
-              هذا الإعلان الوظيفي مغلق حالياً
+              {T("هذا الإعلان الوظيفي مغلق حالياً")}
             </div>
           )}
         </div>
@@ -231,14 +233,14 @@ export default function JobDetailPage() {
 
       {/* وصف الوظيفة */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8 mb-6">
-        <h2 className="text-lg font-black text-[var(--foreground)] mb-4">📋 وصف الوظيفة</h2>
+        <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("📋 وصف الوظيفة")}</h2>
         <p className="text-[var(--muted)] leading-loose text-sm md:text-base whitespace-pre-line">{job.description}</p>
       </div>
 
       {/* المهارات المطلوبة */}
       {job.skills.length > 0 && (
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8 mb-6">
-          <h2 className="text-lg font-black text-[var(--foreground)] mb-4">🛠️ المهارات المطلوبة</h2>
+          <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("🛠️ المهارات المطلوبة")}</h2>
           <div className="flex flex-wrap gap-2">
             {job.skills.map((skill) => (
               <span key={skill} className="bg-[var(--primary)]/5 text-[var(--primary)] border border-[var(--primary)]/15 px-3.5 py-1.5 rounded-full text-sm font-semibold">
@@ -251,7 +253,7 @@ export default function JobDetailPage() {
 
       {/* بيانات الوظيفة */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8 mb-6">
-        <h2 className="text-lg font-black text-[var(--foreground)] mb-5">📌 تفاصيل الوظيفة</h2>
+        <h2 className="text-lg font-black text-[var(--foreground)] mb-5">{T("📌 تفاصيل الوظيفة")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {infoItems.map((item) => (
             <div key={item.label} className="flex items-start gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3.5">
@@ -259,8 +261,8 @@ export default function JobDetailPage() {
                 <item.icon className="w-4 h-4 text-[var(--primary)]" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] text-[var(--muted)] font-bold">{item.label}</p>
-                <p className="text-sm font-bold text-[var(--foreground)] truncate">{item.value || "—"}</p>
+                <p className="text-[11px] text-[var(--muted)] font-bold">{T(item.label)}</p>
+                <p className="text-sm font-bold text-[var(--foreground)] truncate">{T(item.value || "—")}</p>
               </div>
             </div>
           ))}
@@ -270,14 +272,14 @@ export default function JobDetailPage() {
       {/* المزايا */}
       {job.benefits && (
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8 mb-6">
-          <h2 className="text-lg font-black text-[var(--foreground)] mb-4">🎁 مزايا الوظيفة</h2>
+          <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("🎁 مزايا الوظيفة")}</h2>
           <p className="text-[var(--muted)] leading-loose text-sm md:text-base whitespace-pre-line">{job.benefits}</p>
         </div>
       )}
 
       {/* بيانات التواصل */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8">
-        <h2 className="text-lg font-black text-[var(--foreground)] mb-4">📞 بيانات التواصل مع الشركة</h2>
+        <h2 className="text-lg font-black text-[var(--foreground)] mb-4">{T("📞 بيانات التواصل مع الشركة")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-center gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3.5">
             <Phone className="w-4 h-4 text-[var(--primary)] shrink-0" />

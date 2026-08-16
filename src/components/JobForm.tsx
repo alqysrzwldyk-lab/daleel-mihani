@@ -22,6 +22,7 @@ import {
 } from "@/lib/jobs";
 import { resolveErrorMessage } from "@/lib/validationMessages";
 import type { JobItem } from "@/lib/jobTypes";
+import { useT } from "@/lib/useT";
 
 type FormState = {
   jobTitle: string;
@@ -140,6 +141,7 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const T = useT();
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -159,7 +161,7 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
       if (!res.ok) throw new Error(data.error);
       set(kind === "logo" ? "companyLogo" : "banner", data.url as string);
     } catch {
-      setError("فشل رفع الصورة. تأكد من الصيغة والحجم المسموح.");
+      setError(T("فشل رفع الصورة. تأكد من الصيغة والحجم المسموح."));
     } finally {
       setUploading("");
       e.target.value = "";
@@ -218,7 +220,7 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
         router.push("/dashboard/jobs");
       }, 1800);
     } catch {
-      setError("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً.");
+      setError(T("فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً."));
       setSubmitting(false);
     }
   }
@@ -230,22 +232,22 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
     <form onSubmit={handleSubmit} className="bg-[var(--card)] border border-[var(--border)] rounded-2xl card-shadow p-6 md:p-8 space-y-8">
       {done && (
         <div className="bg-[var(--success)]/15 border border-[var(--success)]/25 text-[var(--success)] px-4 py-3 rounded-xl text-sm font-bold text-center animate-in fade-in">
-          {mode === "edit" ? "تم تحديث الإعلان الوظيفي بنجاح!" : "تم نشر إعلانك الوظيفي بنجاح!"}
+          {mode === "edit" ? T("تم تحديث الإعلان الوظيفي بنجاح!") : T("تم نشر إعلانك الوظيفي بنجاح!")}
         </div>
       )}
 
       {/* ─── معلومات الشركة ─── */}
       <section>
         <h3 className={sectionTitle}>
-          <Building2 className="w-4 h-4" /> معلومات الشركة
+          <Building2 className="w-4 h-4" /> {T("معلومات الشركة")}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>اسم الشركة *</label>
-            <input type="text" required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="اسم شركتك أو مؤسستك" className={inputClass} />
+            <label className={labelClass}>{T("اسم الشركة *")}</label>
+            <input type="text" required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder={T("اسم شركتك أو مؤسستك")} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>شعار الشركة</label>
+            <label className={labelClass}>{T("شعار الشركة")}</label>
             <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3 cursor-pointer transition">
               {uploading === "logo" ? (
                 <Loader2 className="w-4 h-4 animate-spin text-[var(--primary)]" />
@@ -253,7 +255,7 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
                 <Upload className="w-4 h-4 text-[var(--primary)]" />
               )}
               <span className="text-xs font-medium text-[var(--muted)]">
-                {form.companyLogo ? "تم رفع الشعار ✓" : "رفع شعار الشركة"}
+                {form.companyLogo ? T("تم رفع الشعار ✓") : T("رفع شعار الشركة")}
               </span>
               <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadImage(e, "logo")} disabled={uploading !== ""} />
             </label>
@@ -263,81 +265,81 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
 
       {/* ─── معلومات الوظيفة ─── */}
       <section className="border-t border-[var(--border)] pt-8">
-        <h3 className={sectionTitle}>معلومات الوظيفة</h3>
+        <h3 className={sectionTitle}>{T("معلومات الوظيفة")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>المسمى الوظيفي *</label>
-            <input type="text" required value={form.jobTitle} onChange={(e) => set("jobTitle", e.target.value)} placeholder="مثال: مطور واجهات أمامية" className={inputClass} />
+            <label className={labelClass}>{T("المسمى الوظيفي *")}</label>
+            <input type="text" required value={form.jobTitle} onChange={(e) => set("jobTitle", e.target.value)} placeholder={T("مثال: مطور واجهات أمامية")} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>نوع الوظيفة *</label>
+            <label className={labelClass}>{T("نوع الوظيفة *")}</label>
             <select required value={form.jobType} onChange={(e) => set("jobType", e.target.value)} className={selectClass}>
-              <option value="" disabled>-- اختر النوع --</option>
+              <option value="" disabled>{T("-- اختر النوع --")}</option>
               {JOB_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>{T(t)}</option>
               ))}
             </select>
             {form.jobType === "أخرى" && (
-              <input type="text" required value={form.jobTypeCustom} onChange={(e) => set("jobTypeCustom", e.target.value)} placeholder="اكتب نوع الوظيفة" className={`${inputClass} mt-2 animate-in fade-in`} />
+              <input type="text" required value={form.jobTypeCustom} onChange={(e) => set("jobTypeCustom", e.target.value)} placeholder={T("اكتب نوع الوظيفة")} className={`${inputClass} mt-2 animate-in fade-in`} />
             )}
           </div>
           <div>
-            <label className={labelClass}>القسم أو التخصص *</label>
+            <label className={labelClass}>{T("القسم أو التخصص *")}</label>
             <select required value={form.department} onChange={(e) => set("department", e.target.value)} className={selectClass}>
-              <option value="" disabled>-- اختر القسم --</option>
+              <option value="" disabled>{T("-- اختر القسم --")}</option>
               {JOB_DEPARTMENTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>{T(d)}</option>
               ))}
             </select>
             {form.department === "أخرى" && (
-              <input type="text" required value={form.departmentCustom} onChange={(e) => set("departmentCustom", e.target.value)} placeholder="اكتب التخصص" className={`${inputClass} mt-2 animate-in fade-in`} />
+              <input type="text" required value={form.departmentCustom} onChange={(e) => set("departmentCustom", e.target.value)} placeholder={T("اكتب التخصص")} className={`${inputClass} mt-2 animate-in fade-in`} />
             )}
           </div>
           <div>
-            <label className={labelClass}>المؤهل العلمي المطلوب *</label>
+            <label className={labelClass}>{T("المؤهل العلمي المطلوب *")}</label>
             <select required value={form.education} onChange={(e) => set("education", e.target.value)} className={selectClass}>
-              <option value="" disabled>-- اختر المؤهل --</option>
+              <option value="" disabled>{T("-- اختر المؤهل --")}</option>
               {EDUCATION_LEVELS.map((ed) => (
-                <option key={ed} value={ed}>{ed}</option>
+                <option key={ed} value={ed}>{T(ed)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className={labelClass}>سنوات الخبرة *</label>
-            <input type="text" required value={form.experienceYears} onChange={(e) => set("experienceYears", e.target.value)} placeholder="مثال: 2 - 5 سنوات" className={inputClass} />
+            <label className={labelClass}>{T("سنوات الخبرة *")}</label>
+            <input type="text" required value={form.experienceYears} onChange={(e) => set("experienceYears", e.target.value)} placeholder={T("مثال: 2 - 5 سنوات")} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>عدد الوظائف المطلوبة *</label>
+            <label className={labelClass}>{T("عدد الوظائف المطلوبة *")}</label>
             <input type="number" min={1} required value={form.vacancies} onChange={(e) => set("vacancies", e.target.value)} className={inputClass} />
           </div>
         </div>
 
         <div className="mt-4">
-          <label className={labelClass}>وصف الوظيفة *</label>
-          <textarea required rows={5} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="اكتب وصفاً تفصيلياً لمهام الوظيفة ومسؤولياتها..." className={`${inputClass} resize-none leading-relaxed`} />
+          <label className={labelClass}>{T("وصف الوظيفة *")}</label>
+          <textarea required rows={5} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={T("اكتب وصفاً تفصيلياً لمهام الوظيفة ومسؤولياتها...")} className={`${inputClass} resize-none leading-relaxed`} />
         </div>
 
         <div className="mt-4">
-          <label className={labelClass}>المهارات المطلوبة (افصل بينها بفاصلة)</label>
-          <input type="text" value={form.skills} onChange={(e) => set("skills", e.target.value)} placeholder="React, Node.js, TypeScript, العمل ضمن فريق..." className={inputClass} />
+          <label className={labelClass}>{T("المهارات المطلوبة (افصل بينها بفاصلة)")}</label>
+          <input type="text" value={form.skills} onChange={(e) => set("skills", e.target.value)} placeholder={T("React, Node.js, TypeScript, العمل ضمن فريق...")} className={inputClass} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
           <div>
-            <label className={labelClass}>الجنس (اختياري)</label>
+            <label className={labelClass}>{T("الجنس (اختياري)")}</label>
             <select value={form.gender} onChange={(e) => set("gender", e.target.value)} className={selectClass}>
-              <option value="">لا يهم</option>
+              <option value="">{T("لا يهم")}</option>
               {GENDERS.map((g) => (
-                <option key={g} value={g}>{g}</option>
+                <option key={g} value={g}>{T(g)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className={labelClass}>العمر من (اختياري)</label>
+            <label className={labelClass}>{T("العمر من (اختياري)")}</label>
             <input type="number" min={16} max={80} value={form.ageFrom} onChange={(e) => set("ageFrom", e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>العمر إلى (اختياري)</label>
+            <label className={labelClass}>{T("العمر إلى (اختياري)")}</label>
             <input type="number" min={16} max={80} value={form.ageTo} onChange={(e) => set("ageTo", e.target.value)} className={inputClass} />
           </div>
         </div>
@@ -345,26 +347,26 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
 
       {/* ─── الراتب ونظام العمل ─── */}
       <section className="border-t border-[var(--border)] pt-8">
-        <h3 className={sectionTitle}>الراتب ونظام العمل</h3>
+        <h3 className={sectionTitle}>{T("الراتب ونظام العمل")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className={labelClass}>الراتب</label>
-            <input type="text" value={form.salary} onChange={(e) => set("salary", e.target.value)} placeholder="مثال: 800 - 1200" className={inputClass} />
+            <label className={labelClass}>{T("الراتب")}</label>
+            <input type="text" value={form.salary} onChange={(e) => set("salary", e.target.value)} placeholder={T("مثال: 800 - 1200")} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>نوع الراتب</label>
+            <label className={labelClass}>{T("نوع الراتب")}</label>
             <select value={form.salaryType} onChange={(e) => set("salaryType", e.target.value)} className={selectClass}>
               {SALARY_TYPES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>{T(s)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className={labelClass}>نوع الدوام *</label>
+            <label className={labelClass}>{T("نوع الدوام *")}</label>
             <select required value={form.workType} onChange={(e) => set("workType", e.target.value)} className={selectClass}>
-              <option value="" disabled>-- اختر نوع الدوام --</option>
+              <option value="" disabled>{T("-- اختر نوع الدوام --")}</option>
               {WORK_TYPES.map((w) => (
-                <option key={w} value={w}>{w}</option>
+                <option key={w} value={w}>{T(w)}</option>
               ))}
             </select>
           </div>
@@ -373,26 +375,26 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
 
       {/* ─── الموقع الجغرافي ─── */}
       <section className="border-t border-[var(--border)] pt-8">
-        <h3 className={sectionTitle}>الموقع الجغرافي</h3>
+        <h3 className={sectionTitle}>{T("الموقع الجغرافي")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className={labelClass}>المدينة *</label>
-            <input type="text" required value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="مثال: عمان" className={inputClass} />
+            <label className={labelClass}>{T("المدينة *")}</label>
+            <input type="text" required value={form.city} onChange={(e) => set("city", e.target.value)} placeholder={T("مثال: عمان")} className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>المحافظة *</label>
+            <label className={labelClass}>{T("المحافظة *")}</label>
             <select required value={form.governorate} onChange={(e) => set("governorate", e.target.value)} className={selectClass}>
-              <option value="" disabled>-- اختر المحافظة --</option>
+              <option value="" disabled>{T("-- اختر المحافظة --")}</option>
               {JORDAN_GOVERNORATES.map((g) => (
-                <option key={g} value={g}>{g}</option>
+                <option key={g} value={g}>{T(g)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className={labelClass}>الدولة *</label>
+            <label className={labelClass}>{T("الدولة *")}</label>
             <select required value={form.country} onChange={(e) => set("country", e.target.value)} className={selectClass}>
               {COUNTRIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>{T(c)}</option>
               ))}
             </select>
           </div>
@@ -401,33 +403,33 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
 
       {/* ─── بيانات التواصل ─── */}
       <section className="border-t border-[var(--border)] pt-8">
-        <h3 className={sectionTitle}>بيانات التواصل</h3>
+        <h3 className={sectionTitle}>{T("بيانات التواصل")}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>رقم التواصل *</label>
+            <label className={labelClass}>{T("رقم التواصل *")}</label>
             <input type="tel" required value={form.contactPhone} onChange={(e) => set("contactPhone", e.target.value)} placeholder="07XXXXXXXX" className={inputClass} dir="ltr" style={{ textAlign: "right" }} />
           </div>
           <div>
-            <label className={labelClass}>البريد الإلكتروني *</label>
+            <label className={labelClass}>{T("البريد الإلكتروني *")}</label>
             <input type="email" required value={form.contactEmail} onChange={(e) => set("contactEmail", e.target.value)} placeholder="hr@company.com" className={inputClass} dir="ltr" />
           </div>
           <div>
-            <label className={labelClass}>الموقع الإلكتروني</label>
+            <label className={labelClass}>{T("الموقع الإلكتروني")}</label>
             <input type="url" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://..." className={inputClass} dir="ltr" />
           </div>
           <div>
-            <label className={labelClass}>آخر موعد للتقديم</label>
+            <label className={labelClass}>{T("آخر موعد للتقديم")}</label>
             <input type="date" value={form.deadline} onChange={(e) => set("deadline", e.target.value)} className={inputClass} />
           </div>
         </div>
 
         <div className="mt-4">
-          <label className={labelClass}>مزايا الوظيفة</label>
-          <textarea rows={3} value={form.benefits} onChange={(e) => set("benefits", e.target.value)} placeholder="مثال: تأمين صحي، بدل مواصلات، ساعات مرنة، إجازات مدفوعة..." className={`${inputClass} resize-none leading-relaxed`} />
+          <label className={labelClass}>{T("مزايا الوظيفة")}</label>
+          <textarea rows={3} value={form.benefits} onChange={(e) => set("benefits", e.target.value)} placeholder={T("مثال: تأمين صحي، بدل مواصلات، ساعات مرنة، إجازات مدفوعة...")} className={`${inputClass} resize-none leading-relaxed`} />
         </div>
 
         <div className="mt-4">
-          <label className={labelClass}>صورة أو Banner للإعلان</label>
+          <label className={labelClass}>{T("صورة أو Banner للإعلان")}</label>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-4 cursor-pointer transition">
             {uploading === "banner" ? (
               <Loader2 className="w-5 h-5 animate-spin text-[var(--primary)]" />
@@ -435,13 +437,13 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
               <ImageIcon className="w-5 h-5 text-[var(--primary)]" />
             )}
             <span className="text-xs font-medium text-[var(--muted)]">
-              {form.banner ? "تم رفع البانر ✓" : "اضغط لرفع صورة البانر"}
+              {form.banner ? T("تم رفع البانر ✓") : T("اضغط لرفع صورة البانر")}
             </span>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadImage(e, "banner")} disabled={uploading !== ""} />
           </label>
           {form.banner && (
             <button type="button" onClick={() => set("banner", "")} className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-[var(--danger)] hover:text-[var(--danger)]/80">
-              <X className="w-3.5 h-3.5" /> إزالة البانر
+              <X className="w-3.5 h-3.5" /> {T("إزالة البانر")}
             </button>
           )}
         </div>
@@ -449,21 +451,21 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
 
       {/* ─── حالة الإعلان ─── */}
       <section className="border-t border-[var(--border)] pt-8">
-        <h3 className={sectionTitle}>حالة الإعلان</h3>
+        <h3 className={sectionTitle}>{T("حالة الإعلان")}</h3>
         <div className="grid grid-cols-2 gap-3 max-w-sm">
           <button
             type="button"
             onClick={() => set("status", "open")}
             className={`py-3 rounded-xl border text-sm font-bold transition ${form.status === "open" ? "bg-[var(--success)]/15 border-[var(--success)]/30 text-[var(--success)]" : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--primary)]"}`}
           >
-            🟢 مفتوح
+            {T("🟢 مفتوح")}
           </button>
           <button
             type="button"
             onClick={() => set("status", "closed")}
             className={`py-3 rounded-xl border text-sm font-bold transition ${form.status === "closed" ? "bg-[var(--danger)]/15 border-[var(--danger)]/30 text-[var(--danger)]" : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--primary)]"}`}
           >
-            🔴 مغلق
+            {T("🔴 مغلق")}
           </button>
         </div>
       </section>
@@ -481,14 +483,14 @@ export default function JobForm({ mode, jobId, defaultCompanyName, defaultCompan
           className="flex-1 inline-flex items-center justify-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition shadow-md shadow-[var(--primary)]/10 active:scale-[0.99]"
         >
           {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-          {submitting ? "جاري الحفظ..." : mode === "edit" ? "حفظ التعديلات" : "نشر الإعلان الوظيفي"}
+          {submitting ? T("جاري الحفظ...") : mode === "edit" ? T("حفظ التعديلات") : T("نشر الإعلان الوظيفي")}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
           className="px-5 py-2 bg-[var(--surface)] hover:bg-[var(--border)] text-[var(--muted)] font-medium rounded-xl transition"
         >
-          إلغاء
+          {T("إلغاء")}
         </button>
       </div>
     </form>

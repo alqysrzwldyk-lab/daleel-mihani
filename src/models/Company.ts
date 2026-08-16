@@ -40,6 +40,7 @@ export interface ICompany {
     twitter?: string;
   };
   views: number;                   // عدد مرات مشاهدة الملف
+  verified: boolean;               // حساب موثّق من الإدارة
   createdAt: Date;
   updatedAt: Date;
 }
@@ -82,6 +83,7 @@ const CompanySchema = new Schema<ICompany>(
       twitter: { type: String },
     },
     views: { type: Number, default: 0 },
+    verified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

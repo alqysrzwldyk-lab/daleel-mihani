@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getT } from "@/i18n/getT";
 import ProfessionFilter from "@/components/ProfessionFilter";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { connectDB } from "@/lib/mongodb";
@@ -17,6 +18,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("search");
+  const T = await getT();
 
   const q = sp.q?.trim();
   const profession = sp.profession?.trim();
@@ -38,7 +40,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>تصفح جميع المهنيين</h1>
+        <h1>{T("تصفح جميع المهنيين")}</h1>
         {q && (
           <span className="badge badge-primary text-sm">
             &ldquo;{q}&rdquo;
@@ -62,7 +64,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
         <div className="empty-state">
           <Search />
           <h3>{t("noResults")}</h3>
-          <p>حاول تغيير كلمات البحث أو تصفح جميع المهن</p>
+          <p>{T("حاول تغيير كلمات البحث أو تصفح جميع المهن")}</p>
         </div>
       ) : (
         <>

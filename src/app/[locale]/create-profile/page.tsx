@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
+import { useT } from "@/lib/useT";
 import { Briefcase, Loader2, CheckCircle, X, Plus, Upload, User } from "lucide-react";
 import { getAvailableProfessions, getProfessionArabic, getProfessionIcon, isCustomProfession } from "@/lib/professions";
 
 export default function CreateProfilePage() {
   const router = useRouter();
+  const T = useT();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -107,7 +109,7 @@ export default function CreateProfilePage() {
         const meData = await meRes.json();
         id = meData.profile?._id || meData.profile?.id;
         if (!id) {
-          setError("لم يتم العثور على الملف المهني، حاول تسجيل الخروج وإعادة التسجيل");
+          setError(T("لم يتم العثور على الملف المهني، حاول تسجيل الخروج وإعادة التسجيل"));
           setSaving(false);
           return;
         }
@@ -132,10 +134,10 @@ export default function CreateProfilePage() {
         setTimeout(() => window.location.href = "/", 1500);
       } else {
         const data = await res.json();
-        setError(data.error || "حدث خطأ");
+        setError(T(data.error || "حدث خطأ"));
       }
     } catch {
-      setError("فشل الاتصال بالسيرفر");
+      setError(T("فشل الاتصال بالسيرفر"));
     } finally {
       setSaving(false);
     }
@@ -158,18 +160,18 @@ export default function CreateProfilePage() {
           <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-3">
             <Briefcase className="w-8 h-8 text-primary" />
           </div>
-          <h1>أنشئ ملفك المهني</h1>
-          <p className="subtitle">خطوة واحدة تفصلك عن الظهور لأصحاب الشركات</p>
+          <h1>{T("أنشئ ملفك المهني")}</h1>
+          <p className="subtitle">{T("خطوة واحدة تفصلك عن الظهور لأصحاب الشركات")}</p>
         </div>
 
         {error && (
-          <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{error}</div>
+          <div className="bg-danger-light text-danger text-sm p-3 rounded-xl mb-4">{T(error)}</div>
         )}
 
         {saved && (
           <div className="bg-success-light text-success text-sm p-4 rounded-xl mb-4 flex items-center gap-2">
             <CheckCircle className="w-5 h-5" />
-            تم إنشاء الملف بنجاح! جارِ التوجيه إلى لوحة التحكم...
+            {T("تم إنشاء الملف بنجاح! جارِ التوجيه إلى لوحة التحكم...")}
           </div>
         )}
 
@@ -189,23 +191,23 @@ export default function CreateProfilePage() {
             </div>
             <label className="btn btn-primary btn-sm cursor-pointer">
               <Upload className="w-4 h-4" />
-              <span>{uploading ? "جاري الرفع..." : "رفع صورة شخصية"}</span>
+              <span>{uploading ? T("جاري الرفع...") : T("رفع صورة شخصية")}</span>
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
             </label>
           </div>
 
           <div className="input-group">
-            <label className="input-label">الاسم الكامل</label>
+            <label className="input-label">{T("الاسم الكامل")}</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-field" required />
           </div>
 
           <div className="input-group">
-            <label className="input-label">المهن (اختر مهنتين كحد أقصى)</label>
+            <label className="input-label">{T("المهن (اختر مهنتين كحد أقصى)")}</label>
 
             <div className="flex flex-wrap gap-2 mb-3">
               {professions.map((p) => (
                 <span key={p} className="chip active flex items-center gap-1">
-                  {getProfessionIcon(p)} {getProfessionArabic(p)}
+                  {getProfessionIcon(p)} {T(getProfessionArabic(p))}
                   <button type="button" onClick={() => toggleProfession(p)} className="me-1 hover:opacity-70">
                     <X className="w-3 h-3" />
                   </button>
@@ -232,7 +234,7 @@ export default function CreateProfilePage() {
                     }`}
                   >
                     <span>{p.icon}</span>
-                    <span>{p.arabic}</span>
+                    <span>{T(p.arabic)}</span>
                     {selected && <CheckCircle className="w-3.5 h-3.5 me-auto" />}
                   </button>
                 );
@@ -244,7 +246,7 @@ export default function CreateProfilePage() {
                 type="text"
                 value={customProfession}
                 onChange={(e) => setCustomProfession(e.target.value)}
-                placeholder="أضف مهنة مخصصة..."
+                placeholder={T("أضف مهنة مخصصة...")}
                 className="input-field flex-1"
                 disabled={professions.length >= 2}
               />
@@ -260,41 +262,41 @@ export default function CreateProfilePage() {
           </div>
 
           <div className="input-group">
-            <label className="input-label">نبذة عنك</label>
+            <label className="input-label">{T("نبذة عنك")}</label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               className="input-field"
-              placeholder="اكتب نبذة قصيرة عن خبراتك ومهاراتك..."
+              placeholder={T("اكتب نبذة قصيرة عن خبراتك ومهاراتك...")}
               rows={3}
             />
           </div>
 
           <div className="input-group">
-            <label className="input-label">المهارات (افصل بفاصلة)</label>
+            <label className="input-label">{T("المهارات (افصل بفاصلة)")}</label>
             <input
               type="text"
               value={skillsText}
               onChange={(e) => setSkillsText(e.target.value)}
               className="input-field"
-              placeholder="مثال: React, Node.js, TypeScript"
+              placeholder={T("مثال: React, Node.js, TypeScript")}
             />
           </div>
 
           <div className="two-col">
             <div className="input-group">
-              <label className="input-label">الموقع</label>
-              <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="input-field" placeholder="المدينة" />
+              <label className="input-label">{T("الموقع")}</label>
+              <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="input-field" placeholder={T("المدينة")} />
             </div>
             <div className="input-group">
-              <label className="input-label">رقم الهاتف</label>
+              <label className="input-label">{T("رقم الهاتف")}</label>
               <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" placeholder="05xxxxxxxx" />
             </div>
           </div>
 
           <button type="submit" disabled={saving} className="btn btn-primary btn-block btn-lg mt-2">
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-            {saving ? "جاري الحفظ..." : "إنشاء الملف المهني"}
+            {saving ? T("جاري الحفظ...") : T("إنشاء الملف المهني")}
           </button>
         </form>
       </div>

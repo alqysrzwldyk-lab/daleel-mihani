@@ -11,6 +11,7 @@ import {
   Calendar,
 } from "lucide-react";
 import HireRequestActions from "@/components/HireRequestActions";
+import { useT } from "@/lib/useT";
 
 type HireDetail = {
   _id: string;
@@ -30,6 +31,7 @@ type AuthUser = {
 };
 
 export default function HireDetailPage() {
+  const T = useT();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -86,9 +88,9 @@ export default function HireDetailPage() {
       <div className="page-container max-w-xl mx-auto">
         <div className="empty-state">
           <Briefcase />
-          <h3>{error || "الطلب غير موجود"}</h3>
+          <h3>{T(error || "الطلب غير موجود")}</h3>
           <button onClick={() => router.push("/notifications")} className="btn btn-primary mt-4">
-            العودة إلى الإشعارات
+            {T("العودة إلى الإشعارات")}
           </button>
         </div>
       </div>
@@ -123,10 +125,10 @@ export default function HireDetailPage() {
             }`}
           >
             {finalStatus === "accepted"
-              ? "تم القبول"
+              ? T("تم القبول")
               : finalStatus === "rejected"
-                ? "تم الرفض"
-                : "قيد الانتظار"}
+                ? T("تم الرفض")
+                : T("قيد الانتظار")}
           </span>
         </div>
 
@@ -142,7 +144,7 @@ export default function HireDetailPage() {
         </p>
 
         <div className="mt-5 bg-[var(--border-light)] rounded-xl p-4">
-          <p className="font-bold text-sm mb-1.5">تفاصيل العرض</p>
+          <p className="font-bold text-sm mb-1.5">{T("تفاصيل العرض")}</p>
           <p className="text-sm text-[var(--foreground)] leading-relaxed whitespace-pre-wrap">{hire.message}</p>
         </div>
 
@@ -150,14 +152,14 @@ export default function HireDetailPage() {
           <UserIcon className="w-4 h-4 text-primary" />
           <span>
             {isProfessional ? hire.employer?.name : hire.professional?.name}
-            {isProfessional ? " (صاحب الطلب)" : " (المهني المستهدف)"}
+            {isProfessional ? T(" (صاحب الطلب)") : T(" (المهني المستهدف)")}
           </span>
         </div>
       </div>
 
       {isProfessional && finalStatus === "pending" && (
         <div className="app-card p-4 mt-4">
-          <p className="text-sm font-bold mb-3">اتخذ قرارك الآن</p>
+          <p className="text-sm font-bold mb-3">{T("اتخذ قرارك الآن")}</p>
           <HireRequestActions
             hireRequestId={hire._id}
             status={finalStatus}
@@ -171,27 +173,27 @@ export default function HireDetailPage() {
 
       {finalStatus === "accepted" && conversationId && (
         <div className="app-card p-4 mt-4 flex flex-col gap-3">
-          <p className="text-sm text-success font-bold">تم قبول الطلب وفتح التواصل المباشر</p>
+          <p className="text-sm text-success font-bold">{T("تم قبول الطلب وفتح التواصل المباشر")}</p>
           <button
             onClick={() => router.push(`/messages/${conversationId}`)}
             className="btn btn-primary btn-block flex items-center justify-center gap-2"
           >
             <MessageSquare className="w-4 h-4" />
-            فتح المحادثة المباشرة
+            {T("فتح المحادثة المباشرة")}
           </button>
         </div>
       )}
 
       {finalStatus === "accepted" && !conversationId && (
         <div className="app-card p-4 mt-4">
-          <p className="text-sm text-success font-bold">تم قبول الطلب</p>
+          <p className="text-sm text-success font-bold">{T("تم قبول الطلب")}</p>
         </div>
       )}
 
       {finalStatus === "rejected" && (
         <div className="app-card p-4 mt-4">
           <p className="text-sm text-red-500 font-bold">
-            {isProfessional ? "رفضت هذا العرض" : "اعتذر المهني عن هذا العرض"}
+            {isProfessional ? T("رفضت هذا العرض") : T("اعتذر المهني عن هذا العرض")}
           </p>
         </div>
       )}
@@ -201,14 +203,14 @@ export default function HireDetailPage() {
           onClick={() => router.push("/notifications")}
           className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition"
         >
-          العودة إلى الإشعارات
+          {T("العودة إلى الإشعارات")}
         </button>
         {user?.role === "professional" && (
           <button
             onClick={() => router.push("/messages")}
             className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition"
           >
-            الرسائل
+            {T("الرسائل")}
           </button>
         )}
       </div>

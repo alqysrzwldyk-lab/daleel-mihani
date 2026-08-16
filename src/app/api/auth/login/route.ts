@@ -36,6 +36,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "invalidCredentials" }, { status: 401 });
     }
 
+    // 3.1 منع دخول الحسابات المعطّلة من الإدارة
+    if (user.status === "disabled") {
+      return NextResponse.json({ error: "accountDisabled" }, { status: 403 });
+    }
+
     // 4. إنشاء الـ Token وحفظه في الكوكيز الآمنة
     const token = signToken({
       userId: user._id.toString(),
