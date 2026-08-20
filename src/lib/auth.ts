@@ -9,7 +9,11 @@ function getJwtSecret(): string {
   }
   return secret;
 }
-const JWT_SECRET = getJwtSecret();
+let _jwtSecret: string | undefined;
+function jwtSecret(): string {
+  if (_jwtSecret === undefined) _jwtSecret = getJwtSecret();
+  return _jwtSecret;
+}
 const COOKIE_NAME = "daleel_token";
 
 export type AuthPayload = {
@@ -19,12 +23,12 @@ export type AuthPayload = {
 };
 
 export function signToken(payload: AuthPayload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign(payload, jwtSecret(), { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): AuthPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] }) as AuthPayload;
+    return jwt.verify(token, jwtSecret(), { algorithms: ["HS256"] }) as AuthPayload;
   } catch {
     return null;
   }
