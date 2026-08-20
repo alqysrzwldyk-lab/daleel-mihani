@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Star, Check, X as XIcon, Loader2 } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+import { Star, Check, Loader2, Wallet } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { useT } from "@/lib/useT";
 
 const PLANS = [
@@ -35,24 +35,27 @@ const PLANS = [
 ];
 
 export default function SubscriptionPage() {
-  const router = useRouter();
   const [current, setCurrent] = useState<string>("free");
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [message, setMessage] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [balance, setBalance] = useState<number | null>(null);
   const T = useT();
 
   useEffect(() => {
-    fetch("/api/subscription")
-      .then((r) => r.json())
-      .then((d) => {
+    Promise.all([
+      fetch("/api/subscription").then((r) => r.json()),
+      fetch("/api/wallet").then((r) => r.json()).catch(() => null),
+    ])
+      .then(([d, w]) => {
         if (d.subscription) {
           setCurrent(d.subscription.plan || "free");
           if (d.subscription.endDate) {
             setEndDate(new Date(d.subscription.endDate).toLocaleDateString("ar"));
           }
         }
+        if (w && w.wallet) setBalance(w.wallet.balance);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -105,6 +108,27 @@ export default function SubscriptionPage() {
           {message}
         </div>
       )}
+
+      <div className="flex items-center justify-between gap-3 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <Wallet className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-xs text-muted">{T("سيتم خصم المبلغ من محفظتك")}</p>
+            <p className="text-sm font-extrabold">
+              {T("رصيدك الحالي")}:{" "}
+              {balance === null ? "—" : `${balance.toLocaleString()} ﷼`}
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/wallet"
+          className="text-xs font-bold text-primary hover:underline whitespace-nowrap"
+        >
+          {T("الشحن من المحفظة")}
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {PLANS.map((plan) => {

@@ -76,7 +76,13 @@
   --color-border: var(--border);
   --font-sans: var(--font-cairo);
 }
-
+.font-arabic {
+  font-family:
+    "Cairo",
+    "Tahoma",
+    "Arial",
+    sans-serif;
+}
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;

@@ -73,6 +73,7 @@ export type ProfessionalPublic = {
   }[];
   ratingDistribution?: { 1: number; 2: number; 3: number; 4: number; 5: number };
   completedJobs?: number;
+  verified?: boolean;
 };
 
 export async function fetchProfessionals(params?: {

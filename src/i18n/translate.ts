@@ -7,6 +7,8 @@ import { jobsDict } from "./dict/jobs";
 import { companyDict } from "./dict/company";
 import { miscPagesDict } from "./dict/misc-pages";
 import { adminDict } from "./dict/admin";
+import { professionalDict } from "./dict/professional";
+import { walletDict } from "./dict/wallet";
 
 export const translations: Record<string, string> = {
   ...landingDict,
@@ -18,6 +20,8 @@ export const translations: Record<string, string> = {
   ...companyDict,
   ...miscPagesDict,
   ...adminDict,
+  ...professionalDict,
+  ...walletDict,
 };
 
 export type TranslateVars = Record<string, string | number>;

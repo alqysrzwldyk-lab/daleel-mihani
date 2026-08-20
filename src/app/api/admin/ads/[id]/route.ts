@@ -4,6 +4,8 @@ import { requireAdminFromRequest, logAdminAction } from "@/lib/admin";
 import { connectDB } from "@/lib/mongodb";
 import { Ad } from "@/models/Ad";
 
+export const dynamic = "force-dynamic";
+
 const AD_STATUSES = ["active", "paused", "sold", "reserved", "expired", "coming_soon", "archived"];
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

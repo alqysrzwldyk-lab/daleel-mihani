@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { MapPin, Briefcase, Star, MessageSquare } from "lucide-react";
+import { MapPin, Briefcase, Star, MessageSquare, BadgeCheck } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useT } from "@/lib/useT";
 import type { ProfessionalPublic } from "@/lib/api";
@@ -13,8 +12,13 @@ type Props = {
   professional: ProfessionalPublic;
 };
 
+const AVAILABILITY_META: Record<string, { label: string; cls: string; icon: string }> = {
+  available: { label: "متوفر", cls: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: "🟢" },
+  busy: { label: "مشغول", cls: "bg-amber-50 text-amber-600 border-amber-200", icon: "🟠" },
+  away: { label: "غير متاح", cls: "bg-slate-100 text-slate-500 border-slate-200", icon: "⚪" },
+};
+
 export default function ProfessionalCard({ professional }: Props) {
-  const t = useTranslations("card");
   const T = useT();
   const router = useRouter();
   const [sending, setSending] = useState(false);
@@ -23,6 +27,8 @@ export default function ProfessionalCard({ professional }: Props) {
   const mainProfession = profs[0];
   const professionIcon = getProfessionIcon(mainProfession);
   const expYears = professional.workExperience?.length || 0;
+  const expLabel = professional.experienceYears || (expYears > 0 ? `${expYears}` : "");
+  const avail = professional.availability ? AVAILABILITY_META[professional.availability] : null;
 
   return (
     <Link href={`/professionals/${professional._id}`} className="block">
@@ -43,6 +49,12 @@ export default function ProfessionalCard({ professional }: Props) {
               </div>
             )}
           </div>
+          {professional.verified && (
+            <span className="absolute top-2 start-2 inline-flex items-center gap-0.5 text-[10px] font-bold text-sky-600 bg-white/90 border border-sky-100 px-1.5 py-0.5 rounded-full shadow-sm">
+              <BadgeCheck className="w-3 h-3" />
+              {T("موثق")}
+            </span>
+          )}
         </div>
 
         <div className="pro-card-body">
@@ -56,6 +68,14 @@ export default function ProfessionalCard({ professional }: Props) {
             ))}
           </div>
 
+          {avail && (
+            <div className="flex justify-center mt-1.5">
+              <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${avail.cls}`}>
+                {avail.icon} {T(avail.label)}
+              </span>
+            </div>
+          )}
+
           {professional.bio && (
             <p className="text-muted text-xs mt-2 line-clamp-2 leading-relaxed">{professional.bio}</p>
           )}
@@ -67,10 +87,10 @@ export default function ProfessionalCard({ professional }: Props) {
                 {professional.location}
               </span>
             )}
-            {expYears > 0 && (
+            {expLabel && (
               <span className="stat">
                 <Briefcase />
-                {expYears} {t("experience")}
+                {expLabel} {T("خبرة")}
               </span>
             )}
           </div>

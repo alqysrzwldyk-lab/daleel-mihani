@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getT } from "@/i18n/getT";
 import ProfessionFilter from "@/components/ProfessionFilter";
+import ProfessionalSearchFilters from "@/components/ProfessionalSearchFilters";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { connectDB } from "@/lib/mongodb";
 import { Professional, type IProfessional } from "@/models/Professional";
@@ -10,7 +11,14 @@ import Pagination from "@/components/Pagination";
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string; profession?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    profession?: string;
+    location?: string;
+    availability?: string;
+    verified?: string;
+    page?: string;
+  }>;
 };
 
 export default async function SearchPage({ params, searchParams }: Props) {
@@ -22,6 +30,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
 
   const q = sp.q?.trim();
   const profession = sp.profession?.trim();
+  const location = sp.location?.trim();
+  const availability = sp.availability?.trim();
+  const verified = sp.verified;
   const page = Math.max(1, parseInt(sp.page || "1", 10));
 
   type ProfessionalsResult = Awaited<ReturnType<typeof searchProfessionals>>;
@@ -29,7 +40,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   let professionalResults: ProfessionalsResult = { data: [], total: 0 };
 
   try {
-    professionalResults = await searchProfessionals(q, profession, page);
+    professionalResults = await searchProfessionals({ q, profession, location, availability, verified, page });
   } catch (error) {
     console.error("Error fetching search data:", error);
   }
@@ -60,6 +71,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </Suspense>
       </div>
 
+      <div className="mb-6">
+        <Suspense fallback={<div className="h-10 skeleton rounded-xl" />}>
+          <ProfessionalSearchFilters />
+        </Suspense>
+      </div>
+
       {totalResults === 0 ? (
         <div className="empty-state">
           <Search />
@@ -78,7 +95,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
             currentPage={page}
             totalPages={totalPages}
             basePath="/search"
-            searchParams={{ q, profession }}
+            searchParams={{ q, profession, location, availability, verified }}
           />
         </>
       )}
@@ -86,25 +103,51 @@ export default async function SearchPage({ params, searchParams }: Props) {
   );
 }
 
-async function searchProfessionals(q?: string, profession?: string, page = 1) {
+function escapeRegex(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function searchProfessionals(params: {
+  q?: string;
+  profession?: string;
+  location?: string;
+  availability?: string;
+  verified?: string;
+  page?: number;
+}) {
+  const { q, profession, location, availability, verified, page = 1 } = params;
   await connectDB();
   const limit = 12;
   const skip = (page - 1) * limit;
 
   const filter: Record<string, unknown> = { isActive: true };
   if (profession && profession !== "all") filter.professions = profession;
+  if (location) filter.location = { $regex: escapeRegex(location), $options: "i" };
+  if (availability && availability !== "all") filter.availability = availability;
+  if (verified === "true") filter.verified = true;
   if (q) {
+    const rx = { $regex: escapeRegex(q), $options: "i" };
     filter.$or = [
-      { name: { $regex: q, $options: "i" } },
-      { professions: { $regex: q, $options: "i" } },
-      { bio: { $regex: q, $options: "i" } },
-      { skills: { $regex: q, $options: "i" } },
-      { location: { $regex: q, $options: "i" } },
+      { name: rx },
+      { professions: rx },
+      { profession: rx },
+      { bio: rx },
+      { skills: rx },
+      { location: rx },
+      { specialization: rx },
+      { objective: rx },
+      { currentWorkplace: rx },
+      { education: rx },
+      { "languages.name": rx },
     ];
   }
 
   const [data, total] = await Promise.all([
-    Professional.find(filter).sort({ averageRating: -1 }).skip(skip).limit(limit).lean<IProfessional[]>(),
+    Professional.find(filter)
+      .sort({ verified: -1, averageRating: -1, ratingCount: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean<IProfessional[]>(),
     Professional.countDocuments(filter),
   ]);
 
@@ -124,6 +167,14 @@ async function searchProfessionals(q?: string, profession?: string, page = 1) {
       email: p.email,
       averageRating: p.averageRating,
       ratingCount: p.ratingCount,
+      verified: p.verified,
+      availability: p.availability,
+      cover: p.cover,
+      specialization: p.specialization,
+      experienceYears: p.experienceYears,
+      skillLevels: p.skillLevels,
+      languages: p.languages,
+      social: p.social,
     })),
     total,
   };

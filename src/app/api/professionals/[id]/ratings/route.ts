@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import { getAuthFromRequest } from "@/lib/auth";
 import { Professional } from "@/models/Professional";
 import { Rating } from "@/models/Rating";
+import { HireRequest } from "@/models/HireRequest";
 import { User } from "@/models/User";
 import { Company } from "@/models/Company";
 import { Notification } from "@/models/Notification";
@@ -29,6 +30,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const professional = await Professional.findById(id);
     if (!professional || !professional.isActive) {
       return NextResponse.json({ error: "notFound" }, { status: 404 });
+    }
+
+    // لا يمكن التقييم إلا بعد وجود تعامل فعلي: طلب توظيف مقبول بين الطرفين
+    const workedTogether = await HireRequest.exists({
+      employerId: auth.userId,
+      professionalId: professional.userId,
+      status: "accepted",
+    });
+
+    if (!workedTogether) {
+      return NextResponse.json(
+        { error: "ratingRequiresWork" },
+        { status: 403 }
+      );
     }
 
     const existing = await Rating.findOne({

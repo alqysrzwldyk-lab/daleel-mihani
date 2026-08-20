@@ -23,7 +23,7 @@ type Row = {
 type Data = {
   transactions: Row[];
   total: number;
-  totalIncome: number;
+  platformRevenue: number;
   page: number;
   totalPages: number;
 };
@@ -51,9 +51,9 @@ export default function AdminTransactionsPage() {
       <div className="admin-toolbar">
         <div className="admin-stat-card !py-3">
           <p className="text-lg font-extrabold text-emerald-600">
-            {data ? data.totalIncome.toLocaleString() : "—"}
+            {data ? data.platformRevenue.toLocaleString() : "—"}
           </p>
-          <p className="text-[11px] text-muted">{T("إجمالي المبالغ المكتملة")}</p>
+          <p className="text-[11px] text-muted">{T("إيرادات المنصة (اشتراكات + تعزيز)")}</p>
         </div>
         <div className="relative flex-1 min-w-[160px]">
           <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-light" />
@@ -90,8 +90,11 @@ export default function AdminTransactionsPage() {
           <option value="commission">{T("عمولة")}</option>
           <option value="withdrawal">{T("سحب")}</option>
           <option value="deposit">{T("إيداع")}</option>
+          <option value="bank_transfer">{T("تحويل بنكي")}</option>
+          <option value="remittance">{T("حوالة")}</option>
           <option value="subscription">{T("اشتراك")}</option>
           <option value="boost">{T("ترقية")}</option>
+          <option value="refund">{T("استرداد")}</option>
         </select>
         <select className="admin-input" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
           <option value="">{T("كل الحالات")}</option>
@@ -99,6 +102,8 @@ export default function AdminTransactionsPage() {
           <option value="completed">{T("مكتمل")}</option>
           <option value="cancelled">{T("ملغى")}</option>
           <option value="refunded">{T("مسترد")}</option>
+          <option value="failed">{T("فشل")}</option>
+          <option value="expired">{T("منتهي")}</option>
         </select>
       </div>
 

@@ -89,7 +89,11 @@ function BoostModal({ adId, onClose }: { adId: string; onClose: () => void }) {
           <Rocket className="w-5 h-5 text-primary" />
           <h3 className="font-extrabold">{T("تعزيز الإعلان")}</h3>
         </div>
-        <p className="text-sm text-muted mb-4">{T("اختر المدة لتعزيز ظهور إعلانك في أعلى النتائج")}</p>
+        <p className="text-sm text-muted mb-2">{T("اختر المدة لتعزيز ظهور إعلانك في أعلى النتائج")}</p>
+        <p className="text-[11px] text-muted bg-[var(--border-light)]/50 rounded-xl px-3 py-2 mb-4">
+          {T("الدفع يتم من رصيد المحفظة تلقائياً")} —{" "}
+          <Link href="/wallet" className="text-primary font-bold">{T("الشحن من المحفظة")}</Link>
+        </p>
         {msg && (
           <div className={`p-3 rounded-xl text-sm font-bold mb-4 ${msg.includes("✅") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
             {msg}

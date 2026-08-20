@@ -3,10 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { getAuthFromRequest } from "@/lib/auth";
 import { Professional, type IProfessional } from "@/models/Professional";
-import { Rating, type IRating } from "@/models/Rating";
-import { HireRequest } from "@/models/HireRequest";
-import { User } from "@/models/User";
-import { Company } from "@/models/Company";
+import { getProfessionalDetails } from "@/lib/professional";
 
 const projectSchema = z.object({
   title: z.string().min(1).max(200),
@@ -130,79 +127,25 @@ function formatProfessional(professional: IProfessional) {
     workingHours: professional.workingHours,
     social: professional.social,
     availability: professional.availability,
+    verified: professional.verified,
   };
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    await connectDB();
 
-    const professional = await Professional.findById(id).lean<IProfessional | null>();
-    if (!professional || !professional.isActive) {
+    const auth = getAuthFromRequest(req);
+
+    const result = await getProfessionalDetails(id, {
+      raterUserId: auth?.userId,
+    });
+
+    if (!result) {
       return NextResponse.json({ error: "notFound" }, { status: 404 });
     }
 
-    const auth = getAuthFromRequest(req);
-    let userRating: number | undefined;
-
-    if (auth) {
-      const rating = await Rating.findOne({
-        professionalId: professional._id,
-        raterUserId: auth.userId,
-      }).lean<IRating | null>();
-      userRating = rating?.score;
-    }
-
-    const [ratings, completedJobs] = await Promise.all([
-      Rating.find({ professionalId: professional._id })
-        .sort({ createdAt: -1 })
-        .lean<IRating[]>(),
-      HireRequest.countDocuments({
-        professionalId: professional.userId,
-        status: "accepted",
-      }),
-    ]);
-
-    const reviewerIds = ratings.map((r) => r.raterUserId);
-    const [reviewers, companies] = await Promise.all([
-      User.find({ _id: { $in: reviewerIds } })
-        .select("name")
-        .lean<{ _id: string; name: string }[]>(),
-      Company.find({ userId: { $in: reviewerIds } })
-        .select("name")
-        .lean<{ userId: string; name: string }[]>(),
-    ]);
-
-    const reviewerMap = new Map(reviewers.map((u) => [String(u._id), u.name]));
-    const companyMap = new Map(companies.map((c) => [String(c.userId), c.name]));
-
-    const allRatings = await Rating.find({ professionalId: professional._id })
-      .select("score")
-      .lean<{ score: number }[]>();
-
-    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    allRatings.forEach((r) => {
-      const s = Math.round(r.score);
-      if (s >= 1 && s <= 5) distribution[s as keyof typeof distribution] += 1;
-    });
-
-    return NextResponse.json({
-      ...formatProfessional(professional),
-      userRating,
-      reviews: ratings.map((r) => ({
-        _id: String(r._id),
-        score: r.score,
-        comment: r.comment,
-        reviewerName:
-          companyMap.get(String(r.raterUserId)) ||
-          reviewerMap.get(String(r.raterUserId)) ||
-          "شركة",
-        createdAt: r.createdAt,
-      })),
-      ratingDistribution: distribution,
-      completedJobs,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Professional get error:", error);
     return NextResponse.json({ error: "generic" }, { status: 500 });

@@ -13,6 +13,7 @@ import {
   Flag,
   Bell,
   CreditCard,
+  Wallet,
   Crown,
   BarChart3,
   ScrollText,
@@ -31,11 +32,13 @@ const items = [
   { href: "/admin/reports", label: "البلاغات", icon: Flag },
   { href: "/admin/notifications", label: "الإشعارات", icon: Bell },
   { href: "/admin/transactions", label: "المعاملات", icon: CreditCard },
+  { href: "/admin/wallet", label: "المحفظة", icon: Wallet },
   { href: "/admin/subscriptions", label: "الاشتراكات", icon: Crown },
   { href: "/admin/analytics", label: "التحليلات", icon: BarChart3 },
   { href: "/admin/audit-logs", label: "سجل التدقيق", icon: ScrollText },
   { href: "/admin/security", label: "مركز الأمان", icon: ShieldCheck },
   { href: "/admin/system", label: "صحة النظام", icon: HeartPulse },
+  { href: "/admin/settings/payments", label: "إعدادات الدفع", icon: CreditCard },
 ];
 
 export default function AdminNav() {

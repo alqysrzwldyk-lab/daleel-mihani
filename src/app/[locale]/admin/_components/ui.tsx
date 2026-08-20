@@ -102,14 +102,22 @@ export function StatusPill({ value }: { value: string }) {
     success: "نجاح",
     warning: "تحذير",
     alert: "تنبيه",
+    bank_transfer: "تحويل بنكي",
+    remittance: "حوالات",
+    failed: "فشل",
+    processing: "قيد المعالجة",
+    card: "بطاقة ائتمان",
+    bank: "تحويل بنكي",
+    transfer: "حوالات",
+    refund: "استرداد",
   };
   if (value === "active" || value === "verified" || value === "completed" || value === "open" || value === "success")
     cls = "admin-pill-green";
-  else if (value === "disabled" || value === "removed" || value === "cancelled" || value === "closed" || value === "alert" || value === "refunded")
+  else if (value === "disabled" || value === "removed" || value === "cancelled" || value === "closed" || value === "alert" || value === "refunded" || value === "failed")
     cls = "admin-pill-red";
-  else if (value === "pending" || value === "warning" || value === "premium")
+  else if (value === "pending" || value === "warning" || value === "premium" || value === "processing")
     cls = "admin-pill-amber";
-  else if (value === "professional" || value === "employer" || value === "admin" || value === "info")
+  else if (value === "professional" || value === "employer" || value === "admin" || value === "info" || value === "bank_transfer" || value === "remittance")
     cls = "admin-pill-blue";
 
   return <span className={`admin-pill ${cls}`}>{T(labels[value] ?? value)}</span>;

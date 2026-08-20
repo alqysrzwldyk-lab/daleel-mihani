@@ -4,6 +4,7 @@ import { requireAdminFromRequest, logAdminAction } from "@/lib/admin";
 import { connectDB } from "@/lib/mongodb";
 import { Rating } from "@/models/Rating";
 import { CompanyRating } from "@/models/CompanyRating";
+import { Professional } from "@/models/Professional";
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdminFromRequest(req);
@@ -21,6 +22,34 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const removed = await Model.findByIdAndDelete(id);
     if (!removed) {
       return NextResponse.json({ error: "notFound" }, { status: 404 });
+    }
+
+    // إعادة حساب متوسط التقييم وعدده بعد الحذف حتى يبقى متسقاً مع قاعدة البيانات
+    if (type === "professional") {
+      const rating = removed as unknown as {
+        professionalId: mongoose.Types.ObjectId;
+      };
+      if (rating.professionalId) {
+        const stats = await Rating.aggregate([
+          { $match: { professionalId: rating.professionalId } },
+          {
+            $group: {
+              _id: null,
+              average: { $avg: "$score" },
+              count: { $sum: 1 },
+            },
+          },
+        ]);
+        await Professional.updateOne(
+          { _id: rating.professionalId },
+          {
+            $set: {
+              averageRating: Math.round((stats[0]?.average || 0) * 10) / 10,
+              ratingCount: stats[0]?.count || 0,
+            },
+          }
+        );
+      }
     }
 
     await logAdminAction({

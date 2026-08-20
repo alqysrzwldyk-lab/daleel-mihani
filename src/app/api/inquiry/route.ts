@@ -6,6 +6,7 @@ import { Transaction } from "@/models/Transaction";
 import { Notification } from "@/models/Notification";
 import { createMessageAndNotify } from "@/lib/messaging";
 import { incrementAdStat } from "@/lib/adStats";
+import { isRateLimited } from "@/lib/rateLimit";
 
 const COMMISSION_RATE = 0.05;
 
@@ -14,6 +15,10 @@ export async function POST(request: Request) {
     const auth = await getAuthFromCookies();
     if (!auth?.userId) {
       return NextResponse.json({ error: "يجب تسجيل الدخول أولاً" }, { status: 401 });
+    }
+
+    if (isRateLimited(`inquiry:${auth.userId}`, { windowMs: 60000, maxRequests: 10 })) {
+      return NextResponse.json({ error: "تم تجاوز الحد المسموح" }, { status: 429 });
     }
 
     const { adId, message } = await request.json();
@@ -34,6 +39,21 @@ export async function POST(request: Request) {
 
     const amount = ad.price || 0;
     const fee = Math.round(amount * COMMISSION_RATE);
+
+    const existingInquiry = await Transaction.findOne({
+      fromUserId: auth.userId,
+      refType: "ad",
+      refId: adId,
+      type: "payment",
+    });
+
+    if (existingInquiry) {
+      return NextResponse.json({
+        success: true,
+        message: "تم إرسال طلبك مسبقاً",
+        transaction: existingInquiry,
+      });
+    }
 
     const transaction = await Transaction.create({
       fromUserId: auth.userId,
